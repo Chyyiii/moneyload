@@ -207,6 +207,19 @@ html[data-hide] :is(.hero-bal, .hero-sub, .stat-v, .tile-val, .tile-sub, .jar-v,
 .piewrap .pc { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; pointer-events: none; }
 .piewrap .pc small { font-size: 12px; font-weight: 700; color: var(--muted); }
 .piewrap .pc b { font-size: 20px; font-weight: 800; }
+.pr { display: block; width: 100%; padding: 10px 4px; background: none; border: 0; border-bottom: 1px solid var(--line); text-align: left; font: inherit; color: inherit; cursor: pointer; transition: opacity .15s, background .15s; }
+.pr.dim { opacity: .35; }
+.pr.sel { background: var(--tint); border-radius: 12px; }
+.pr-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 14px; }
+.pr-n { display: flex; align-items: center; gap: 8px; font-weight: 700; min-width: 0; }
+.pr-n i { flex: none; width: 10px; height: 10px; border-radius: 50%; }
+.pr-v { display: flex; gap: 10px; white-space: nowrap; }
+.pr-v b { min-width: 36px; text-align: right; color: var(--muted); }
+.pr-bar { display: block; height: 8px; margin-top: 7px; border-radius: 4px; background: var(--tint); overflow: hidden; }
+.pr-bar i { display: block; height: 100%; border-radius: 4px; }
+.piewrap circle { cursor: pointer; transition: opacity .15s; }
+.piewrap .pc small { max-width: 110px; line-height: 1.2; }
+.piewrap .pc b { font-size: 18px; }
 .pieleg { display: grid; grid-template-columns: auto 1fr auto auto; gap: 10px; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
 .pieleg i { width: 12px; height: 12px; border-radius: 4px; }
 .pieleg .pp { color: var(--muted); font-weight: 600; min-width: 38px; text-align: right; }
@@ -711,6 +724,8 @@ footer p { max-width: 52ch; }
       <button type="button" class="link muted" id="svDisable">Выключить накопления</button>
     </div>
     <div class="chkwrap">
+      <label class="chk"><input type="checkbox" id="svLimGoals"><span>Учитывать взнос по целям в лимите на день</span></label>
+      <p class="hint">Если включено, ежемесячный взнос по целям заранее вычитается из денег на каждый день. Если выключено, лимит считается только от доходов, расходов и регулярных платежей.</p>
       <label class="chk"><input type="checkbox" id="svCarry"><span>Переносить остаток на следующий месяц</span></label>
       <p class="hint">Неизрасходованные деньги прибавляются к остатку нового месяца. Если включены накопления, в начале месяца приложение предложит отправить часть в копилку.</p>
     </div>
@@ -764,7 +779,7 @@ footer p { max-width: 52ch; }
       <details><summary>Поиск по записям</summary>
         <p>Строка <b>«Поиск по записям»</b> над журналом ищет по комментарию, категории и сумме во всех месяцах сразу. Над результатами видно, сколько найдено. Чтобы вернуть обычный вид, нажмите «Показать все».</p>
         <h4>Диаграмма доходов</h4>
-        <p>Кнопка с диаграммой в шапке (рядом с «глазом» и настройками) показывает, на что разошлись доходы выбранного месяца: расходы по категориям, отложенное в копилку и остаток. Для каждой части видны сумма и доля. Месяц переключается стрелками на главной.</p>
+        <p>Кнопка с диаграммой в шапке (рядом с «глазом» и настройками) показывает, на что разошлись доходы выбранного месяца: расходы по категориям, отложенное в копилку и остаток. Для каждой части видны сумма, доля и полоска. Нажмите на строку или на кусок кольца, и он подсветится, а в центре появится его название и сумма. Мелкие категории объединены в «Остальные категории». Месяц переключается стрелками на главной.</p>
         <h4>Сворачивание записей</h4>
         <p>Кнопка «Свернуть» справа от заголовка «Записи» убирает весь список в одну строку: сколько записей и на какую сумму доходов и расходов. Нажмите на эту строку или «Развернуть», чтобы вернуть список. Выбор запоминается на этом устройстве.</p>
       </details>
@@ -1009,7 +1024,7 @@ footer p { max-width: 52ch; }
   var txs = [];
   var loading = true;
   var store = { mode: 'local', col: null };
-  var settings = { on: false, plan: 0, goal: 0, carry: true, carryFrom: '', closed: '', goals: [], months: 0, goalStart: '' };
+  var settings = { on: false, plan: 0, goal: 0, carry: true, limitGoals: true, carryFrom: '', closed: '', goals: [], months: 0, goalStart: '' };
   var ui = { name: '', palette: 'emerald', mode: 'auto' };
   var selectedId = null;
   var toastTimer = null, nameTimer = null;
@@ -1189,7 +1204,7 @@ footer p { max-width: 52ch; }
     }
     var mk = /^\d{4}-\d{2}$/;
     function mo(v) { v = Math.round(Number(v)); return isFinite(v) && v > 0 ? Math.min(v, 600) : 0; }
-    return { on: o.on === true, plan: n(o.plan), goal: n(o.goal), carry: o.carry !== false, goals: cleanGoals(o.goals), months: mo(o.months), goalStart: typeof o.goalStart === 'string' && mk.test(o.goalStart) ? o.goalStart : '',
+    return { on: o.on === true, plan: n(o.plan), goal: n(o.goal), carry: o.carry !== false, limitGoals: o.limitGoals !== false, goals: cleanGoals(o.goals), months: mo(o.months), goalStart: typeof o.goalStart === 'string' && mk.test(o.goalStart) ? o.goalStart : '',
       carryFrom: typeof o.carryFrom === 'string' && mk.test(o.carryFrom) ? o.carryFrom : '',
       closed: typeof o.closed === 'string' && mk.test(o.closed) ? o.closed : '' };
   }
@@ -1197,7 +1212,7 @@ footer p { max-width: 52ch; }
     try { return cleanSettings(JSON.parse(localStorage.getItem(LS_SAVE))); } catch (e) { return cleanSettings(null); }
   }
   function saveSettings() {
-    var body = { on: settings.on, plan: settings.plan, goal: settings.goal, carry: settings.carry, carryFrom: settings.carryFrom, closed: settings.closed, goals: settings.goals, months: settings.months, goalStart: settings.goalStart };
+    var body = { on: settings.on, plan: settings.plan, goal: settings.goal, carry: settings.carry, limitGoals: settings.limitGoals, carryFrom: settings.carryFrom, closed: settings.closed, goals: settings.goals, months: settings.months, goalStart: settings.goalStart };
     if (store.mode === 'cloud') return store.col.doc('_save').set(body);
     try { localStorage.setItem(LS_SAVE, JSON.stringify(body)); } catch (e) {}
     return Promise.resolve();
@@ -1836,7 +1851,7 @@ footer p { max-width: 52ch; }
       else svm += x.amount;
     });
     inc += carryIn(ck);
-    var reserve = Math.max(0, planEff() - svm);
+    var reserve = settings.limitGoals ? reserveNow(svm) : 0;
     var upcoming = upcomingOut();
     var held = extOut();
     var avail = inc - exp - svm - reserve - upcoming - held;
@@ -1848,6 +1863,7 @@ footer p { max-width: 52ch; }
   }
   function fillSettingsInputs() {
     $('svCarry').checked = settings.carry;
+    $('svLimGoals').checked = settings.limitGoals;
   }
   function persistSettings() {
     fillSettingsInputs();
@@ -1868,9 +1884,9 @@ footer p { max-width: 52ch; }
     var s = saveStats();
     var isShort = s.short > 0.005;
     var covered = s.need > 0 ? Math.max(0, Math.min(100, s.have / s.need * 100)) : 0;
-    var lblDay = !isShort ? 'Можно сегодня' : (s.need > 0 ? 'Не хватает на платежи' : 'Расходы выше доходов');
+    var lblDay = !isShort ? 'Можно сегодня' : (s.upcoming > 0 ? (s.reserve > 0 ? 'Не хватает на платежи и цели' : 'Не хватает на платежи') : (s.reserve > 0 ? 'Не хватает на цели' : 'Расходы выше доходов'));
     var valDay = isShort ? '−' + money(Math.ceil(s.short - 0.005)) : (s.over ? '−' + money(Math.ceil(-s.left - 0.005)) : money(Math.floor(s.left + 0.005)));
-    var subDay = isShort ? (s.need > 0 ? 'покрыто ' + Math.round(covered) + '% · на сегодня 0 ₽' : 'на сегодня 0 ₽') : (s.over ? 'перерасход за сегодня' : 'лимит на день ' + money(Math.floor(s.limit + 0.005)));
+    var subDay = isShort ? (s.need > 0 ? [s.upcoming > 0 ? 'платежи ' + money(r2(s.upcoming)) : '', s.reserve > 0 ? 'цели ' + money(r2(s.reserve)) : ''].filter(Boolean).join(' · ') + ' · покрыто ' + Math.round(covered) + '%' : 'на сегодня 0 ₽') : (s.over ? 'перерасход за сегодня' : 'лимит на день ' + money(Math.floor(s.limit + 0.005)));
     var pctDay = isShort ? covered : (s.limit > 0 ? Math.min(100, s.spent / s.limit * 100) : (s.spent > 0 ? 100 : 0));
     var bad = s.over || isShort;
     var pockets = [];
@@ -1942,11 +1958,11 @@ footer p { max-width: 52ch; }
     if (s.short > 0.005) {
       var cv = s.need > 0 ? Math.max(0, Math.min(100, s.have / s.need * 100)) : 0;
       sh.hidden = false;
-      $('sShortLbl').textContent = s.need > 0 ? 'Не хватает на платежи' : 'Расходы выше доходов';
+      $('sShortLbl').textContent = s.upcoming > 0 ? (s.reserve > 0 ? 'Не хватает на платежи и цели' : 'Не хватает на платежи') : (s.reserve > 0 ? 'Не хватает на цели' : 'Расходы выше доходов');
       $('sShortV').textContent = '−' + money(Math.ceil(s.short - 0.005));
       $('sShortBar').style.width = cv + '%';
       var need = [];
-      if (s.reserve > 0) need.push('отложить ' + money(r2(s.reserve)));
+      if (s.reserve > 0) need.push('отложить по целям ' + money(r2(s.reserve)));
       if (s.upcoming > 0) need.push('оплатить регулярные платежи ' + money(r2(s.upcoming)));
       $('sShortNote').textContent = s.need > 0
         ? 'Нужно ' + need.join(' и ') + '. Свободно ' + money(r2(Math.max(0, s.have))) + ', покрыто ' + Math.round(cv) + '%.'
@@ -1958,6 +1974,11 @@ footer p { max-width: 52ch; }
 
   $('tiles').addEventListener('click', function (e) {
     if (e.target.closest('[data-open="save"]')) openOv('ovSave');
+  });
+  $('svLimGoals').addEventListener('change', function () {
+    settings.limitGoals = $('svLimGoals').checked;
+    persistSettings();
+    toast(settings.limitGoals ? 'Взнос по целям учитывается в лимите' : 'Лимит считается без взноса по целям');
   });
   $('svCarry').addEventListener('change', function () {
     settings.carry = $('svCarry').checked;
@@ -2011,6 +2032,24 @@ footer p { max-width: 52ch; }
     if (!id) return needPerMonth(settings.goal, pocketBal('') - pocketMonthDeposits(''), settings.months, settings.goalStart);
     var g = settings.goals.filter(function (x) { return x.id === id; })[0];
     return g ? needPerMonth(g.target, goalSaved(id) - pocketMonthDeposits(id), g.months, g.start) : 0;
+  }
+  // Сколько ещё нужно отложить в этом месяце: по каждой копилке отдельно, переводы между копилками не засчитываются
+  function pocketFresh(id) {
+    var ck = curKey(), sum = 0, ids = settings.goals.map(function (g) { return g.id; });
+    txs.forEach(function (t) {
+      if (t.type !== 'save' || t.date.slice(0, 7) !== ck || (t.note || '').indexOf('Перевод ') === 0) return;
+      var inP = id ? t.goalId === id : (!t.goalId || ids.indexOf(t.goalId) < 0);
+      if (inP) sum += t.amount;
+    });
+    return Math.max(0, r2(sum));
+  }
+  function reserveNow(svm) {
+    var ids = [''].concat(settings.goals.map(function (g) { return g.id; })), any = false, sum = 0;
+    ids.forEach(function (id) {
+      var pl = planFor(id);
+      if (pl > 0) { any = true; sum += Math.max(0, pl - pocketFresh(id)); }
+    });
+    return any ? sum : Math.max(0, settings.plan - svm);
   }
   function planEff() {
     var sum = planFor('');
@@ -2253,7 +2292,7 @@ footer p { max-width: 52ch; }
       if (t.recId) o.recId = t.recId;
       if (t.goalId) o.goalId = t.goalId;
       return o;
-    }), cats: catsBody(), save: { on: settings.on, plan: settings.plan, goal: settings.goal, carry: settings.carry, carryFrom: settings.carryFrom, closed: settings.closed, goals: settings.goals, months: settings.months, goalStart: settings.goalStart },
+    }), cats: catsBody(), save: { on: settings.on, plan: settings.plan, goal: settings.goal, carry: settings.carry, limitGoals: settings.limitGoals, carryFrom: settings.carryFrom, closed: settings.closed, goals: settings.goals, months: settings.months, goalStart: settings.goalStart },
       tpl: { items: tpl.items }, ui: { name: ui.name.trim(), palette: ui.palette, mode: ui.mode }, rec: { items: rec.items } };
   }
   function downloadText(name, text) {
@@ -2707,7 +2746,7 @@ footer p { max-width: 52ch; }
     var names = Object.keys(by).sort(function (a, b) { return by[b] - by[a]; });
     var segs = [], other = 0;
     names.forEach(function (n, i) {
-      if (i < 6) segs.push({ name: n, icon: iconFor('out', n), v: by[n], c: PIE_COLORS[i] });
+      if (i < 5 && by[n] / base >= 0.04) segs.push({ name: n, icon: iconFor('out', n), v: by[n], c: PIE_COLORS[i] });
       else other += by[n];
     });
     if (other > 0) segs.push({ name: 'Остальные категории', icon: '', v: r2(other), c: PIE_COLORS[7] });
@@ -2715,19 +2754,47 @@ footer p { max-width: 52ch; }
     var rest = r2(inc - spend);
     if (rest > 0.005) segs.push({ name: 'Остаток', icon: '', v: rest, c: '#B8C4BF' });
     var acc = 0, circ = '';
-    segs.forEach(function (g) {
+    pieSegs = segs; pieBase = base; pieInc = inc > 0 ? inc : spend; pieLbl = inc > 0 ? 'Доходы' : 'Расходы'; pieSel = -1;
+    segs.forEach(function (g, gi) {
       var p = g.v / base * 100;
-      circ += '<circle cx="21" cy="21" r="15.9155" fill="none" stroke="' + g.c + '" stroke-width="6" stroke-dasharray="' + Math.max(0, p - 0.4).toFixed(3) + ' ' + (100 - Math.max(0, p - 0.4)).toFixed(3) + '" stroke-dashoffset="' + (-acc).toFixed(3) + '"/>';
+      circ += '<circle data-i="' + gi + '" cx="21" cy="21" r="15.9155" fill="none" stroke="' + g.c + '" stroke-width="6" stroke-dasharray="' + Math.max(0, p - 0.4).toFixed(3) + ' ' + (100 - Math.max(0, p - 0.4)).toFixed(3) + '" stroke-dashoffset="' + (-acc).toFixed(3) + '"/>';
       acc += p;
     });
-    wrap.innerHTML = '<svg viewBox="0 0 42 42" role="img" aria-label="Диаграмма распределения доходов">' + circ + '</svg><div class="pc"><small>' + (inc > 0 ? 'Доходы' : 'Расходы') + '</small><b class="amt">' + money(inc > 0 ? inc : spend) + '</b></div>';
-    leg.innerHTML = segs.map(function (g) {
-      return '<div class="pieleg"><i style="background:' + g.c + '"></i><span>' + (g.icon ? esc(g.icon) + ' ' : '') + esc(g.name) + '</span><span class="amt">' + money(g.v) + '</span><span class="pp">' + Math.round(g.v / base * 100) + '%</span></div>';
+    wrap.innerHTML = '<svg viewBox="0 0 42 42" role="img" aria-label="Диаграмма распределения доходов">' + circ + '</svg><div class="pc"><small id="pcL"></small><b class="amt" id="pcV"></b></div>';
+    var mx = Math.max.apply(null, segs.map(function (g) { return g.v; }));
+    leg.innerHTML = segs.map(function (g, gi) {
+      var pc = g.v / base * 100;
+      return '<button type="button" class="pr" data-i="' + gi + '"><span class="pr-top"><span class="pr-n"><i style="background:' + g.c + '"></i>' + (g.icon ? esc(g.icon) + ' ' : '') + esc(g.name) + '</span><span class="pr-v"><span class="amt">' + money(g.v) + '</span><b>' + (pc < 1 ? '<1' : Math.round(pc)) + '%</b></span></span><span class="pr-bar"><i style="width:' + (g.v / mx * 100).toFixed(1) + '%;background:' + g.c + '"></i></span></button>';
     }).join('');
+    pieShow();
     if (inc <= 0) note.textContent = 'В этом месяце нет доходов, проценты считаются от суммы расходов.';
     else if (spend > inc + 0.005) note.textContent = 'Расходы и накопления больше доходов месяца на ' + money(r2(spend - inc)) + ': часть оплачена остатком прошлых месяцев.';
     else note.textContent = 'Доли считаются от доходов месяца. Остаток прошлых месяцев сюда не входит.';
   }
+  var pieSegs = [], pieBase = 0, pieInc = 0, pieLbl = '', pieSel = -1;
+  function pieShow() {
+    var g = pieSel >= 0 ? pieSegs[pieSel] : null;
+    var L = $('pcL'), V = $('pcV');
+    if (!L || !V) return;
+    L.textContent = g ? g.name : pieLbl;
+    V.textContent = money(g ? g.v : pieInc);
+    Array.prototype.forEach.call($('pieWrap').querySelectorAll('circle'), function (c) {
+      c.style.opacity = g && +c.getAttribute('data-i') !== pieSel ? '0.22' : '1';
+    });
+    Array.prototype.forEach.call($('pieLeg').querySelectorAll('.pr'), function (r) {
+      r.classList.toggle('sel', +r.getAttribute('data-i') === pieSel);
+      r.classList.toggle('dim', !!g && +r.getAttribute('data-i') !== pieSel);
+    });
+  }
+  function pieTap(e) {
+    var el = e.target.closest('[data-i]');
+    if (!el) return;
+    var i = +el.getAttribute('data-i');
+    pieSel = pieSel === i ? -1 : i;
+    pieShow();
+  }
+  $('pieLeg').addEventListener('click', pieTap);
+  $('pieWrap').addEventListener('click', pieTap);
   $('pie').addEventListener('click', function () { renderPie(); openOv('ovPie'); });
   function renderCmp() {
     var arr = [], max = 0;
