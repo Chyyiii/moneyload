@@ -188,6 +188,10 @@ html[data-hide] .eye .slash { display: block; }
 html[data-hide] :is(.hero-bal, .hero-sub, .stat-v, .tile-val, .tile-sub, .jar-v, .amt, .amt-n, .cmp-v, .remind b, .fbar span, .short-v, .goalv, .prow) { filter: blur(9px); }
 .remind { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 16px; background: var(--tint); border-left: 4px solid #D9A93B; font-size: 14px; }
 .remind b { font-weight: 700; }
+.bkrem { border-left-color: var(--brand); }
+.bkrem[hidden] { display: none; }
+.bkrem-b { display: flex; gap: 8px; }
+.bkrem-b button { flex: 1; height: 40px; border-radius: 12px; font-size: 14px; }
 .tile.wide { grid-column: 1 / -1; }
 .search { margin-bottom: 10px; }
 .goal { padding: 12px 0; border-bottom: 1px solid var(--line); }
@@ -372,6 +376,32 @@ footer p { max-width: 52ch; }
 .fab span { font-size: 24px; line-height: 0.8; font-weight: 600; }
 
 /* Окна снизу */
+.tour { position: fixed; inset: 0; z-index: 90; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(8, 14, 12, .72); }
+.tour[hidden] { display: none; }
+.tour-card { position: relative; width: 100%; max-width: 400px; max-height: calc(100vh - 32px); overflow: auto; background: var(--bg); color: var(--ink); border-radius: 26px; padding: 22px 20px 18px; box-shadow: 0 20px 60px rgba(0,0,0,.4); outline: none; animation: tourIn .25s ease; }
+@keyframes tourIn { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
+.tour-skip { position: absolute; top: 14px; right: 16px; background: none; border: 0; color: var(--muted); font-weight: 700; font-size: 13px; padding: 4px; cursor: pointer; }
+.tour-vis { display: grid; place-items: center; min-height: 150px; margin: 18px 0 14px; }
+.tour-card h2 { font-size: 22px; line-height: 1.2; margin: 0 0 8px; }
+.tour-card p { margin: 0; font-size: 15px; line-height: 1.45; color: var(--muted); }
+.tour-dots { display: flex; justify-content: center; gap: 6px; margin: 18px 0 14px; }
+.tour-dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--line); transition: width .2s, background .2s; }
+.tour-dots i.on { width: 20px; border-radius: 4px; background: var(--brand); }
+.tm { width: 100%; max-width: 280px; border-radius: 18px; padding: 14px; background: var(--tint); border: 1px solid var(--line); text-align: left; }
+.tm.hero { background: var(--brand); color: var(--brand-ink); border: 0; }
+.tm small { display: block; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; opacity: .75; }
+.tm b.big { display: block; font-size: 30px; font-weight: 800; margin: 2px 0 8px; }
+.tm .chips { display: flex; gap: 6px; }
+.tm .chips span { flex: 1; border-radius: 10px; padding: 6px 8px; background: rgba(255,255,255,.14); font-size: 12px; font-weight: 700; }
+.tm .bar { height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; margin: 8px 0 6px; }
+.tm .bar i { display: block; height: 100%; background: var(--gold); border-radius: 4px; }
+.tm .row { display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.tm .row:last-child { border-bottom: 0; }
+.tm .fab { display: inline-block; padding: 12px 22px; border-radius: 999px; background: var(--brand); color: var(--brand-ink); font-weight: 800; font-size: 16px; }
+.tm .ring { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto; background: conic-gradient(#2E7D6B 0 38%, #C0392B 0 57%, #3F6FB5 0 68%, #D4A017 0 80%, #B8C4BF 0 100%); -webkit-mask: radial-gradient(circle 36px, transparent 98%, #000 100%); mask: radial-gradient(circle 36px, transparent 98%, #000 100%); }
+.tour-icon { width: 128px; height: 128px; border-radius: 29px; box-shadow: 0 14px 34px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.25); }
+.tm.plain { background: none; border: 0; padding: 0; text-align: center; }
+.tm .ico { font-size: 64px; line-height: 1; }
 .overlay { position: fixed; inset: 0; z-index: 40; display: flex; align-items: flex-end; justify-content: center; }
 .backdrop { position: absolute; inset: 0; background: rgba(6, 14, 11, 0.55); opacity: 0; transition: opacity 0.2s ease; }
 .sheet {
@@ -561,6 +591,10 @@ footer p { max-width: 52ch; }
   </header>
 
   <div class="remind" id="remind" hidden></div>
+  <div class="remind bkrem" id="bkRemind" hidden>
+    <div id="bkRemT"></div>
+    <div class="bkrem-b"><button type="button" class="primary" id="bkRemSave">Сохранить копию</button><button type="button" class="secondary" id="bkRemLater">Напомнить завтра</button></div>
+  </div>
   <div class="tiles" id="tiles"></div>
 
   <div class="tiles" id="quick">
@@ -585,6 +619,7 @@ footer p { max-width: 52ch; }
     <p id="storeNote"></p>
     <button type="button" class="link muted" id="clearEx" hidden>Убрать примеры</button>
     <button type="button" class="secondary helpbtn" id="helpBtn">Руководство пользователя</button>
+    <button type="button" class="secondary helpbtn" id="tourBtn" style="margin-top:10px">Показать обучение</button>
   </footer>
 </main>
 
@@ -835,18 +870,35 @@ footer p { max-width: 52ch; }
       </details>
       <details><summary>Резервная копия</summary>
         <p>В окне оформления есть <b>«Сохранить копию»</b> и <b>«Загрузить копию»</b>. Копия — это файл со всеми записями, категориями, целями, регулярными платежами и настройками.</p>
-        <p><b>Делайте копию регулярно</b>, например раз в неделю и всегда перед очисткой браузера или сменой телефона. При загрузке записи добавляются к текущим, одинаковые заменяются.</p>
+        <p><b>Делайте копию регулярно</b>, например раз в неделю и всегда перед очисткой браузера или сменой телефона. Если с последней копии прошло 5 дней и больше, на главном экране появится напоминание с кнопкой «Сохранить копию» и вариантом «Напомнить завтра». При загрузке записи добавляются к текущим, одинаковые заменяются.</p>
       </details>
       <details><summary>Где хранятся данные</summary>
         <p>Все записи, категории, цели и настройки хранятся только в браузере на этом устройстве. Другим людям они не видны.</p>
         <p>Что из этого следует: если очистить данные сайта или историю браузера, записи пропадут. На другом телефоне или компьютере их не будет, пока вы не перенесёте их через резервную копию.</p>
         <p><b>Обязательно делайте резервную копию</b>: «Сохранить копию» в окне оформления (значок с ползунками в шапке). Храните файл в «Файлах» или отправьте себе в мессенджер. Лучше делать копию раз в неделю и перед любой очисткой браузера.</p>
       </details>
+      <details><summary>Обучение</summary>
+        <p>При первом открытии приложение показывает короткое обучение из нескольких слайдов. Листайте кнопками «Далее» и «Назад» или свайпом, «Пропустить» закрывает его. Запустить обучение снова можно кнопкой <b>«Показать обучение»</b> внизу главного экрана.</p>
+      </details>
       <details><summary>Иконка на экране «Домой» (iPhone)</summary>
         <p>В Safari откройте страницу, нажмите «Поделиться» и выберите «На экран „Домой“». Если иконка уже была добавлена раньше, удалите её и добавьте заново.</p>
       </details>
     </div>
     <div class="stack" style="margin-top:14px"><button type="button" class="primary" data-close>Понятно</button></div>
+  </div>
+</div>
+
+<div class="tour" id="tour" hidden role="dialog" aria-modal="true" aria-labelledby="tourT">
+  <div class="tour-card" id="tourCard" tabindex="-1">
+    <button type="button" class="tour-skip" id="tourSkip">Пропустить</button>
+    <div class="tour-vis" id="tourVis"></div>
+    <h2 id="tourT"></h2>
+    <p id="tourP"></p>
+    <div class="tour-dots" id="tourDots" aria-hidden="true"></div>
+    <div class="btnrow">
+      <button type="button" class="secondary" id="tourBack">Назад</button>
+      <button type="button" class="primary" id="tourNext">Далее</button>
+    </div>
   </div>
 </div>
 
@@ -1566,6 +1618,81 @@ footer p { max-width: 52ch; }
     syncEye();
   });
   $('helpBtn').addEventListener('click', function () { openOv('ovHelp'); });
+
+  /* Обучение */
+  var tourI = 0, tourOpen = false, tourLast = null;
+  function tourSlides() {
+    var nm = ui.name.trim() || DEFAULT_NAME;
+    return [
+      { v: '<div class="tm plain"><div class="ico">🪙</div></div>', t: 'Добро пожаловать в «' + esc(nm) + '»', p: 'Личная касса: доходы, расходы, накопления и лимит на каждый день. За минуту покажу, как всё устроено.' },
+      { v: '<div class="tm plain"><span class="fab">＋ Запись</span></div>', t: 'Записывайте доходы и расходы', p: 'Нажмите «Запись», введите сумму и выберите категорию. Один платёж можно разделить по нескольким категориям, а частые траты сохранить как быстрые записи.' },
+      { v: '<div class="tm hero"><small>Остаток за месяц</small><b class="big">20 000 ₽</b><div class="chips"><span>Доходы<br>80 000</span><span>Расходы<br>50 000</span><span>Отложено<br>10 000</span></div></div>', t: 'Остаток месяца всегда на виду', p: 'Месяц переключается стрелками. Неизрасходованное можно переносить дальше, а кнопка с глазом прячет суммы от посторонних глаз.' },
+      { v: '<div class="tm"><small>Можно сегодня</small><b class="big" style="margin-bottom:4px">2 500 ₽</b><div class="bar"><i style="width:40%;background:var(--brand)"></i></div><small style="text-transform:none;letter-spacing:0">лимит на день 2 500 ₽</small></div>', t: 'Сколько можно тратить сегодня', p: 'Приложение делит остаток на оставшиеся дни и вычитает ближайшие платежи. Включите накопления в плитке, и лимит появится на главном экране.' },
+      { v: '<div class="tm"><div class="row"><span>Отпуск</span><span style="color:var(--gold)">40%</span></div><div class="bar"><i style="width:40%"></i></div><small style="text-transform:none;letter-spacing:0">Откладывайте 10 000 ₽ в месяц · осталось 6 мес.</small></div>', t: 'Копилка и цели', p: 'Задайте сумму цели и за сколько месяцев её накопить, а приложение посчитает ежемесячный взнос. Деньги можно переводить между копилкой и целями.' },
+      { v: '<div class="tm"><div class="row"><span>🏠 Аренда</span><span>25 000 ₽</span></div><div class="row"><span>💳 Кредит</span><span>7 520 ₽</span></div><div class="row"><span>📱 Связь</span><span>600 ₽</span></div></div>', t: 'Регулярные платежи', p: 'Аренда, кредит, подписки: укажите сумму и день месяца, и запись сама появится в журнале. Если деньги уже отложены на другом счёте или придут позже, отметьте это галочкой.' },
+      { v: '<div class="tm plain"><div class="ring"></div></div>', t: 'Куда уходят деньги', p: 'Кнопка с диаграммой в шапке показывает, на что разошлись доходы. Нажмите на категорию, и в журнале останутся только её траты. Ещё есть поиск и сравнение месяцев.' },
+      { v: '<div class="tm plain"><div class="ico">💾</div></div>', t: 'Сохраните свои данные', p: 'Записи хранятся только в браузере этого устройства. Делайте резервную копию в окне оформления (значок с ползунками), хотя бы раз в несколько дней.' },
+      { v: '<div class="tm"><div class="row"><span>📖 Руководство пользователя</span><span>›</span></div><div class="row"><span>🎓 Показать обучение</span><span>›</span></div></div>', t: 'Руководство всегда под рукой', p: 'Внизу главного экрана есть кнопка «Руководство пользователя»: в нём по разделам описано всё, что умеет приложение. Рядом кнопка «Показать обучение», если захотите пройти его снова.' }
+    ];
+  }
+  function tourRender() {
+    var sl = tourSlides(), n = sl.length, c = sl[tourI];
+    $('tourVis').innerHTML = c.v;
+    $('tourT').innerHTML = c.t;
+    $('tourP').textContent = c.p;
+    $('tourDots').innerHTML = sl.map(function (x, k) { return '<i class="' + (k === tourI ? 'on' : '') + '"></i>'; }).join('');
+    $('tourBack').style.visibility = tourI === 0 ? 'hidden' : 'visible';
+    $('tourNext').textContent = tourI === n - 1 ? 'Начать' : 'Далее';
+    var card = $('tourCard');
+    card.style.animation = 'none'; void card.offsetWidth; card.style.animation = '';
+  }
+  function tourStart() {
+    if (tourOpen) return;
+    tourOpen = true; tourI = 0; tourLast = document.activeElement;
+    tourRender();
+    $('tour').hidden = false;
+    document.body.style.overflow = 'hidden';
+    setTimeout(function () { $('tourCard').focus(); }, 30);
+  }
+  function tourEnd() {
+    if (!tourOpen) return;
+    tourOpen = false;
+    $('tour').hidden = true;
+    if (!openId) document.body.style.overflow = '';
+    try { localStorage.setItem('kassa-tour', '1'); } catch (e) {}
+    if (tourLast && tourLast.focus) tourLast.focus();
+  }
+  function tourGo(d) {
+    var n = tourSlides().length, k = tourI + d;
+    if (k >= n) { tourEnd(); return; }
+    if (k < 0) return;
+    tourI = k; tourRender();
+  }
+  $('tourNext').addEventListener('click', function () { tourGo(1); });
+  $('tourBack').addEventListener('click', function () { tourGo(-1); });
+  $('tourSkip').addEventListener('click', tourEnd);
+  $('tourBtn').addEventListener('click', tourStart);
+  document.addEventListener('keydown', function (e) {
+    if (!tourOpen) return;
+    if (e.key === 'Escape') { e.stopPropagation(); tourEnd(); }
+    else if (e.key === 'ArrowRight') tourGo(1);
+    else if (e.key === 'ArrowLeft') tourGo(-1);
+  }, true);
+  (function () {
+    var tx = null;
+    var card = $('tourCard');
+    card.addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; }, { passive: true });
+    card.addEventListener('touchend', function (e) {
+      if (tx === null) return;
+      var dx = e.changedTouches[0].clientX - tx; tx = null;
+      if (Math.abs(dx) > 50) tourGo(dx < 0 ? 1 : -1);
+    }, { passive: true });
+  })();
+  setTimeout(function () {
+    var seen = true;
+    try { seen = localStorage.getItem('kassa-tour') === '1'; } catch (e) { seen = true; }
+    if (!seen) tourStart();
+  }, 700);
 
   /* Категории и значки */
   function curIcon() {
@@ -2321,7 +2448,7 @@ footer p { max-width: 52ch; }
     try {
       var dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null;
       if (dl) {
-        try { await dl.save({ filename: name, data: json }); toast('Копия сохранена'); }
+        try { await dl.save({ filename: name, data: json }); markBackup(); toast('Копия сохранена'); }
         catch (e) { if (!e || e.code !== 'declined') toast('Не удалось сохранить копию'); }
         return;
       }
@@ -2329,12 +2456,13 @@ footer p { max-width: 52ch; }
     var file = null;
     try { file = new File([json], name, { type: 'application/json' }); } catch (e) {}
     if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-      navigator.share({ files: [file], title: 'Кассовая книга' }).then(function () { toast('Копия готова'); }).catch(function (e) {
+      navigator.share({ files: [file], title: 'Кассовая книга' }).then(function () { markBackup(); toast('Копия готова'); }).catch(function (e) {
         if (e && e.name === 'AbortError') return;
-        downloadText(name, json); toast('Копия сохранена в загрузки');
+        downloadText(name, json); markBackup(); toast('Копия сохранена в загрузки');
       });
     } else {
       downloadText(name, json);
+      markBackup();
       toast('Копия сохранена в загрузки');
     }
   });
@@ -2862,8 +2990,25 @@ footer p { max-width: 52ch; }
     box.innerHTML = lines.slice(0, 3).map(function (l) { return '<div>' + l.html + '</div>'; }).join('');
     box.hidden = !lines.length;
   }
+  var BK_DAYS = 5;
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, String(v)); } catch (e) {} }
+  function markBackup() { lsSet('kassa-bk-last', Date.now()); lsSet('kassa-bk-snooze', 0); renderBkRemind(); }
+  function renderBkRemind() {
+    var box = $('bkRemind');
+    if (loading || !txs.some(function (t) { return !t.example; })) { box.hidden = true; return; }
+    var now = Date.now(), last = +lsGet('kassa-bk-last') || 0;
+    if (!last) { lsSet('kassa-bk-last', now); box.hidden = true; return; }
+    var days = Math.floor((now - last) / 86400000);
+    if (days < BK_DAYS || now < (+lsGet('kassa-bk-snooze') || 0)) { box.hidden = true; return; }
+    $('bkRemT').innerHTML = '<b>Пора сохранить резервную копию.</b> С последней копии прошло ' + days + ' дн. Записи хранятся только в браузере, поэтому лучше не откладывать.';
+    box.hidden = false;
+  }
+  $('bkRemSave').addEventListener('click', function () { $('bkSave').click(); });
+  $('bkRemLater').addEventListener('click', function () { lsSet('kassa-bk-snooze', Date.now() + 86400000); renderBkRemind(); toast('Напомню завтра'); });
   function renderQuick() {
     renderRemind();
+    renderBkRemind();
     var key = view.y + '-' + pad(view.m + 1);
     var set = CATS.out.filter(function (c) { return CATS.limits[c] > 0; });
     var over = set.filter(function (c) { return catSpent(c, key) > CATS.limits[c] + 0.005; }).length;
