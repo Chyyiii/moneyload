@@ -725,7 +725,7 @@ footer p { max-width: 52ch; }
     </div>
     <div class="chkwrap">
       <label class="chk"><input type="checkbox" id="svLimGoals"><span>Учитывать взнос по целям в лимите на день</span></label>
-      <p class="hint">Если включено, ежемесячный взнос по целям заранее вычитается из денег на каждый день. Если выключено, лимит считается только от доходов, расходов и регулярных платежей.</p>
+      <p class="hint">Если выключено (по умолчанию), лимит на день считается от остатка с учётом регулярных платежей, а взнос по целям показывается отдельной строкой. Если включено, взнос по целям заранее вычитается из денег на каждый день, и лимит может стать нулевым.</p>
       <label class="chk"><input type="checkbox" id="svCarry"><span>Переносить остаток на следующий месяц</span></label>
       <p class="hint">Неизрасходованные деньги прибавляются к остатку нового месяца. Если включены накопления, в начале месяца приложение предложит отправить часть в копилку.</p>
     </div>
@@ -1024,7 +1024,7 @@ footer p { max-width: 52ch; }
   var txs = [];
   var loading = true;
   var store = { mode: 'local', col: null };
-  var settings = { on: false, plan: 0, goal: 0, carry: true, limitGoals: true, carryFrom: '', closed: '', goals: [], months: 0, goalStart: '' };
+  var settings = { on: false, plan: 0, goal: 0, carry: true, limitGoals: false, carryFrom: '', closed: '', goals: [], months: 0, goalStart: '' };
   var ui = { name: '', palette: 'emerald', mode: 'auto' };
   var selectedId = null;
   var toastTimer = null, nameTimer = null;
@@ -1204,7 +1204,7 @@ footer p { max-width: 52ch; }
     }
     var mk = /^\d{4}-\d{2}$/;
     function mo(v) { v = Math.round(Number(v)); return isFinite(v) && v > 0 ? Math.min(v, 600) : 0; }
-    return { on: o.on === true, plan: n(o.plan), goal: n(o.goal), carry: o.carry !== false, limitGoals: o.limitGoals !== false, goals: cleanGoals(o.goals), months: mo(o.months), goalStart: typeof o.goalStart === 'string' && mk.test(o.goalStart) ? o.goalStart : '',
+    return { on: o.on === true, plan: n(o.plan), goal: n(o.goal), carry: o.carry !== false, limitGoals: o.limitGoals === true, goals: cleanGoals(o.goals), months: mo(o.months), goalStart: typeof o.goalStart === 'string' && mk.test(o.goalStart) ? o.goalStart : '',
       carryFrom: typeof o.carryFrom === 'string' && mk.test(o.carryFrom) ? o.carryFrom : '',
       closed: typeof o.closed === 'string' && mk.test(o.closed) ? o.closed : '' };
   }
@@ -1851,14 +1851,15 @@ footer p { max-width: 52ch; }
       else svm += x.amount;
     });
     inc += carryIn(ck);
-    var reserve = settings.limitGoals ? reserveNow(svm) : 0;
+    var goalsNeed = reserveNow(svm);
+    var reserve = settings.limitGoals ? goalsNeed : 0;
     var upcoming = upcomingOut();
     var held = extOut();
     var avail = inc - exp - svm - reserve - upcoming - held;
     var days = new Date(t.getFullYear(), t.getMonth() + 1, 0).getDate() - t.getDate() + 1;
     var limit = Math.max(0, (avail + spent) / days);
     var left = limit - spent;
-    return { total: total, spent: spent, reserve: reserve, upcoming: upcoming, avail: avail, days: days, limit: limit, left: left, over: left < -0.005,
+    return { total: total, spent: spent, reserve: reserve, goalsNeed: goalsNeed, upcoming: upcoming, avail: avail, days: days, limit: limit, left: left, over: left < -0.005,
       need: reserve + upcoming, have: inc - exp - svm, held: held, short: Math.max(0, -(avail + held)) };
   }
   function fillSettingsInputs() {
@@ -1907,7 +1908,8 @@ footer p { max-width: 52ch; }
       '<button type="button" class="tile" data-open="save"><span class="tile-lbl">' + esc(lblDay) + '</span>' +
       '<span class="tile-val' + (bad ? ' over' : '') + '">' + valDay + '</span>' +
       '<span class="mini"><i class="' + (bad ? 'over' : '') + '" data-w="' + pctDay.toFixed(1) + '"></i></span>' +
-      '<span class="tile-sub">' + esc(subDay) + '</span></button>' +
+      '<span class="tile-sub">' + esc(subDay) + '</span>' +
+      (!settings.limitGoals && s.goalsNeed > 0.005 ? '<span class="tile-sub">по целям ещё ' + money(r2(s.goalsNeed)) + '</span>' : '') + '</button>' +
       '<button type="button" class="tile" data-open="save"><span class="tile-lbl">В копилке</span>' +
       '<span class="tile-val gold">' + money(r2(s.total)) + '</span>' +
       jarHtml + '</button>';
@@ -1950,6 +1952,7 @@ footer p { max-width: 52ch; }
       'дней до конца месяца: ' + s.days
     ];
     if (s.reserve > 0) parts.push('отложить ещё ' + money(r2(s.reserve)));
+    else if (s.goalsNeed > 0.005) parts.push('по целям ещё ' + money(r2(s.goalsNeed)) + ' (в лимите не учтено)');
     if (s.upcoming > 0) parts.push('впереди регулярные платежи ' + money(r2(s.upcoming)));
     var txt = parts.join(' · ') + '.';
     if (s.short > 0.005) txt += ' Лимит на сегодня нулевой.';
