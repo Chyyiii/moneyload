@@ -668,6 +668,22 @@ footer p { max-width: 52ch; }
           <button type="button" data-m="dark" aria-pressed="false">Тёмный</button>
         </div>
       </div>
+      <div class="field">
+        <span class="lbl" id="lblBk">Резервная копия</span>
+        <p class="hint">Файл со всеми записями, категориями и настройками. Сохраните его в «Файлы» или отправьте себе в мессенджер. Из него можно восстановить данные на любом устройстве.</p>
+        <div class="qrow">
+          <button type="button" class="qbtn" id="bkSave">Сохранить копию</button>
+          <button type="button" class="qbtn" id="bkLoad">Загрузить копию</button>
+        </div>
+        <input type="file" id="bkFile" accept=".json,application/json" hidden>
+        <div id="bkInfo" hidden>
+          <p class="hint" id="bkText"></p>
+          <div class="qrow">
+            <button type="button" class="qbtn" id="bkGo">Загрузить</button>
+            <button type="button" class="qbtn" id="bkNo">Отмена</button>
+          </div>
+        </div>
+      </div>
       <button type="button" class="primary" data-close>Готово</button>
     </div>
   </div>
@@ -1509,6 +1525,110 @@ footer p { max-width: 52ch; }
     settings.goal = goal;
     persistSettings();
     toast('Сохранено');
+  });
+
+  /* Резервная копия */
+  var bkPending = null;
+  function buildBackup() {
+    return { app: 'kassa', v: 1, at: new Date().toISOString(), txs: txs.filter(function (t) { return !t.example; }).map(function (t) {
+      var o = { id: t.id, type: t.type, cat: t.cat, amount: t.amount, date: t.date, note: t.note || '', createdAt: t.createdAt || 0 };
+      if (t.auto) o.auto = true;
+      if (t.recId) o.recId = t.recId;
+      return o;
+    }), cats: catsBody(), save: { on: settings.on, plan: settings.plan, goal: settings.goal, carry: settings.carry, carryFrom: settings.carryFrom, closed: settings.closed },
+      ui: { name: ui.name.trim(), palette: ui.palette, mode: ui.mode }, rec: { items: rec.items } };
+  }
+  function downloadText(name, text) {
+    var blob = new Blob([text], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+  }
+  $('bkSave').addEventListener('click', async function () {
+    var json = JSON.stringify(buildBackup(), null, 1), name = 'kassa-' + dateStr(new Date()) + '.json';
+    try {
+      var dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null;
+      if (dl) {
+        try { await dl.save({ filename: name, data: json }); toast('Копия сохранена'); }
+        catch (e) { if (!e || e.code !== 'declined') toast('Не удалось сохранить копию'); }
+        return;
+      }
+    } catch (e) {}
+    var file = null;
+    try { file = new File([json], name, { type: 'application/json' }); } catch (e) {}
+    if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], title: 'Кассовая книга' }).then(function () { toast('Копия готова'); }).catch(function (e) {
+        if (e && e.name === 'AbortError') return;
+        downloadText(name, json); toast('Копия сохранена в загрузки');
+      });
+    } else {
+      downloadText(name, json);
+      toast('Копия сохранена в загрузки');
+    }
+  });
+  $('bkLoad').addEventListener('click', function () { $('bkFile').value = ''; $('bkFile').click(); });
+  $('bkNo').addEventListener('click', function () { bkPending = null; $('bkInfo').hidden = true; });
+  $('bkFile').addEventListener('change', function () {
+    var f = this.files && this.files[0];
+    if (!f) return;
+    var r = new FileReader();
+    r.onload = function () {
+      try {
+        var b = JSON.parse(String(r.result));
+        if (!b || b.app !== 'kassa' || !Array.isArray(b.txs)) throw new Error('bad');
+        var list = [];
+        b.txs.forEach(function (t) {
+          if (list.length >= 20000 || !valid(t) || typeof t.id !== 'string' || !/^[A-Za-z0-9_-]{1,64}$/.test(t.id) || t.id.charAt(0) === '_') return;
+          var o = { id: t.id, type: t.type, cat: t.cat.slice(0, 30), amount: r2(t.amount), date: t.date, note: typeof t.note === 'string' ? t.note.slice(0, 60) : '', createdAt: Number(t.createdAt) || 0 };
+          if (t.auto === true) o.auto = true;
+          if (typeof t.recId === 'string' && /^[A-Za-z0-9]{1,24}$/.test(t.recId)) o.recId = t.recId;
+          list.push(o);
+        });
+        bkPending = { txs: list, cats: b.cats, save: b.save, ui: b.ui, rec: b.rec };
+        $('bkText').textContent = 'В копии ' + list.length + ' записей' + (b.at ? ' от ' + new Date(b.at).toLocaleDateString('ru-RU') : '') + '. Записи добавятся к текущим (одинаковые заменятся). Категории, регулярные платежи и настройки будут взяты из копии.';
+        $('bkInfo').hidden = false;
+      } catch (e) {
+        bkPending = null; $('bkInfo').hidden = true;
+        toast('Это не файл копии «Кассовой книги»');
+      }
+    };
+    r.onerror = function () { toast('Не удалось прочитать файл'); };
+    r.readAsText(f);
+  });
+  $('bkGo').addEventListener('click', async function () {
+    var b = bkPending;
+    if (!b) return;
+    bkPending = null;
+    $('bkInfo').hidden = true;
+    try {
+      if (store.mode === 'cloud') {
+        for (var i = 0; i < b.txs.length; i += 20) {
+          await Promise.all(b.txs.slice(i, i + 20).map(function (t) { return addTx(t); }));
+        }
+      } else {
+        var map = {};
+        txs.forEach(function (t) { map[t.id] = t; });
+        b.txs.forEach(function (t) { map[t.id] = t; });
+        txs = Object.keys(map).map(function (k) { return map[k]; });
+        lsSave();
+      }
+      CATS = cleanCats(b.cats);
+      settings = cleanSettings(b.save);
+      ui = cleanUi(b.ui);
+      rec = cleanRec(b.rec);
+      applyUi(); renderUiSheet(); fillSettingsInputs();
+      changeCats();
+      persistSettings();
+      persistUi();
+      persistRec();
+      render();
+      toast('Копия загружена: ' + b.txs.length + ' записей');
+    } catch (e) {
+      toast('Не удалось загрузить копию. Попробуйте ещё раз.');
+    }
   });
 
   /* Отрисовка */
