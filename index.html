@@ -169,6 +169,13 @@ button { cursor: pointer; }
 .hero-lbl { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--hero-mute); }
 .hero-bal { font-family: var(--font-disp); font-weight: 500; font-size: clamp(28px, 9.5vw, 42px); line-height: 1.15; overflow-wrap: anywhere; margin-bottom: 12px; }
 .hero-bal.neg { color: var(--hero-out); }
+.splitrow { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+.splitrow select { flex: 1 1 auto; min-width: 0; }
+.splitrow input { flex: 0 0 112px; width: 112px; text-align: right; }
+.splitrow .rm { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: transparent; color: var(--muted); font-size: 18px; line-height: 1; }
+.splitsum { font-size: 13px; font-weight: 700; color: var(--muted); margin: 4px 0 8px; }
+.splitsum.ok { color: var(--brand); }
+.splitsum.bad { color: #C0392B; }
 .qrow { display: flex; gap: 8px; margin-top: 8px; }
 .qbtn { flex: 1; height: 40px; border: 1px solid var(--line); border-radius: 10px; background: var(--tint); color: var(--text); font-weight: 700; font-size: 14px; }
 .hero-sub { margin: -8px 0 12px; font-size: 12px; font-weight: 600; opacity: 0.75; }
@@ -337,7 +344,7 @@ footer p { max-width: 52ch; }
 .field input::-webkit-date-and-time-value { text-align: left; margin: 0; }
 .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .field label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
-.field input, .field select, .addrow input, .ip-foot input, .limrow input {
+.field input, .field select, .addrow input, .ip-foot input, .limrow input, .splitrow input, .splitrow select {
   width: 100%;
   min-width: 0;
   max-width: 100%;
@@ -367,7 +374,7 @@ footer p { max-width: 52ch; }
 .tile-sub.bad { color: var(--out); }
 .rowedit { background: var(--tint); color: var(--ink); border: 0; border-radius: 10px; padding: 9px 14px; font-weight: 700; font-size: 14px; }
 .hint { color: var(--muted); font-size: 13px; }
-.field select { display: block; padding-right: 38px; text-overflow: ellipsis; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%238A9A94' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; }
+.field select, .splitrow select { display: block; padding-right: 38px; text-overflow: ellipsis; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%238A9A94' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; }
 .limlist { display: flex; flex-direction: column; gap: 10px; }
 .limrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .limrow label { flex: 1; min-width: 0; font-weight: 600; overflow-wrap: anywhere; }
@@ -496,7 +503,7 @@ footer p { max-width: 52ch; }
         <input id="amount" inputmode="decimal" autocomplete="off" placeholder="0">
         <span class="cur" aria-hidden="true">₽</span>
       </div>
-      <div>
+      <div id="catBlock">
         <div class="cathead">
           <span class="lbl">Категория</span>
           <button type="button" class="link" id="catEdit">Править</button>
@@ -517,6 +524,13 @@ footer p { max-width: 52ch; }
           </div>
         </div>
       </div>
+      <div id="splitBox" hidden>
+        <div class="cathead"><span class="lbl">Разделить по категориям</span><button type="button" class="link" id="splitOff">Одна категория</button></div>
+        <div id="splitRows"></div>
+        <p class="splitsum" id="splitSum"></p>
+        <button type="button" class="link" id="splitAdd">+ Ещё категория</button>
+      </div>
+      <button type="button" class="link" id="splitOn">Разделить по категориям</button>
       <div class="two">
         <div class="field"><label for="date">Дата</label><input id="date" type="date"></div>
         <div class="field"><label for="note">Комментарий</label><input id="note" maxlength="120" autocomplete="off" placeholder="Необязательно"></div>
@@ -1068,6 +1082,68 @@ footer p { max-width: 52ch; }
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeOv(); });
 
+  var splitOn = false, splitRows = [];
+  function splitCats() { return CATS[type].slice(); }
+  function splitTotal() { var a = parseAmt($('amount').value); return a > 0 ? a : 0; }
+  function renderSplit() {
+    var box = $('splitBox'), isEdit = !!editingId;
+    $('splitOn').hidden = isEdit || splitOn;
+    box.hidden = !splitOn;
+    $('catBlock').hidden = splitOn;
+    if (!splitOn) return;
+    var cats = splitCats();
+    splitRows.forEach(function (r) { if (cats.indexOf(r.cat) < 0) r.cat = cats[0]; });
+    $('splitRows').innerHTML = splitRows.map(function (r, i) {
+      var opts = cats.map(function (c) { return '<option' + (c === r.cat ? ' selected' : '') + '>' + esc(c) + '</option>'; }).join('');
+      return '<div class="splitrow"><select data-sc="' + i + '" aria-label="Категория ' + (i + 1) + '">' + opts + '</select>' +
+        '<input data-sa="' + i + '" inputmode="decimal" autocomplete="off" placeholder="0" value="' + esc(r.amt) + '" aria-label="Сумма ' + (i + 1) + '">' +
+        (splitRows.length > 2 ? '<button type="button" class="rm" data-sr="' + i + '" aria-label="Убрать строку">×</button>' : '') + '</div>';
+    }).join('');
+    updateSplitSum();
+  }
+  function updateSplitSum() {
+    var total = splitTotal(), sum = 0;
+    splitRows.forEach(function (r) { var a = parseAmt(r.amt); if (a > 0) sum += a; });
+    sum = r2(sum);
+    var left = r2(total - sum), el = $('splitSum');
+    if (!(total > 0)) { el.className = 'splitsum'; el.textContent = 'Сначала введите общую сумму'; return; }
+    if (Math.abs(left) < 0.005) { el.className = 'splitsum ok'; el.textContent = 'Распределено ' + money(sum) + ' из ' + money(total) + ' ✓'; }
+    else if (left > 0) { el.className = 'splitsum'; el.textContent = 'Распределено ' + money(sum) + ' из ' + money(total) + ' · осталось ' + money(left); }
+    else { el.className = 'splitsum bad'; el.textContent = 'Больше общей суммы на ' + money(Math.abs(left)); }
+    var inputs = $('splitRows').querySelectorAll('[data-sa]');
+    var last = inputs[inputs.length - 1];
+    if (last) last.placeholder = left > 0.005 ? String(left).replace('.', ',') : '0';
+  }
+  function startSplit(on) {
+    splitOn = on;
+    if (on) {
+      var cats = splitCats();
+      splitRows = [{ cat: cats.indexOf(selCat) >= 0 ? selCat : cats[0], amt: '' }, { cat: cats[(cats.indexOf(selCat) + 1) % cats.length] || cats[0], amt: '' }];
+    } else splitRows = [];
+    renderSplit();
+  }
+  $('splitOn').addEventListener('click', function () { startSplit(true); });
+  $('splitOff').addEventListener('click', function () { startSplit(false); });
+  $('splitAdd').addEventListener('click', function () {
+    if (splitRows.length >= 12) { toast('Не больше 12 категорий'); return; }
+    var cats = splitCats();
+    splitRows.push({ cat: cats[splitRows.length % cats.length], amt: '' });
+    renderSplit();
+  });
+  $('splitRows').addEventListener('input', function (e) {
+    var a = e.target.closest('[data-sa]');
+    if (a) { splitRows[+a.getAttribute('data-sa')].amt = a.value; updateSplitSum(); }
+  });
+  $('splitRows').addEventListener('change', function (e) {
+    var c = e.target.closest('[data-sc]');
+    if (c) splitRows[+c.getAttribute('data-sc')].cat = c.value;
+  });
+  $('splitRows').addEventListener('click', function (e) {
+    var r = e.target.closest('[data-sr]');
+    if (r) { splitRows.splice(+r.getAttribute('data-sr'), 1); renderSplit(); }
+  });
+  $('amount').addEventListener('input', function () { if (splitOn) updateSplitSum(); });
+
   function catList() {
     var l = CATS[type].slice();
     if (editingId && editingCat && editingCat.type === type && l.indexOf(editingCat.cat) < 0) l.push(editingCat.cat);
@@ -1087,6 +1163,7 @@ footer p { max-width: 52ch; }
     editCats = false;
     pickTarget = null;
     renderPick();
+    startSplit(false);
     openOv('ovAdd', 'amount');
   }
   function openEdit(id) {
@@ -1105,6 +1182,7 @@ footer p { max-width: 52ch; }
     pickTarget = null;
     setAddMode(true);
     renderPick();
+    startSplit(false);
     openOv('ovAdd', 'amount');
   }
   $('fab').addEventListener('click', openAdd);
@@ -1220,7 +1298,7 @@ footer p { max-width: 52ch; }
     if (e.key === 'Enter') { e.preventDefault(); addCategory(); }
   });
   Array.prototype.forEach.call(document.querySelectorAll('input[name="type"]'), function (r) {
-    r.addEventListener('change', function () { type = r.value; pickTarget = null; renderPick(); });
+    r.addEventListener('change', function () { type = r.value; pickTarget = null; renderPick(); if (splitOn) { var cs = splitCats(); splitRows.forEach(function (x) { x.cat = cs[0]; }); renderSplit(); } });
   });
 
   /* Запись */
@@ -1232,6 +1310,38 @@ footer p { max-width: 52ch; }
     var d = $('date').value;
     if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) { toast('Укажите дату'); $('date').focus(); return; }
     var note = $('note').value.trim().slice(0, 120);
+    if (splitOn && !editingId) {
+      var parts = [], ssum = 0, okRows = true;
+      splitRows.forEach(function (r) {
+        var a = parseAmt(r.amt);
+        if (!(a > 0)) { okRows = false; return; }
+        parts.push({ cat: r.cat, amt: a }); ssum += a;
+      });
+      if (!okRows || parts.length < 2) { toast('Введите сумму в каждой строке'); return; }
+      if (Math.abs(r2(ssum) - amt) > 0.005) { toast('Суммы частей должны давать ' + money(amt)); return; }
+      var sbtn = $('submit');
+      sbtn.disabled = true;
+      (async function () {
+        try {
+          var now = Date.now(), msgs = [];
+          for (var i = 0; i < parts.length; i++) {
+            var tag = 'часть ' + (i + 1) + ' из ' + parts.length;
+            var tt = { id: newId(), type: type, amount: parts[i].amt, cat: parts[i].cat, date: d, note: (note ? note + ' · ' + tag : 'Часть ' + (i + 1) + ' из ' + parts.length).slice(0, 120), createdAt: now + i };
+            await addTx(tt);
+            var m = limitMsg(tt);
+            if (m && msgs.indexOf(m) < 0) msgs.push(m);
+          }
+          view = { y: +d.slice(0, 4), m: +d.slice(5, 7) - 1 };
+          render();
+          closeOv();
+          toast('Записано: ' + parts.length + ' части' + (msgs.length ? '. ' + msgs[0] : ''));
+        } catch (err) {
+          toast('Не удалось сохранить. Попробуйте ещё раз.');
+        }
+        sbtn.disabled = false;
+      })();
+      return;
+    }
     var base = editingId ? txs.filter(function (x) { return x.id === editingId; })[0] : null;
     var t = base
       ? Object.assign({}, base, { type: type, amount: amt, cat: selCat, date: d, note: note })
