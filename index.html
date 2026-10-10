@@ -215,6 +215,11 @@ html[data-hide] :is(.hero-bal, .hero-sub, .stat-v, .tile-val, .tile-sub, .jar-v,
 .pr-n i { flex: none; width: 10px; height: 10px; border-radius: 50%; }
 .pr-v { display: flex; gap: 10px; white-space: nowrap; }
 .pr-v b { min-width: 36px; text-align: right; color: var(--muted); }
+.pr-short { display: block; margin-top: 6px; font-size: 12px; color: var(--muted); }
+.pr-full { display: none; margin-top: 8px; }
+.pr.sel .pr-short { display: none; }
+.pr.sel .pr-full { display: block; }
+.pr-subrow { display: flex; justify-content: space-between; gap: 10px; padding: 5px 0 5px 18px; font-size: 13px; border-top: 1px solid var(--line); }
 .pr-bar { display: block; height: 8px; margin-top: 7px; border-radius: 4px; background: var(--tint); overflow: hidden; }
 .pr-bar i { display: block; height: 100%; border-radius: 4px; }
 .piewrap circle { cursor: pointer; transition: opacity .15s; }
@@ -779,7 +784,7 @@ footer p { max-width: 52ch; }
       <details><summary>Поиск по записям</summary>
         <p>Строка <b>«Поиск по записям»</b> над журналом ищет по комментарию, категории и сумме во всех месяцах сразу. Над результатами видно, сколько найдено. Чтобы вернуть обычный вид, нажмите «Показать все».</p>
         <h4>Диаграмма доходов</h4>
-        <p>Кнопка с диаграммой в шапке (рядом с «глазом» и настройками) показывает, на что разошлись доходы выбранного месяца: расходы по категориям, отложенное в копилку и остаток. Для каждой части видны сумма, доля и полоска. Нажмите на строку или на кусок кольца, и он подсветится, а в центре появится его название и сумма. Мелкие категории объединены в «Остальные категории». Месяц переключается стрелками на главной.</p>
+        <p>Кнопка с диаграммой в шапке (рядом с «глазом» и настройками) показывает, на что разошлись доходы выбранного месяца: расходы по категориям, отложенное в копилку и остаток. Для каждой части видны сумма, доля и полоска. Нажмите на строку или на кусок кольца, и он подсветится, а в центре появится его название и сумма. Мелкие категории объединены в «Остальные категории»: нажмите на эту строку, чтобы увидеть, какие именно там и по сколько. Месяц переключается стрелками на главной.</p>
         <h4>Сворачивание записей</h4>
         <p>Кнопка «Свернуть» справа от заголовка «Записи» убирает весь список в одну строку: сколько записей и на какую сумму доходов и расходов. Нажмите на эту строку или «Развернуть», чтобы вернуть список. Выбор запоминается на этом устройстве.</p>
       </details>
@@ -2751,12 +2756,12 @@ footer p { max-width: 52ch; }
       return;
     }
     var names = Object.keys(by).sort(function (a, b) { return by[b] - by[a]; });
-    var segs = [], other = 0;
+    var segs = [], other = 0, otherList = [];
     names.forEach(function (n, i) {
       if (i < 5 && by[n] / base >= 0.04) segs.push({ name: n, icon: iconFor('out', n), v: by[n], c: PIE_COLORS[i] });
-      else other += by[n];
+      else { other += by[n]; otherList.push({ name: n, icon: iconFor('out', n), v: by[n] }); }
     });
-    if (other > 0) segs.push({ name: 'Остальные категории', icon: '', v: r2(other), c: PIE_COLORS[7] });
+    if (other > 0) segs.push({ name: 'Остальные категории', icon: '', v: r2(other), c: PIE_COLORS[7], sub: otherList });
     if (sv > 0) segs.push({ name: 'Отложено в копилку', icon: '', v: sv, c: '#D4A017' });
     var rest = r2(inc - spend);
     if (rest > 0.005) segs.push({ name: 'Остаток', icon: '', v: rest, c: '#B8C4BF' });
@@ -2769,9 +2774,14 @@ footer p { max-width: 52ch; }
     });
     wrap.innerHTML = '<svg viewBox="0 0 42 42" role="img" aria-label="Диаграмма распределения доходов">' + circ + '</svg><div class="pc"><small id="pcL"></small><b class="amt" id="pcV"></b></div>';
     var mx = Math.max.apply(null, segs.map(function (g) { return g.v; }));
+    function subHtml(list) {
+      var short = list.slice(0, 3).map(function (x) { return x.name; }).join(', ') + (list.length > 3 ? ' и ещё ' + (list.length - 3) : '') + ' · нажмите, чтобы увидеть все';
+      var full = list.map(function (x) { return '<span class="pr-subrow"><span>' + (x.icon ? esc(x.icon) + ' ' : '') + esc(x.name) + '</span><span class="amt">' + money(r2(x.v)) + '</span></span>'; }).join('');
+      return '<span class="pr-short">' + esc(short) + '</span><span class="pr-full">' + full + '</span>';
+    }
     leg.innerHTML = segs.map(function (g, gi) {
       var pc = g.v / base * 100;
-      return '<button type="button" class="pr" data-i="' + gi + '"><span class="pr-top"><span class="pr-n"><i style="background:' + g.c + '"></i>' + (g.icon ? esc(g.icon) + ' ' : '') + esc(g.name) + '</span><span class="pr-v"><span class="amt">' + money(g.v) + '</span><b>' + (pc < 1 ? '<1' : Math.round(pc)) + '%</b></span></span><span class="pr-bar"><i style="width:' + (g.v / mx * 100).toFixed(1) + '%;background:' + g.c + '"></i></span></button>';
+      return '<button type="button" class="pr" data-i="' + gi + '"><span class="pr-top"><span class="pr-n"><i style="background:' + g.c + '"></i>' + (g.icon ? esc(g.icon) + ' ' : '') + esc(g.name) + '</span><span class="pr-v"><span class="amt">' + money(g.v) + '</span><b>' + (pc < 1 ? '<1' : Math.round(pc)) + '%</b></span></span><span class="pr-bar"><i style="width:' + (g.v / mx * 100).toFixed(1) + '%;background:' + g.c + '"></i></span>' + (g.sub ? subHtml(g.sub) : '') + '</button>';
     }).join('');
     pieShow();
     if (inc <= 0) note.textContent = 'В этом месяце нет доходов, проценты считаются от суммы расходов.';
