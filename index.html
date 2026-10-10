@@ -281,6 +281,13 @@ html[data-hide] :is(.hero-bal, .hero-sub, .stat-v, .tile-val, .tile-sub, .jar-v,
 .bar i.warn { background: var(--gold); }
 .bar i.over { background: var(--out); }
 
+.jhead { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.jhead .sec { margin: 0; }
+.jhead .link { font-size: 13px; padding: 4px; }
+.jfold { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 0; background: none; border: 0; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.jfold .chev { display: inline-block; width: 14px; font-size: 11px; transform: rotate(-90deg); color: var(--muted); }
+.jfold .dl { font-weight: 800; }
+.jfold .ds { flex: 1; text-align: right; font-size: 13px; font-weight: 600; color: var(--muted); }
 .dayh { font-size: 12px; font-weight: 700; color: var(--muted); padding: 14px 0 2px; }
 .row + .row { border-top: 1px solid var(--line); }
 .rowmain { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; gap: 12px; width: 100%; padding: 10px 0; background: none; border: 0; text-align: left; }
@@ -542,7 +549,7 @@ footer p { max-width: 52ch; }
   </section>
 
   <section id="journal">
-    <h2 class="sec">Записи</h2>
+    <div class="jhead"><h2 class="sec">Записи</h2><button type="button" class="link" id="foldAll" hidden>Свернуть</button></div>
     <input id="q" type="search" class="search" placeholder="Поиск по записям" aria-label="Поиск по записям" autocomplete="off" hidden>
     <div class="fbar" id="fbar" hidden><span id="fbarT"></span><button type="button" class="link" id="fbarX">Показать все</button></div>
     <div class="card" id="list"></div>
@@ -748,6 +755,8 @@ footer p { max-width: 52ch; }
       </details>
       <details><summary>Поиск по записям</summary>
         <p>Строка <b>«Поиск по записям»</b> над журналом ищет по комментарию, категории и сумме во всех месяцах сразу. Над результатами видно, сколько найдено. Чтобы вернуть обычный вид, нажмите «Показать все».</p>
+        <h4>Сворачивание записей</h4>
+        <p>Кнопка «Свернуть» справа от заголовка «Записи» убирает весь список в одну строку: сколько записей и на какую сумму доходов и расходов. Нажмите на эту строку или «Развернуть», чтобы вернуть список. Выбор запоминается на этом устройстве.</p>
       </details>
       <details><summary>Быстрые записи</summary>
         <p>Заполнили форму записи и нажали <b>«Сохранить как быструю запись»</b>: сумма, категория и комментарий запомнятся. В следующий раз в начале формы появится кнопка с этой записью: нажмите на неё, и форма заполнится сама, останется нажать «Записать». «Править» рядом позволяет удалить ненужные.</p>
@@ -2435,13 +2444,25 @@ footer p { max-width: 52ch; }
     } else {
       var byDay = {};
       mt.forEach(function (t) { (byDay[t.date] = byDay[t.date] || []).push(t); });
-      list.innerHTML = Object.keys(byDay).sort().reverse().map(function (d) {
+      var jin = 0, jout = 0;
+      mt.forEach(function (t) { if (t.type === 'in') jin += t.amount; else if (t.type === 'out') jout += t.amount; });
+      var n = mt.length;
+      if (jFolded) {
+        var sp = [];
+        if (jin > 0) sp.push('<span class="amt">+' + money(r2(jin)) + '</span>');
+        if (jout > 0) sp.push('<span class="amt">−' + money(r2(jout)) + '</span>');
+        list.innerHTML = '<button type="button" class="jfold" data-jfold><span class="chev">▼</span><span class="dl">' + n + ' ' + (n % 10 === 1 && n % 100 !== 11 ? 'запись' : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'записи' : 'записей')) + '</span><span class="ds">' + sp.join(' · ') + '</span></button>';
+      } else list.innerHTML = Object.keys(byDay).sort().reverse().map(function (d) {
         var items = byDay[d].sort(function (a, b) { return (b.createdAt || 0) - (a.createdAt || 0); });
         var dd = new Date(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
         var label = cap(dd.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' }));
         return '<div class="day"><h3 class="dayh">' + esc(label) + '</h3><ul>' + items.map(row).join('') + '</ul></div>';
       }).join('');
     }
+
+    var fa = $('foldAll');
+    fa.hidden = loading || txs.length === 0 || mt.length === 0;
+    fa.textContent = jFolded ? 'Развернуть' : 'Свернуть';
 
     renderTiles();
     renderQuick();
@@ -2453,6 +2474,16 @@ footer p { max-width: 52ch; }
       : 'Записи хранятся только в этом браузере. Если очистить данные сайта, они пропадут.';
   }
 
+  var jFolded = false;
+  try { jFolded = localStorage.getItem('kassa-jfold') === '1'; } catch (e) {}
+  function toggleJ() {
+    jFolded = !jFolded;
+    try { localStorage.setItem('kassa-jfold', jFolded ? '1' : '0'); } catch (e) {}
+    selectedId = null;
+    render();
+  }
+  $('foldAll').addEventListener('click', toggleJ);
+  $('list').addEventListener('click', function (e) { if (e.target.closest('[data-jfold]')) toggleJ(); });
   function toggleCat(li) {
     var n = li.getAttribute('data-cat');
     catFilter = catFilter === n ? null : n;
