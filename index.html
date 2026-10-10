@@ -176,6 +176,11 @@ button { cursor: pointer; }
 .splitsum { font-size: 13px; font-weight: 700; color: var(--muted); margin: 4px 0 8px; }
 .splitsum.ok { color: var(--brand); }
 .splitsum.bad { color: #C0392B; }
+.cats li.cl { cursor: pointer; border-radius: 12px; padding: 4px 6px; margin: -4px -6px; -webkit-tap-highlight-color: transparent; }
+.cats li.cl.on { background: var(--tint); }
+.cats.has-filter li.cl:not(.on) { opacity: 0.55; }
+.fbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 10px; padding: 10px 14px; border-radius: 14px; background: var(--tint); font-size: 14px; font-weight: 700; }
+.fbar span { min-width: 0; overflow-wrap: anywhere; }
 .helpbtn { width: 100%; margin-top: 14px; color: var(--ink); }
 .guide details { border-bottom: 1px solid var(--line); padding: 2px 0; }
 .guide summary { cursor: pointer; font-weight: 700; padding: 13px 0; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
@@ -484,6 +489,7 @@ footer p { max-width: 52ch; }
 
   <section id="journal">
     <h2 class="sec">Записи</h2>
+    <div class="fbar" id="fbar" hidden><span id="fbarT"></span><button type="button" class="link" id="fbarX">Показать все</button></div>
     <div class="card" id="list"></div>
   </section>
 
@@ -638,6 +644,9 @@ footer p { max-width: 52ch; }
       </details>
       <details><summary>Один платёж на несколько категорий</summary>
         <p>В форме новой записи введите общую сумму и нажмите <b>«Разделить по категориям»</b>. Выберите категории и впишите суммы частей: приложение покажет, сколько ещё не распределено. Когда сумма сойдётся, нажмите «Записать». В журнале появятся отдельные записи с пометкой «Часть 1 из 3». Разделить можно только новую запись.</p>
+      </details>
+      <details><summary>Расходы по одной категории</summary>
+        <p>В блоке <b>«Куда уходят деньги»</b> нажмите на категорию: в журнале останутся только её расходы за выбранный месяц, а над журналом появится сумма. Нажмите на ту же категорию ещё раз или «Показать все», чтобы вернуть полный список.</p>
       </details>
       <details><summary>Категории и значки</summary>
         <p>В форме записи нажмите <b>«Править»</b> рядом с категориями. Там можно добавить свою категорию, удалить ненужную и нажать на круглый значок, чтобы выбрать картинку для категории.</p>
@@ -1839,11 +1848,16 @@ footer p { max-width: 52ch; }
       '<button type="button" class="rowdel" data-id="' + esc(t.id) + '">Удалить запись</button></div>' : '') + '</li>';
   }
 
+  var catFilter = null;
+  function catAttr(n) {
+    return ' class="cl' + (catFilter === n ? ' on' : '') + '" data-cat="' + esc(n) + '" role="button" tabindex="0" aria-pressed="' + (catFilter === n ? 'true' : 'false') + '"';
+  }
   function render() {
     var key = view.y + '-' + pad(view.m + 1);
     $('monthLabel').textContent = cap(new Date(view.y, view.m, 1).toLocaleDateString('ru-RU', { month: 'long' })) + ' ' + view.y;
 
     var mt = txs.filter(function (t) { return t.date.slice(0, 7) === key; });
+    var mtAll = mt;
     var inc = 0, exp = 0, sv = 0;
     mt.forEach(function (t) {
       if (t.type === 'in') inc += t.amount;
@@ -1884,15 +1898,16 @@ footer p { max-width: 52ch; }
           var p = sp / lim * 100;
           var st = sp > lim + 0.005 ? 'over' : (p >= 80 ? 'warn' : '');
           var msg = st === 'over' ? 'Превышено на ' + money(r2(sp - lim)) : 'Осталось ' + money(r2(lim - sp));
-          return '<li><div class="brow"><span class="name">' + head + '</span><span class="amt">' + money(r2(sp)) + ' из ' + money(lim) + '</span></div>' +
+          return '<li' + catAttr(n) + '><div class="brow"><span class="name">' + head + '</span><span class="amt">' + money(r2(sp)) + ' из ' + money(lim) + '</span></div>' +
             '<div class="bar"><i class="' + st + '" data-w="' + Math.min(100, p).toFixed(1) + '"></i></div>' +
             '<p class="lstat ' + st + '">' + msg + '</p></li>';
         }
         var pct = exp > 0 ? sp / exp * 100 : 0;
-        return '<li><div class="brow"><span class="name">' + head + '</span><span class="amt">' + money(r2(sp)) + ' · ' + Math.round(pct) + '%</span></div>' +
+        return '<li' + catAttr(n) + '><div class="brow"><span class="name">' + head + '</span><span class="amt">' + money(r2(sp)) + ' · ' + Math.round(pct) + '%</span></div>' +
           '<div class="bar"><i data-w="' + pct.toFixed(1) + '"></i></div></li>';
       }).join('');
       applyWidths($('cats'));
+      $('cats').classList.toggle('has-filter', !!catFilter);
       box.hidden = false;
     } else {
       box.hidden = true;
@@ -1900,6 +1915,14 @@ footer p { max-width: 52ch; }
 
     // журнал
     var list = $('list');
+    var fb = $('fbar');
+    if (catFilter && !loading) {
+      mt = mtAll.filter(function (t) { return t.type === 'out' && t.cat === catFilter; });
+      var fsum = 0; mt.forEach(function (t) { fsum += t.amount; });
+      var fic = iconFor('out', catFilter);
+      $('fbarT').textContent = 'Расходы: ' + (fic ? fic + ' ' : '') + catFilter + ' · ' + money(r2(fsum));
+      fb.hidden = false;
+    } else fb.hidden = true;
     if (loading) {
       list.innerHTML = '<p class="load">Загружаю записи…</p>';
     } else if (txs.length === 0) {
@@ -1908,7 +1931,7 @@ footer p { max-width: 52ch; }
         '<div class="btnrow"><button type="button" class="primary" data-act="add">Добавить запись</button>' +
         '<button type="button" class="secondary" data-act="seed">Загрузить примеры</button></div></div>';
     } else if (mt.length === 0) {
-      list.innerHTML = '<p class="load">В этом месяце записей нет.</p>';
+      list.innerHTML = '<p class="load">' + (catFilter ? 'В этом месяце расходов по этой категории нет.' : 'В этом месяце записей нет.') + '</p>';
     } else {
       var byDay = {};
       mt.forEach(function (t) { (byDay[t.date] = byDay[t.date] || []).push(t); });
@@ -1930,6 +1953,26 @@ footer p { max-width: 52ch; }
       : 'Записи хранятся только в этом браузере. Если очистить данные сайта, они пропадут.';
   }
 
+  function toggleCat(li) {
+    var n = li.getAttribute('data-cat');
+    catFilter = catFilter === n ? null : n;
+    selectedId = null;
+    render();
+    if (catFilter) {
+      var fb = $('fbar');
+      if (fb && fb.scrollIntoView) fb.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+  }
+  $('cats').addEventListener('click', function (e) {
+    var li = e.target.closest('li[data-cat]');
+    if (li) toggleCat(li);
+  });
+  $('cats').addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var li = e.target.closest('li[data-cat]');
+    if (li) { e.preventDefault(); toggleCat(li); }
+  });
+  $('fbarX').addEventListener('click', function () { catFilter = null; render(); });
   $('list').addEventListener('click', function (e) {
     if (e.target.closest('[data-act="seed"]')) { loadExamples(); return; }
     if (e.target.closest('[data-act="add"]')) { openAdd(); return; }
