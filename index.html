@@ -648,6 +648,14 @@ html[data-style="glass"] .remind.bkrem { border-left-color: var(--brand); }
   html[data-style="glass"] .tank::before { background: color-mix(in srgb, var(--gold) 26%, transparent); }
   html[data-style="glass"] .av:not(.in):not(.save) { background: color-mix(in srgb, var(--cc, var(--ink)) 20%, transparent); color: var(--cc, var(--ink)); }
 }
+.tm .fab { position: static; transform: none; box-shadow: none; }
+.rlist { display: flex; flex-direction: column; margin-top: 4px; }
+.rrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 12px; align-items: baseline; padding: 8px 0; border-top: 1px solid var(--line); }
+.rrow .rn { font-weight: 700; overflow-wrap: anywhere; }
+.rrow b { font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rrow .rd { grid-column: 1; font-size: 12px; color: var(--muted); font-weight: 600; }
+.rrow b { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
 .sw[data-p="sunset"] i { background: #B1305A; }
 .sw[data-p="midnight"] i { background: #3B3FA8; }
 </style>
@@ -701,15 +709,18 @@ html[data-style="glass"] .remind.bkrem { border-left-color: var(--brand); }
   <div class="tiles" id="tiles"></div>
 
   <div class="tiles" id="quick">
-    <button type="button" class="tile" data-open="lim"><span class="tile-lbl">Лимиты по категориям</span><span class="tile-sub" id="limSub"></span></button>
-    <button type="button" class="tile" data-open="rec"><span class="tile-lbl">Регулярные платежи</span><span class="tile-sub" id="recSub"></span></button>
-    <button type="button" class="tile wide" data-open="cmp"><span class="tile-lbl">Сравнение и динамика</span><span class="tile-sub">Расходы по месяцам и по категориям</span></button>
+    <button type="button" class="tile wide" data-open="rec"><span class="tile-lbl">Регулярные платежи</span><span class="tile-sub" id="recSub"></span><span class="rlist" id="recList"></span></button>
   </div>
 
   <section id="catsBox" hidden>
     <h2 class="sec">Куда уходят деньги</h2>
     <div class="card"><ul class="cats" id="cats"></ul></div>
   </section>
+
+  <div class="tiles" id="quick2">
+    <button type="button" class="tile" data-open="lim"><span class="tile-lbl">Лимиты по категориям</span><span class="tile-sub" id="limSub"></span></button>
+    <button type="button" class="tile" data-open="cmp"><span class="tile-lbl">Сравнение и динамика</span><span class="tile-sub">Расходы по месяцам и по категориям</span></button>
+  </div>
 
   <section id="journal">
     <div class="jhead"><h2 class="sec">Записи</h2><button type="button" class="link" id="foldAll" hidden>Свернуть</button></div>
@@ -3444,16 +3455,23 @@ html[data-style="glass"] .remind.bkrem { border-left-color: var(--brand); }
     var ls = $('limSub');
     ls.textContent = !set.length ? 'Не заданы' : 'Задано: ' + set.length + (over ? ' · превышено: ' + over : '');
     ls.className = 'tile-sub' + (over ? ' bad' : '');
-    var rs = $('recSub');
+    var rs = $('recSub'), rl = $('recList');
     if (!rec.items.length) {
-      rs.textContent = 'Не настроены';
+      rs.textContent = 'Не настроены. Нажмите, чтобы добавить аренду, кредит, подписки';
+      rl.innerHTML = '';
     } else {
-      var best = null;
-      rec.items.forEach(function (it) {
+      var td = new Date(), mid = new Date(td.getFullYear(), td.getMonth(), td.getDate());
+      var list = rec.items.map(function (it) {
         var d = nextDate(it);
-        if (!best || d < best.d) best = { d: d, it: it };
-      });
-      rs.textContent = 'Ближайший: ' + (best.it.note || best.it.cat) + ', ' + fmtShort(best.d);
+        return { d: d, it: it, diff: Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - mid) / 86400000) };
+      }).sort(function (a, b) { return a.d - b.d; });
+      var sum30 = 0, n30 = 0;
+      list.forEach(function (x) { if (x.diff <= 30 && x.it.type === 'out') { sum30 += x.it.amount; n30++; } });
+      rs.textContent = n30 ? 'В ближайшие 30 дней: ' + n30 + ' · ' + money(r2(sum30)) : 'В ближайшие 30 дней платежей нет';
+      rl.innerHTML = list.slice(0, 3).map(function (x) {
+        var when = x.diff <= 0 ? 'сегодня' : (x.diff === 1 ? 'завтра' : 'через ' + x.diff + ' дн.');
+        return '<span class="rrow"><span class="rn">' + esc(x.it.note || x.it.cat) + '</span><span class="rd">' + fmtShort(x.d) + ' · ' + when + '</span><b>' + (x.it.type === 'in' ? '+' : '') + money(x.it.amount) + '</b></span>';
+      }).join('') + (list.length > 3 ? '<span class="tile-sub">и ещё ' + (list.length - 3) + '</span>' : '');
     }
   }
 
@@ -3630,7 +3648,9 @@ html[data-style="glass"] .remind.bkrem { border-left-color: var(--brand); }
     render();
   });
 
-  $('quick').addEventListener('click', function (e) {
+  var quickClick;
+  $('quick2').addEventListener('click', function (e) { quickClick(e); });
+  $('quick').addEventListener('click', quickClick = function (e) {
     var b = e.target.closest('[data-open]');
     if (!b) return;
     if (b.getAttribute('data-open') === 'cmp') { renderCmp(); openOv('ovCmp'); return; }
