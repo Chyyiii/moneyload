@@ -1018,6 +1018,23 @@ html[data-style="glass"] .remind.bkrem { border-left-color: var(--brand); }
   </div>
 </div>
 
+<div class="overlay" id="ovDay" hidden>
+  <div class="backdrop" data-close></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="dayTitle" tabindex="-1">
+    <div class="sheet-head">
+      <h2 id="dayTitle">Лимит на день</h2>
+      <button type="button" class="x" data-close aria-label="Закрыть">×</button>
+    </div>
+    <div class="stack">
+      <div><p class="tile-lbl" id="dayLbl"></p><p class="tile-val" id="dayBig" style="font-size:32px"></p></div>
+      <div class="jsplit" id="dayRows" style="display:flex;flex-direction:column;gap:8px"></div>
+      <p class="hint" id="dayNote" hidden></p>
+      <p class="hint">Лимит = доступные деньги ÷ оставшиеся дни месяца. Если сегодня потратить меньше, завтра лимит вырастет.</p>
+      <div class="qrow"><button type="button" class="qbtn" id="dayToSave">Открыть копилку</button><button type="button" class="qbtn" data-close>Закрыть</button></div>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="ovPie" hidden>
   <div class="backdrop" data-close></div>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="pieTitle" tabindex="-1">
@@ -2280,7 +2297,8 @@ html[data-style="glass"] .remind.bkrem { border-left-color: var(--brand); }
       else if (x.type === 'out') { exp += x.amount; if (x.date === today) spent += x.amount; }
       else svm += x.amount;
     });
-    inc += carryIn(ck);
+    var carryV = carryIn(ck);
+    inc += carryV;
     var goalsNeed = reserveNow(svm);
     var reserve = settings.limitGoals ? goalsNeed : 0;
     var upcoming = upcomingOut();
@@ -2289,7 +2307,7 @@ html[data-style="glass"] .remind.bkrem { border-left-color: var(--brand); }
     var days = new Date(t.getFullYear(), t.getMonth() + 1, 0).getDate() - t.getDate() + 1;
     var limit = Math.max(0, (avail + spent) / days);
     var left = limit - spent;
-    return { total: total, spent: spent, reserve: reserve, goalsNeed: goalsNeed, upcoming: upcoming, avail: avail, days: days, limit: limit, left: left, over: left < -0.005,
+    return { inc: inc, carryV: carryV, exp: exp, svm: svm, total: total, spent: spent, reserve: reserve, goalsNeed: goalsNeed, upcoming: upcoming, avail: avail, days: days, limit: limit, left: left, over: left < -0.005,
       need: reserve + upcoming, have: inc - exp - svm, held: held, short: Math.max(0, -(avail + held)) };
   }
   function fillSettingsInputs() {
@@ -2335,7 +2353,7 @@ html[data-style="glass"] .remind.bkrem { border-left-color: var(--brand); }
       }).join('') + (pockets.length > 3 ? '<span class="tile-sub">и ещё ' + (pockets.length - 3) + '</span>' : '');
     }
     box.innerHTML =
-      '<button type="button" class="tile t-day" data-open="save"><span class="tile-lbl">' + esc(lblDay) + '</span>' +
+      '<button type="button" class="tile t-day" data-open="day"><span class="tile-lbl">' + esc(lblDay) + '</span>' +
       '<svg class="lring' + (bad ? ' bad' : '') + '" viewBox="0 0 36 36" aria-hidden="true"><circle class="lb" cx="18" cy="18" r="15.5"/><circle class="lf" cx="18" cy="18" r="15.5" pathLength="100" stroke-dasharray="' + pctDay.toFixed(1) + ' 100"/></svg>' +
       '<span class="tile-val' + (bad ? ' over' : '') + '">' + valDay + '</span>' +
       '<span class="mini m-day"><i class="' + (bad ? 'over' : '') + '" data-w="' + pctDay.toFixed(1) + '"></i></span>' +
@@ -2406,9 +2424,36 @@ html[data-style="glass"] .remind.bkrem { border-left-color: var(--brand); }
     }
   }
 
+  function renderDay() {
+    var s = saveStats(), rows = [];
+    function R(l, v, cls) { rows.push('<div class="jrow' + (cls ? ' ' + cls : '') + '"><span>' + l + '</span><b>' + v + '</b></div>'); }
+    var isShort = s.short > 0.005;
+    var big = isShort ? '−' + money(Math.ceil(s.short - 0.005)) : (s.over ? '−' + money(Math.ceil(-s.left - 0.005)) : money(Math.floor(s.left + 0.005)));
+    $('dayLbl').textContent = isShort ? 'На сегодня лимит нулевой' : (s.over ? 'Перерасход за сегодня' : 'Можно потратить сегодня');
+    $('dayBig').textContent = big;
+    $('dayBig').className = 'tile-val' + (isShort || s.over ? ' over' : '');
+    R('Доходы за месяц' + (s.carryV > 0.005 ? ' (с переносом)' : ''), '+' + money(r2(s.inc)));
+    R('Расходы до сегодняшнего дня', '−' + money(r2(s.exp - s.spent)));
+    if (s.svm > 0.005) R('Отложено в копилку', '−' + money(r2(s.svm)));
+    if (s.held > 0.005) R('Отложено на платежи', '−' + money(r2(s.held)));
+    if (s.upcoming > 0.005) R('Регулярные платежи впереди', '−' + money(r2(s.upcoming)));
+    if (s.reserve > 0.005) R('Взнос по целям', '−' + money(r2(s.reserve)));
+    R('Доступно на оставшиеся дни', money(r2(s.avail + s.spent)), 'free');
+    R('Дней до конца месяца (с сегодняшним)', String(s.days));
+    R('Лимит на день', money(Math.floor(s.limit + 0.005)), 'free');
+    R('Потрачено сегодня', money(r2(s.spent)));
+    $('dayRows').innerHTML = rows.join('');
+    var notes = [];
+    if (isShort) notes.push('Денег не хватает на ближайшие платежи' + (s.reserve > 0 ? ' и цели' : '') + ': ' + (s.upcoming > 0 ? 'сначала нужно закрыть платежи впереди.' : 'расходы выше доходов.'));
+    if (!settings.limitGoals && s.goalsNeed > 0.005) notes.push('По целям нужно отложить ещё ' + money(r2(s.goalsNeed)) + ', в лимите это не учтено. Учёт включается в окне «Накопления».');
+    $('dayNote').textContent = notes.join(' ');
+    $('dayNote').hidden = !notes.length;
+  }
   $('tiles').addEventListener('click', function (e) {
+    if (e.target.closest('[data-open="day"]')) { renderDay(); openOv('ovDay'); return; }
     if (e.target.closest('[data-open="save"]')) openOv('ovSave');
   });
+  $('dayToSave').addEventListener('click', function () { openOv('ovSave'); });
   $('svLimGoals').addEventListener('change', function () {
     settings.limitGoals = $('svLimGoals').checked;
     persistSettings();
