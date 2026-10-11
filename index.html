@@ -656,6 +656,13 @@ html[data-style="glass"] .remind.bkrem { border-left-color: var(--brand); }
 .rrow .rd { grid-column: 1; font-size: 12px; color: var(--muted); font-weight: 600; }
 .rrow b { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
 html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
+.arow { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.arow .an { font-weight: 700; overflow-wrap: anywhere; }
+.arow b { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.arow b.neg { color: var(--out); }
+.xrow { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 0; font-size: 13px; color: var(--muted); font-weight: 600; }
+.xrow .link { font-size: 12px; padding: 2px 4px; }
+html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px); }
 .sw[data-p="sunset"] i { background: #B1305A; }
 .sw[data-p="midnight"] i { background: #3B3FA8; }
 </style>
@@ -709,6 +716,7 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
   <div class="tiles" id="tiles"></div>
 
   <div class="tiles" id="quick">
+    <button type="button" class="tile wide" data-open="acc"><span class="tile-lbl">Счета</span><span class="tile-sub" id="accSub"></span><span class="rlist" id="accList"></span></button>
     <button type="button" class="tile wide" data-open="rec"><span class="tile-lbl">Регулярные платежи</span><span class="tile-sub" id="recSub"></span><span class="rlist" id="recList"></span></button>
   </div>
 
@@ -792,6 +800,7 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
         <button type="button" class="link" id="splitAdd">+ Ещё категория</button>
       </div>
       <button type="button" class="link" id="splitOn">Разделить по категориям</button>
+      <div class="field" id="accBox" hidden><span class="lbl">Счёт</span><ul class="pick" id="accChips"></ul></div>
       <div class="two">
         <div class="field"><label for="date">Дата</label><input id="date" type="date"></div>
         <div class="field"><label for="note">Комментарий</label><input id="note" maxlength="120" autocomplete="off" placeholder="Необязательно"></div>
@@ -838,6 +847,7 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
             <ul class="pick" id="svToChips"></ul>
           </div>
           <select id="svTo" hidden></select>
+          <div class="field" id="svAccBox" hidden><label for="svAcc">Со счёта / на счёт</label><select id="svAcc"></select></div>
           <div class="field"><label for="svAmt">Сумма</label><input id="svAmt" inputmode="decimal" autocomplete="off" placeholder="0"></div>
           <div class="btnrow">
             <button type="submit" class="primary">Отложить</button>
@@ -965,6 +975,9 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
       <details><summary>Категории и значки</summary>
         <p>В форме записи нажмите <b>«Править»</b> рядом с категориями. Там можно добавить свою категорию, удалить ненужную и нажать на круглый значок, чтобы выбрать картинку для категории.</p>
       </details>
+      <details><summary>Счета: наличные, карты, банки</summary>
+        <p>Плитка «Счета» открывает окно, где можно завести несколько счетов и указать, сколько на каждом сейчас. Дальше при записи расхода или дохода выбирается счёт, и остаток каждого пересчитывается сам. Между счетами можно делать переводы: они не считаются доходом или расходом. Остаток месяца в шапке остаётся общим, а остатки по счетам показывают, сколько реально денег где лежит. Записи, сделанные до включения счетов, на остатки не влияют.</p>
+      </details>
       <details><summary>Накопления (копилка)</summary>
         <ul>
           <li>Нажмите плитку «Накопления» и включите функцию.</li>
@@ -973,7 +986,7 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
         </ul>
       </details>
       <details><summary>«Можно сегодня» и «Не хватает на платежи»</summary>
-        <p><b>«Можно сегодня»</b> — сколько можно потратить сегодня и не выйти за остаток. Расчёт: (остаток − предстоящие регулярные платежи) ÷ число оставшихся дней месяца, включая сегодня. Деньги, отложенные на другом счёте, и платежи «с будущего дохода» в расчёт не входят.</p>
+        <p><b>«Можно сегодня»</b> — сколько можно потратить сегодня и не выйти за остаток. Расчёт: (остаток − предстоящие регулярные платежи) ÷ число оставшихся дней месяца, включая сегодня. Деньги, отложенные на другом счёте, и платежи «с будущего дохода» в расчёт не входят. Нажмите на плитку, и откроется окно «Лимит на день» с расчётом по шагам: доходы, расходы, платежи, число дней и итоговый лимит.</p>
         <p>Взнос по целям по умолчанию из лимита не вычитается: он показан отдельной строкой «по целям ещё …» в плитке. Если хотите, чтобы цели жёстко уменьшали лимит, включите галочку <b>«Учитывать взнос по целям в лимите на день»</b> в окне «Накопления». Тогда при нехватке денег лимит может стать нулевым.</p>
         <p>Если денег меньше, чем нужно на ближайшие платежи (и на цели, когда галочка включена), вместо лимита появляется красная плитка <b>«Не хватает на платежи»</b> (или «на цели», «на платежи и цели») с суммой нехватки со знаком минус и шкалой покрытия. В плитке видно, из чего она складывается.</p>
       </details>
@@ -981,7 +994,7 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
         <p>Плитка «Лимиты по категориям» позволяет задать максимум на категорию в месяц. В списке «Куда уходят деньги» шкала станет жёлтой после 80% и красной при превышении. После записи расхода приложение предупредит, если вы близки к лимиту.</p>
       </details>
       <details><summary>Регулярные платежи</summary>
-        <p>Плитка «Регулярные платежи»: аренда, подписки, зарплата. Укажите сумму, категорию и день месяца, и запись сама появится в журнале в этот день каждый месяц. Предстоящие расходы заранее вычитаются из дневного лимита.</p>
+        <p>Плитка «Регулярные платежи»: аренда, подписки, зарплата. Укажите сумму, категорию и день месяца, и запись сама появится в журнале в этот день каждый месяц. Предстоящие расходы заранее вычитаются из дневного лимита. На главном экране плитка показывает три ближайших платежа с датой и суммой, а также сколько уйдёт за ближайшие 30 дней.</p>
         <ul>
           <li><b>«Отложено на другом счёте»</b>: деньги на платёж уже лежат отдельно. Сумма сразу вычитается из остатка, в день платежа попадает в журнал, повторно ничего не вычитается.</li>
           <li><b>«Оплачу с будущего дохода»</b>: деньги ещё не пришли. До даты платежа он не уменьшает дневной лимит и не вызывает «Не хватает на платежи», в свой день попадает в журнал как обычный расход.</li>
@@ -1042,6 +1055,48 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
       <p class="hint" id="dayNote" hidden></p>
       <p class="hint">Лимит = доступные деньги ÷ оставшиеся дни месяца. Если сегодня потратить меньше, завтра лимит вырастет.</p>
       <div class="qrow"><button type="button" class="qbtn" id="dayToSave">Открыть копилку</button><button type="button" class="qbtn" data-close>Закрыть</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ovAcc" hidden>
+  <div class="backdrop" data-close></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="accTitle" tabindex="-1">
+    <div class="sheet-head">
+      <h2 id="accTitle">Счета</h2>
+      <button type="button" class="x" data-close aria-label="Закрыть">×</button>
+    </div>
+    <div class="stack">
+      <div id="accOff">
+        <p class="hint">Заведите счета: наличные, карты, банки. Остаток каждого считается сам: сумма, которую вы укажете сейчас, плюс доходы и минус расходы, которые вы запишете дальше. Прошлые записи на остатки не влияют.</p>
+        <div class="field"><label for="accMName">Как назвать первый счёт</label><input id="accMName" maxlength="24" autocomplete="off" value="Основной"></div>
+        <div class="field"><label for="accMBal">Сколько на нём сейчас, ₽</label><input id="accMBal" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+        <button type="button" class="primary" id="accOnBtn">Включить счета</button>
+      </div>
+      <div id="accOnBox" hidden>
+        <div><p class="tile-lbl">Всего на счетах</p><p class="tile-val gold" id="accTotal" style="font-size:28px"></p></div>
+        <div id="accRows"></div>
+        <div class="field">
+          <span class="lbl">Новый счёт</span>
+          <div class="setgrid">
+            <div class="field"><label for="accNName">Название</label><input id="accNName" maxlength="24" autocomplete="off" placeholder="Например, Наличка"></div>
+            <div class="field"><label for="accNBal">Сейчас на нём, ₽</label><input id="accNBal" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+          </div>
+          <button type="button" class="secondary" id="accNAdd">Добавить счёт</button>
+        </div>
+        <div class="field" id="accXfBox">
+          <span class="lbl">Перевод между счетами</span>
+          <div class="setgrid">
+            <div class="field"><label for="accXf">Откуда</label><select id="accXf"></select></div>
+            <div class="field"><label for="accXt">Куда</label><select id="accXt"></select></div>
+          </div>
+          <div class="field"><label for="accXa">Сумма, ₽</label><input id="accXa" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+          <button type="button" class="secondary" id="accXgo">Перевести</button>
+          <div id="accXfList"></div>
+        </div>
+        <p class="hint">Переводы между счетами не считаются ни доходом, ни расходом. Если удалить счёт, его записи перейдут на первый счёт.</p>
+      </div>
+      <button type="button" class="primary" data-close>Готово</button>
     </div>
   </div>
 </div>
@@ -1184,9 +1239,10 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
         <div id="bkInfo" hidden>
           <p class="hint" id="bkText"></p>
           <div class="qrow">
-            <button type="button" class="qbtn" id="bkGo">Загрузить</button>
-            <button type="button" class="qbtn" id="bkNo">Отмена</button>
+            <button type="button" class="qbtn" id="bkGo">Добавить к текущим</button>
+            <button type="button" class="qbtn" id="bkRep">Заменить всё копией</button>
           </div>
+          <button type="button" class="link" id="bkNo">Отмена</button>
         </div>
       </div>
       <button type="button" class="primary" data-close>Готово</button>
@@ -1246,7 +1302,7 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
   var txs = [];
   var loading = true;
   var store = { mode: 'local', col: null };
-  var settings = { on: false, plan: 0, goal: 0, carry: true, limitGoals: false, carryFrom: '', closed: '', goals: [], months: 0, goalStart: '' };
+  var settings = { accs: [], xfers: [], on: false, plan: 0, goal: 0, carry: true, limitGoals: false, carryFrom: '', closed: '', goals: [], months: 0, goalStart: '' };
   var ui = { name: '', palette: 'emerald', mode: 'auto' };
   var STYLE = 'glass', OLED = false;
   try { STYLE = localStorage.getItem('kassa-style') === 'classic' ? 'classic' : 'glass'; OLED = localStorage.getItem('kassa-oled') === '1'; } catch (e) {}
@@ -1481,6 +1537,28 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
     });
     return res;
   }
+  function cleanAccs(a) {
+    var res = [], seen = {};
+    if (Array.isArray(a)) a.forEach(function (x) {
+      if (res.length >= 12 || !x || typeof x.id !== 'string' || (x.id !== '' && !/^[A-Za-z0-9]{1,24}$/.test(x.id)) || seen[x.id] || typeof x.name !== 'string') return;
+      var nm = x.name.trim().slice(0, 24), st = Number(x.start), sn = Number(x.since);
+      if (!nm) return;
+      seen[x.id] = 1;
+      res.push({ id: x.id, name: nm, start: isFinite(st) ? Math.max(-1e9, Math.min(1e9, r2(st))) : 0, since: isFinite(sn) && sn > 0 ? sn : 0 });
+    });
+    if (res.length && !seen['']) res.unshift({ id: '', name: 'Основной', start: 0, since: Math.min.apply(null, res.map(function (r) { return r.since; })) });
+    return res;
+  }
+  function cleanXfers(a) {
+    var res = [];
+    if (Array.isArray(a)) a.forEach(function (x) {
+      if (res.length >= 500 || !x || typeof x.id !== 'string' || !/^[A-Za-z0-9]{1,24}$/.test(x.id) || typeof x.from !== 'string' || typeof x.to !== 'string' || x.from === x.to) return;
+      var am = Number(x.amount), ts = Number(x.ts);
+      if (!isFinite(am) || !(am > 0) || am > 1e9 || !isFinite(ts)) return;
+      res.push({ id: x.id, ts: ts, date: typeof x.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(x.date) ? x.date : '', from: x.from, to: x.to, amount: r2(am) });
+    });
+    return res;
+  }
   function cleanSettings(o) {
     o = o || {};
     function n(v) {
@@ -1489,7 +1567,7 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
     }
     var mk = /^\d{4}-\d{2}$/;
     function mo(v) { v = Math.round(Number(v)); return isFinite(v) && v > 0 ? Math.min(v, 600) : 0; }
-    return { on: o.on === true, plan: n(o.plan), goal: n(o.goal), carry: o.carry !== false, limitGoals: o.limitGoals === true, goals: cleanGoals(o.goals), months: mo(o.months), goalStart: typeof o.goalStart === 'string' && mk.test(o.goalStart) ? o.goalStart : '',
+    return { accs: cleanAccs(o.accs), xfers: cleanXfers(o.xfers), on: o.on === true, plan: n(o.plan), goal: n(o.goal), carry: o.carry !== false, limitGoals: o.limitGoals === true, goals: cleanGoals(o.goals), months: mo(o.months), goalStart: typeof o.goalStart === 'string' && mk.test(o.goalStart) ? o.goalStart : '',
       carryFrom: typeof o.carryFrom === 'string' && mk.test(o.carryFrom) ? o.carryFrom : '',
       closed: typeof o.closed === 'string' && mk.test(o.closed) ? o.closed : '' };
   }
@@ -1497,7 +1575,7 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
     try { return cleanSettings(JSON.parse(localStorage.getItem(LS_SAVE))); } catch (e) { return cleanSettings(null); }
   }
   function saveSettings() {
-    var body = { on: settings.on, plan: settings.plan, goal: settings.goal, carry: settings.carry, limitGoals: settings.limitGoals, carryFrom: settings.carryFrom, closed: settings.closed, goals: settings.goals, months: settings.months, goalStart: settings.goalStart };
+    var body = { accs: settings.accs, xfers: settings.xfers, on: settings.on, plan: settings.plan, goal: settings.goal, carry: settings.carry, limitGoals: settings.limitGoals, carryFrom: settings.carryFrom, closed: settings.closed, goals: settings.goals, months: settings.months, goalStart: settings.goalStart };
     if (store.mode === 'cloud') return store.col.doc('_save').set(body);
     try { localStorage.setItem(LS_SAVE, JSON.stringify(body)); } catch (e) {}
     return Promise.resolve();
@@ -1889,6 +1967,8 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
     startSplit(false);
     tplEditMode = false;
     renderTpl();
+    selAcc = lsGet('kassa-acc-last') || '';
+    renderAccPick();
     openOv('ovAdd', 'amount');
   }
   function openEdit(id) {
@@ -1909,6 +1989,8 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
     renderPick();
     startSplit(false);
     renderTpl();
+    selAcc = accOf(t);
+    renderAccPick();
     openOv('ovAdd', 'amount');
   }
   $('fab').addEventListener('click', openAdd);
@@ -1932,6 +2014,7 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
       { v: '<div class="tm hero"><small>Остаток за месяц</small><b class="big">20 000 ₽</b><div class="chips"><span>Доходы<br>80 000</span><span>Расходы<br>50 000</span><span>Отложено<br>10 000</span></div></div>', t: 'Остаток месяца всегда на виду', p: 'Месяц переключается стрелками. Неизрасходованное можно переносить дальше, а кнопка с глазом прячет суммы от посторонних глаз.' },
       { v: '<div class="tm"><small>Можно сегодня</small><b class="big" style="margin-bottom:4px">2 500 ₽</b><div class="bar"><i style="width:40%;background:var(--brand)"></i></div><small style="text-transform:none;letter-spacing:0">лимит на день 2 500 ₽</small></div>', t: 'Сколько можно тратить сегодня', p: 'Приложение делит остаток на оставшиеся дни и вычитает ближайшие платежи. Включите накопления в плитке, и лимит появится на главном экране.' },
       { v: '<div class="tm"><div class="row"><span>Отпуск</span><span style="color:var(--gold)">40%</span></div><div class="bar"><i style="width:40%"></i></div><small style="text-transform:none;letter-spacing:0">Откладывайте 10 000 ₽ в месяц · осталось 6 мес.</small></div>', t: 'Копилка и цели', p: 'Задайте сумму цели и за сколько месяцев её накопить, а приложение посчитает ежемесячный взнос. Деньги можно переводить между копилкой и целями.' },
+      { v: '<div class="tm"><div class="row"><span>💳 Карта</span><span>49 000 ₽</span></div><div class="row"><span>💵 Наличка</span><span>5 300 ₽</span></div><small style="text-transform:none;letter-spacing:0;margin-top:6px">Всего на счетах: 54 300 ₽</small></div>', t: 'Несколько счетов', p: 'В плитке «Счета» заведите наличные и карты и укажите, сколько на каждом. При записи выберите счёт, и остаток пересчитается сам. Переводы между счетами не считаются расходом.' },
       { v: '<div class="tm"><div class="row"><span>🏠 Аренда</span><span>25 000 ₽</span></div><div class="row"><span>💳 Кредит</span><span>7 520 ₽</span></div><div class="row"><span>📱 Связь</span><span>600 ₽</span></div></div>', t: 'Регулярные платежи', p: 'Аренда, кредит, подписки: укажите сумму и день месяца, и запись сама появится в журнале. Если деньги уже отложены на другом счёте или придут позже, отметьте это галочкой.' },
       { v: '<div class="tm plain"><div class="ring"></div></div>', t: 'Куда уходят деньги', p: 'Кнопка с диаграммой в шапке показывает, на что разошлись доходы. Нажмите на категорию, и в журнале останутся только её траты. Ещё есть поиск и сравнение месяцев.' },
       { v: '<div class="tm plain"><div class="ico">💾</div></div>', t: 'Сохраните свои данные', p: 'Записи хранятся только в браузере этого устройства. Делайте резервную копию в окне оформления (значок с ползунками), хотя бы раз в несколько дней.' },
@@ -2137,6 +2220,7 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
           for (var i = 0; i < parts.length; i++) {
             var tag = 'часть ' + (i + 1) + ' из ' + parts.length;
             var tt = { id: newId(), type: type, amount: parts[i].amt, cat: parts[i].cat, date: d, note: (note ? note + ' · ' + tag : 'Часть ' + (i + 1) + ' из ' + parts.length).slice(0, 120), createdAt: now + i };
+            if (accOn() && selAcc) tt.acc = selAcc;
             await addTx(tt);
             var m = limitMsg(tt);
             if (m && msgs.indexOf(m) < 0) msgs.push(m);
@@ -2157,6 +2241,7 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
       ? Object.assign({}, base, { type: type, amount: amt, cat: selCat, date: d, note: note })
       : { id: newId(), type: type, amount: amt, cat: selCat, date: d, note: note, createdAt: Date.now() };
     if (base) delete t.example;
+    if (accOn()) { if (selAcc) t.acc = selAcc; else delete t.acc; }
     var wasEdit = !!base;
     var btn = $('submit');
     btn.disabled = true;
@@ -2333,6 +2418,145 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
       toast('Не удалось сохранить настройки. Попробуйте ещё раз.');
     }).then(function () { setPending--; });
   }
+
+  /* Счета */
+  var selAcc = '', accEditId = null;
+  function accOn() { return settings.accs.length > 0; }
+  function accById(id) { for (var i = 0; i < settings.accs.length; i++) if (settings.accs[i].id === id) return settings.accs[i]; return null; }
+  function accOf(t) { var a = t.acc || ''; return accById(a) ? a : ''; }
+  function accName(id) { var a = accById(id); return a ? a.name : ''; }
+  function accBal(id) {
+    var a = accById(id);
+    if (!a) return 0;
+    var b = a.start;
+    txs.forEach(function (t) {
+      if (t.example || (t.createdAt || 0) < a.since || accOf(t) !== id) return;
+      b += t.type === 'in' ? t.amount : -t.amount;
+    });
+    settings.xfers.forEach(function (x) {
+      if (x.ts < a.since) return;
+      if (x.to === id) b += x.amount;
+      if (x.from === id) b -= x.amount;
+    });
+    return r2(b);
+  }
+  function accTotal() { var t = 0; settings.accs.forEach(function (a) { t += accBal(a.id); }); return r2(t); }
+  function sgn(v) { return (v < 0 ? '−' : '') + money(Math.abs(v)); }
+  function renderAccPick() {
+    $('accBox').hidden = !accOn();
+    if (!accOn()) return;
+    if (!accById(selAcc)) selAcc = '';
+    $('accChips').innerHTML = settings.accs.map(function (a) {
+      return '<li><button type="button" class="chip" data-acc="' + esc(a.id) + '" aria-pressed="' + (a.id === selAcc ? 'true' : 'false') + '">' + esc(a.name) + '</button></li>';
+    }).join('');
+  }
+  $('accChips').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-acc]');
+    if (!b) return;
+    selAcc = b.getAttribute('data-acc');
+    lsSet('kassa-acc-last', selAcc);
+    renderAccPick();
+  });
+  function fillSel(el, keep) {
+    el.innerHTML = settings.accs.map(function (a) { return '<option value="' + esc(a.id) + '">' + esc(a.name) + '</option>'; }).join('');
+    if (settings.accs.some(function (a) { return a.id === keep; })) el.value = keep;
+  }
+  function renderAccUi() {
+    var box = $('svAccBox');
+    box.hidden = !accOn();
+    if (accOn()) fillSel($('svAcc'), $('svAcc').value || lsGet('kassa-acc-last') || '');
+    if ($('ovAcc').classList.contains('show')) renderAcc();
+  }
+  function renderAcc() {
+    var on = accOn();
+    $('accOff').hidden = on;
+    $('accOnBox').hidden = !on;
+    if (!on) return;
+    $('accTotal').textContent = sgn(accTotal());
+    $('accRows').innerHTML = settings.accs.map(function (a) {
+      var bal = accBal(a.id);
+      if (accEditId === a.id) {
+        return '<div class="gcard editing"><div class="field"><label for="aeName">Название</label><input id="aeName" maxlength="24" autocomplete="off" value="' + esc(a.name) + '"></div>' +
+          '<div class="field"><label for="aeBal">Сейчас на счёте, ₽</label><input id="aeBal" inputmode="decimal" autocomplete="off" value="' + String(bal).replace('.', ',') + '"></div>' +
+          '<div class="gc-act"><button type="button" class="main" data-asave="' + esc(a.id) + '">Сохранить</button><button type="button" data-acancel="1">Отмена</button>' +
+          (a.id ? '<button type="button" data-adel="' + esc(a.id) + '">Удалить</button>' : '') + '</div></div>';
+      }
+      return '<div class="arow"><span class="an">' + esc(a.name) + '</span><b class="' + (bal < 0 ? 'neg' : '') + '">' + sgn(bal) + '</b><button type="button" class="link" data-aedit="' + esc(a.id) + '">Изменить</button></div>';
+    }).join('');
+    var f0 = $('accXf').value, t0 = $('accXt').value;
+    fillSel($('accXf'), f0);
+    fillSel($('accXt'), t0);
+    if ($('accXf').value === $('accXt').value && settings.accs.length > 1) $('accXt').value = settings.accs.filter(function (a) { return a.id !== $('accXf').value; })[0].id;
+    $('accXfBox').hidden = settings.accs.length < 2;
+    $('accXfList').innerHTML = settings.xfers.slice(-5).reverse().map(function (x) {
+      return '<div class="xrow"><span>' + (x.date ? new Date(+x.date.slice(0, 4), +x.date.slice(5, 7) - 1, +x.date.slice(8, 10)).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }) + ': ' : '') + esc(accName(x.from) || '?') + ' → ' + esc(accName(x.to) || '?') + ' · ' + money(x.amount) + '</span><button type="button" class="link" data-xdel="' + esc(x.id) + '">Удалить</button></div>';
+    }).join('');
+  }
+  function accId() { return 'a' + Date.now().toString(36).slice(-5) + Math.random().toString(36).slice(2, 6); }
+  function accBalIn(el) { var v = el.value.trim() === '' ? 0 : parseAmt(el.value); return (isFinite(v) && Math.abs(v) <= 1e9) ? v : NaN; }
+  $('accOnBtn').addEventListener('click', function () {
+    var bal = accBalIn($('accMBal'));
+    if (isNaN(bal)) { toast('Проверьте сумму'); $('accMBal').focus(); return; }
+    settings.accs = [{ id: '', name: $('accMName').value.trim().slice(0, 24) || 'Основной', start: bal, since: Date.now() }];
+    persistSettings();
+    renderAcc();
+    toast('Счета включены. Добавьте остальные ниже');
+  });
+  $('accNAdd').addEventListener('click', function () {
+    var nm = $('accNName').value.trim().slice(0, 24), bal = accBalIn($('accNBal'));
+    if (!nm) { toast('Введите название'); $('accNName').focus(); return; }
+    if (isNaN(bal)) { toast('Проверьте сумму'); $('accNBal').focus(); return; }
+    if (settings.accs.length >= 12) { toast('Слишком много счетов'); return; }
+    if (settings.accs.some(function (a) { return a.name.toLowerCase() === nm.toLowerCase(); })) { toast('Такой счёт уже есть'); return; }
+    settings.accs.push({ id: accId(), name: nm, start: bal, since: Date.now() });
+    $('accNName').value = ''; $('accNBal').value = '';
+    persistSettings();
+    renderAcc();
+  });
+  $('accRows').addEventListener('click', function (e) {
+    var ed = e.target.closest('[data-aedit]');
+    if (ed) { accEditId = ed.getAttribute('data-aedit'); renderAcc(); return; }
+    if (e.target.closest('[data-acancel]')) { accEditId = null; renderAcc(); return; }
+    var dl = e.target.closest('[data-adel]');
+    if (dl) {
+      var did = dl.getAttribute('data-adel');
+      settings.accs = settings.accs.filter(function (a) { return a.id !== did; });
+      settings.xfers = settings.xfers.map(function (x) { return { id: x.id, ts: x.ts, date: x.date, amount: x.amount, from: x.from === did ? '' : x.from, to: x.to === did ? '' : x.to }; }).filter(function (x) { return x.from !== x.to; });
+      accEditId = null;
+      persistSettings(); renderAcc();
+      toast('Счёт удалён. Его записи перешли на «' + settings.accs[0].name + '»');
+      return;
+    }
+    var sv = e.target.closest('[data-asave]');
+    if (!sv) return;
+    var id = sv.getAttribute('data-asave'), a = accById(id);
+    if (!a) return;
+    var nm = $('aeName').value.trim().slice(0, 24), nb = accBalIn($('aeBal'));
+    if (!nm) { toast('Введите название'); return; }
+    if (isNaN(nb)) { toast('Проверьте сумму'); return; }
+    if (settings.accs.some(function (x) { return x.id !== id && x.name.toLowerCase() === nm.toLowerCase(); })) { toast('Такой счёт уже есть'); return; }
+    a.start = r2(a.start + (nb - accBal(id)));
+    a.name = nm;
+    accEditId = null;
+    persistSettings(); renderAcc();
+  });
+  $('accXgo').addEventListener('click', function () {
+    var f = $('accXf').value, t = $('accXt').value, am = parseAmt($('accXa').value);
+    if (f === t) { toast('Выберите разные счета'); return; }
+    if (!(am > 0) || am > 1e9) { toast('Введите сумму больше нуля'); $('accXa').focus(); return; }
+    settings.xfers.push({ id: 'x' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), ts: Date.now(), date: dateStr(new Date()), from: f, to: t, amount: am });
+    if (settings.xfers.length > 500) settings.xfers = settings.xfers.slice(-500);
+    $('accXa').value = '';
+    persistSettings(); renderAcc();
+    toast('Переведено');
+  });
+  $('accXfList').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-xdel]');
+    if (!b) return;
+    var id = b.getAttribute('data-xdel');
+    settings.xfers = settings.xfers.filter(function (x) { return x.id !== id; });
+    persistSettings(); renderAcc();
+  });
 
   function renderTiles() {
     var box = $('tiles');
@@ -2766,6 +2990,8 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
     if (sign < 0 && a > pocketBal(gid) + 0.005) { toast('В этой копилке меньше этой суммы'); return; }
     var t = { id: newId(), type: 'save', cat: 'Накопления', amount: sign * a, note: '', date: dateStr(new Date()), createdAt: Date.now() };
     if (gid) t.goalId = gid;
+    var sa = $('svAcc').value;
+    if (accOn() && sa) t.acc = sa;
     addTx(t).then(function () {
       $('svAmt').value = '';
       toast(sign > 0 ? 'Отложено' : 'Снято из копилки');
@@ -2781,8 +3007,9 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
       if (t.auto) o.auto = true;
       if (t.recId) o.recId = t.recId;
       if (t.goalId) o.goalId = t.goalId;
+      if (t.acc) o.acc = t.acc;
       return o;
-    }), cats: catsBody(), save: { on: settings.on, plan: settings.plan, goal: settings.goal, carry: settings.carry, limitGoals: settings.limitGoals, carryFrom: settings.carryFrom, closed: settings.closed, goals: settings.goals, months: settings.months, goalStart: settings.goalStart },
+    }), cats: catsBody(), save: { accs: settings.accs, xfers: settings.xfers, on: settings.on, plan: settings.plan, goal: settings.goal, carry: settings.carry, limitGoals: settings.limitGoals, carryFrom: settings.carryFrom, closed: settings.closed, goals: settings.goals, months: settings.months, goalStart: settings.goalStart },
       tpl: { items: tpl.items }, ui: { name: ui.name.trim(), palette: ui.palette, mode: ui.mode }, rec: { items: rec.items } };
   }
   function downloadText(name, text) {
@@ -2820,11 +3047,11 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
   function csvCell(v) { v = String(v == null ? '' : v); return /[";\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
   $('bkCsv').addEventListener('click', async function () {
     var rows = txs.filter(function (t) { return !t.example; }).slice().sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : (a.createdAt || 0) - (b.createdAt || 0); });
-    var lines = ['Дата;Тип;Категория;Сумма;Комментарий;Копилка'];
+    var lines = ['Дата;Тип;Категория;Сумма;Комментарий;Копилка;Счёт'];
     rows.forEach(function (t) {
       var tn = t.type === 'in' ? 'Доход' : t.type === 'out' ? 'Расход' : (t.amount < 0 ? 'Снятие из копилки' : 'В копилку');
       var pk = t.type === 'save' ? (t.goalId && goalName(t.goalId) ? goalName(t.goalId) : 'Общая копилка') : '';
-      lines.push([t.date, tn, t.cat, String(Math.abs(t.amount)).replace('.', ','), t.note || '', pk].map(csvCell).join(';'));
+      lines.push([t.date, tn, t.cat, String(Math.abs(t.amount)).replace('.', ','), t.note || '', pk, accOn() ? accName(accOf(t)) : ''].map(csvCell).join(';'));
     });
     var text = '\ufeff' + lines.join('\r\n'), name = 'kassa-' + dateStr(new Date()) + '.csv';
     try {
@@ -2852,6 +3079,8 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
     }
   });
   $('bkLoad').addEventListener('click', function () { $('bkFile').value = ''; $('bkFile').click(); });
+  var bkReplace = false;
+  $('bkRep').addEventListener('click', function () { bkReplace = true; $('bkGo').click(); });
   $('bkNo').addEventListener('click', function () { bkPending = null; $('bkInfo').hidden = true; });
   $('bkFile').addEventListener('change', function () {
     var f = this.files && this.files[0];
@@ -2868,10 +3097,11 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
           if (t.auto === true) o.auto = true;
           if (typeof t.recId === 'string' && /^[A-Za-z0-9]{1,24}$/.test(t.recId)) o.recId = t.recId;
           if (typeof t.goalId === 'string' && /^[A-Za-z0-9]{1,24}$/.test(t.goalId)) o.goalId = t.goalId;
+          if (typeof t.acc === 'string' && /^[A-Za-z0-9]{1,24}$/.test(t.acc)) o.acc = t.acc;
           list.push(o);
         });
         bkPending = { txs: list, cats: b.cats, save: b.save, ui: b.ui, rec: b.rec, tpl: b.tpl };
-        $('bkText').textContent = 'В копии ' + list.length + ' записей' + (b.at ? ' от ' + new Date(b.at).toLocaleDateString('ru-RU') : '') + '. Записи добавятся к текущим (одинаковые заменятся). Категории, регулярные платежи и настройки будут взяты из копии.';
+        $('bkText').textContent = 'В копии ' + list.length + ' записей' + (b.at ? ' от ' + new Date(b.at).toLocaleDateString('ru-RU') : '') + '. «Добавить к текущим» объединит их с теми, что уже есть (одинаковые заменятся). «Заменить всё копией» удалит все текущие записи, которых нет в копии, и оставит ровно то, что в файле. Категории, платежи и настройки в любом случае берутся из копии.';
         $('bkInfo').hidden = false;
       } catch (e) {
         bkPending = null; $('bkInfo').hidden = true;
@@ -2884,9 +3114,24 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
   $('bkGo').addEventListener('click', async function () {
     var b = bkPending;
     if (!b) return;
+    var repl = bkReplace;
+    bkReplace = false;
     bkPending = null;
     $('bkInfo').hidden = true;
     try {
+      if (repl) {
+        var keep = {};
+        b.txs.forEach(function (t) { keep[t.id] = 1; });
+        var oldIds = txs.filter(function (t) { return !keep[t.id]; }).map(function (t) { return t.id; });
+        if (store.mode === 'cloud') {
+          for (var di = 0; di < oldIds.length; di += 20) {
+            await Promise.all(oldIds.slice(di, di + 20).map(function (id) { return store.col.doc(id).delete(); }));
+          }
+        } else {
+          txs = txs.filter(function (t) { return keep[t.id]; });
+          lsSave();
+        }
+      }
       if (store.mode === 'cloud') {
         for (var i = 0; i < b.txs.length; i += 20) {
           await Promise.all(b.txs.slice(i, i + 20).map(function (t) { return addTx(t); }));
@@ -2926,6 +3171,7 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
     var ic = t.type === 'save' ? '' : iconFor(t.type, t.cat);
     var letter = t.type === 'save' ? (t.amount < 0 ? '←' : '→') : (ic || t.cat.charAt(0).toUpperCase());
     var note = t.note || (t.type === 'save' ? (t.amount < 0 ? 'Из копилки' : 'В копилку') + (t.goalId && goalName(t.goalId) ? ' · ' + goalName(t.goalId) : '') : '');
+    if (settings.accs.length > 1) { var an0 = accName(accOf(t)); note = note ? note + ' · ' + an0 : an0; }
     var amount = t.type === 'save'
       ? (t.amount < 0 ? '← ' : '→ ') + money(Math.abs(t.amount))
       : (t.type === 'in' ? '+' : '−') + money(t.amount);
@@ -3113,6 +3359,7 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
     renderQuick();
     renderSaveSheet();
     checkDone();
+    renderAccUi();
 
     $('clearEx').hidden = !txs.some(function (t) { return t.example; });
     $('storeNote').textContent = store.mode === 'cloud'
@@ -3455,6 +3702,15 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
     var ls = $('limSub');
     ls.textContent = !set.length ? 'Не заданы' : 'Задано: ' + set.length + (over ? ' · превышено: ' + over : '');
     ls.className = 'tile-sub' + (over ? ' bad' : '');
+    var as = $('accSub'), al = $('accList');
+    if (!accOn()) { as.textContent = 'Наличка, карты, банки: сколько денег на каждом'; al.innerHTML = ''; }
+    else {
+      as.textContent = 'Всего на счетах: ' + money(accTotal());
+      al.innerHTML = settings.accs.slice(0, 4).map(function (a) {
+        var bl = accBal(a.id);
+        return '<span class="rrow"><span class="rn">' + esc(a.name) + '</span><b>' + (bl < 0 ? '−' : '') + money(Math.abs(bl)) + '</b></span>';
+      }).join('') + (settings.accs.length > 4 ? '<span class="tile-sub">и ещё ' + (settings.accs.length - 4) + '</span>' : '');
+    }
     var rs = $('recSub'), rl = $('recList');
     if (!rec.items.length) {
       rs.textContent = 'Не настроены. Нажмите, чтобы добавить аренду, кредит, подписки';
@@ -3653,6 +3909,7 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
   $('quick').addEventListener('click', quickClick = function (e) {
     var b = e.target.closest('[data-open]');
     if (!b) return;
+    if (b.getAttribute('data-open') === 'acc') { accEditId = null; renderAcc(); openOv('ovAcc'); return; }
     if (b.getAttribute('data-open') === 'cmp') { renderCmp(); openOv('ovCmp'); return; }
     if (b.getAttribute('data-open') === 'lim') {
       renderLimSheet();
