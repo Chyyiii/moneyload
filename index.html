@@ -663,6 +663,26 @@ html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
 .xrow { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 0; font-size: 13px; color: var(--muted); font-weight: 600; }
 .xrow .link { font-size: 12px; padding: 2px 4px; }
 html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px); }
+.sheet > .sheet-head { position: sticky; top: -18px; z-index: 6; margin: -18px -18px 0; padding: 18px 18px 10px; background: var(--surface); }
+.stickyb { position: sticky; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 5; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.28)); }
+.fold { border: 1px solid var(--line); border-radius: 16px; padding: 0 14px; background: var(--tint); }
+.fold > summary { cursor: pointer; font-weight: 700; padding: 13px 0; list-style: none; }
+.fold > summary::-webkit-details-marker { display: none; }
+.fold[open] > summary { border-bottom: 1px solid var(--line); margin-bottom: 4px; }
+.fold > :not(summary) { margin-top: 12px; }
+.fold > :last-child { margin-bottom: 14px; }
+.dchips { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.dchips .chip { padding: 6px 12px; font-size: 13px; }
+#helpQ { width: 100%; }
+.grp { font-size: 15px; font-weight: 800; margin: 0 0 -6px; }
+.grp.sep { border-top: 1px solid var(--line); padding-top: 18px; margin-top: 6px; }
+@supports (color: color-mix(in srgb, red, blue)) {
+  html[data-style="glass"] .sheet > .sheet-head { background: color-mix(in srgb, var(--surface) 86%, transparent); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }
+  html[data-style="glass"] .fold { background: color-mix(in srgb, var(--tint) 70%, transparent); }
+}
+.limhead { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.limitem { display: flex; flex-direction: column; }
+.limitem .bar { margin-top: 8px; }
 .sw[data-p="sunset"] i { background: #B1305A; }
 .sw[data-p="midnight"] i { background: #3B3FA8; }
 </style>
@@ -717,7 +737,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
 
   <div class="tiles" id="quick">
     <button type="button" class="tile wide" data-open="acc"><span class="tile-lbl">Счета</span><span class="tile-sub" id="accSub"></span><span class="rlist" id="accList"></span></button>
-    <button type="button" class="tile wide" data-open="rec"><span class="tile-lbl">Регулярные платежи</span><span class="tile-sub" id="recSub"></span><span class="rlist" id="recList"></span></button>
+    <button type="button" class="tile wide" data-open="rec"><span class="tile-lbl">Регулярные платежи</span><span class="tile-sub" id="recSub"></span><span class="rlist" id="recTileList"></span></button>
   </div>
 
   <section id="catsBox" hidden>
@@ -802,10 +822,10 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
       <button type="button" class="link" id="splitOn">Разделить по категориям</button>
       <div class="field" id="accBox" hidden><span class="lbl">Счёт</span><ul class="pick" id="accChips"></ul></div>
       <div class="two">
-        <div class="field"><label for="date">Дата</label><input id="date" type="date"></div>
+        <div class="field"><label for="date">Дата</label><input id="date" type="date"><div class="dchips"><button type="button" class="chip" data-d="0">Сегодня</button><button type="button" class="chip" data-d="1">Вчера</button><button type="button" class="chip" data-d="2">Позавчера</button></div></div>
         <div class="field"><label for="note">Комментарий</label><input id="note" maxlength="120" autocomplete="off" placeholder="Необязательно"></div>
       </div>
-      <button class="primary" id="submit" type="submit">Записать</button>
+      <button class="primary stickyb" id="submit" type="submit">Записать</button>
       <button type="button" class="link" id="tplSave">Сохранить как быструю запись</button>
     </form>
   </div>
@@ -848,7 +868,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
           </div>
           <select id="svTo" hidden></select>
           <div class="field" id="svAccBox" hidden><label for="svAcc">Со счёта / на счёт</label><select id="svAcc"></select></div>
-          <div class="field"><label for="svAmt">Сумма</label><input id="svAmt" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+          <div class="field"><label for="svAmt">Сумма</label><input id="svAmt" inputmode="decimal" autocomplete="off" placeholder="0"><div class="dchips" id="svQuick"><button type="button" class="chip" data-add="500">+500</button><button type="button" class="chip" data-add="1000">+1 000</button><button type="button" class="chip" data-add="5000">+5 000</button><button type="button" class="chip" data-add="10000">+10 000</button></div></div>
           <div class="btnrow">
             <button type="submit" class="primary">Отложить</button>
             <button type="button" class="secondary" id="svTake">Снять</button>
@@ -870,7 +890,8 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
             </div>
           </form>
         </div>
-        <p class="quiet small" id="sLimit"></p>
+        <button type="button" class="link" id="sLimitBtn">Как считается лимит на день →</button>
+        <p class="quiet small" id="sLimit" hidden></p>
       </div>
       <div class="stack" id="svPaneGoals" hidden>
         <p class="small quiet">Задайте сумму и срок, а приложение посчитает, сколько откладывать каждый месяц.</p>
@@ -891,12 +912,14 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
       </div>
       <button type="button" class="link muted" id="svDisable">Выключить накопления</button>
     </div>
+    <details class="fold" id="svSetD"><summary>Настройки накоплений</summary>
     <div class="chkwrap">
       <label class="chk"><input type="checkbox" id="svLimGoals"><span>Учитывать взнос по целям в лимите на день</span></label>
-      <p class="hint">Если выключено (по умолчанию), лимит на день считается от остатка с учётом регулярных платежей, а взнос по целям показывается отдельной строкой. Если включено, взнос по целям заранее вычитается из денег на каждый день, и лимит может стать нулевым.</p>
+      <p class="hint">Выключено: лимит считается от остатка и платежей, а взнос по целям показан отдельной строкой. Включено: взнос по целям заранее вычитается из лимита, и он может стать нулевым.</p>
       <label class="chk"><input type="checkbox" id="svCarry"><span>Переносить остаток на следующий месяц</span></label>
       <p class="hint">Неизрасходованные деньги прибавляются к остатку нового месяца. Если включены накопления, в начале месяца приложение предложит отправить часть в копилку.</p>
     </div>
+    </details>
   </div>
 </div>
 
@@ -930,6 +953,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
       <h2 id="helpTitle">Руководство</h2>
       <button type="button" class="x" data-close aria-label="Закрыть">×</button>
     </div>
+    <input type="search" id="helpQ" class="search" placeholder="Найти в руководстве…" autocomplete="off">
     <div class="guide">
       <details open><summary>С чего начать</summary>
         <p>Нажмите <b>«+ Запись»</b> внизу экрана, введите сумму, выберите тип (расход или доход) и категорию, при желании поменяйте дату и добавьте комментарий. Стрелки в верхней карточке переключают месяцы. Вверху крупно виден <b>остаток за месяц</b>: доходы минус расходы и минус отложенное.</p>
@@ -1076,24 +1100,23 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
       <div id="accOnBox" hidden>
         <div><p class="tile-lbl">Всего на счетах</p><p class="tile-val gold" id="accTotal" style="font-size:28px"></p></div>
         <div id="accRows"></div>
-        <div class="field">
-          <span class="lbl">Новый счёт</span>
+        <details class="fold" id="accNewD"><summary>＋ Добавить счёт</summary>
           <div class="setgrid">
             <div class="field"><label for="accNName">Название</label><input id="accNName" maxlength="24" autocomplete="off" placeholder="Например, Наличка"></div>
             <div class="field"><label for="accNBal">Сейчас на нём, ₽</label><input id="accNBal" inputmode="decimal" autocomplete="off" placeholder="0"></div>
           </div>
           <button type="button" class="secondary" id="accNAdd">Добавить счёт</button>
-        </div>
-        <div class="field" id="accXfBox">
-          <span class="lbl">Перевод между счетами</span>
+        </details>
+        <details class="fold" id="accXfBox"><summary>⇄ Перевод между счетами</summary>
           <div class="setgrid">
             <div class="field"><label for="accXf">Откуда</label><select id="accXf"></select></div>
             <div class="field"><label for="accXt">Куда</label><select id="accXt"></select></div>
           </div>
           <div class="field"><label for="accXa">Сумма, ₽</label><input id="accXa" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+          <div class="field"><label for="accXn">Комментарий</label><input id="accXn" maxlength="60" autocomplete="off" placeholder="Необязательно"></div>
           <button type="button" class="secondary" id="accXgo">Перевести</button>
           <div id="accXfList"></div>
-        </div>
+        </details>
         <p class="hint">Переводы между счетами не считаются ни доходом, ни расходом. Если удалить счёт, его записи перейдут на первый счёт.</p>
       </div>
       <button type="button" class="primary" data-close>Готово</button>
@@ -1149,10 +1172,11 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
       <h2 id="limTitle">Лимиты по категориям</h2>
       <button type="button" class="x" data-close aria-label="Закрыть">×</button>
     </div>
-    <p class="hint">Сколько вы готовы тратить на категорию за месяц. Пустое поле значит «без лимита». Шкала в списке «Куда уходят деньги» покажет, сколько осталось.</p>
+    <p class="hint">Сколько вы готовы тратить на категорию за месяц. Пустое поле значит «без лимита».</p>
+    <div class="limhead"><span class="lbl" id="limMonth"></span><button type="button" class="link" id="limSuggest">Заполнить по прошлому месяцу</button></div>
     <form id="limForm" class="stack" novalidate>
       <div class="limlist" id="limList"></div>
-      <button type="submit" class="primary">Сохранить</button>
+      <button type="submit" class="primary stickyb">Сохранить</button>
     </form>
   </div>
 </div>
@@ -1164,7 +1188,13 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
       <h2 id="recTitle">Регулярные платежи</h2>
       <button type="button" class="x" data-close aria-label="Закрыть">×</button>
     </div>
-    <p class="hint">Платёж сам появится в журнале в выбранный день каждого месяца. Если день этого месяца уже прошёл, он начнётся со следующего. Не добавляйте сюда то, что уже записали вручную. Предстоящие расходы заранее вычитаются из дневного лимита. Если деньги на платёж уже отложены на другом счёте, поставьте галочку «Отложено на другом счёте»: сумма сразу вычтется из остатка как недоступная. В день платежа он попадёт в журнал, повторно ничего не вычтется. Если деньги ещё не пришли, поставьте «Оплачу с будущего дохода»: платёж не уменьшит лимит до своей даты.</p>
+    <p class="hint">Платёж сам появится в журнале в выбранный день каждого месяца. Предстоящие платежи заранее вычитаются из дневного лимита.</p>
+    <details class="fold"><summary>Как это работает</summary>
+      <p class="hint">Если день этого месяца уже прошёл, платёж начнётся со следующего месяца. Не добавляйте сюда то, что уже записали вручную.</p>
+      <p class="hint">«Отложено на другом счёте»: деньги уже лежат отдельно, сумма сразу вычитается из остатка. В день платежа он попадёт в журнал, повторно ничего не вычтется.</p>
+      <p class="hint">«Оплачу с будущего дохода»: деньги ещё не пришли, поэтому платёж не уменьшает лимит до своей даты.</p>
+    </details>
+    <h3 class="lbl" id="recListT" hidden>Ваши платежи</h3>
     <div class="card" id="recCard" hidden><ul id="recList"></ul></div>
     <form id="recForm" class="stack recform" novalidate>
       <h3 class="lbl" id="recFormTitle">Новый платёж</h3>
@@ -1180,11 +1210,11 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
       </div>
       <div class="chkwrap">
         <label class="chk"><input type="checkbox" id="recExt"><span>Отложено на другом счёте</span></label>
-        <p class="hint">Сумма сразу вычитается из остатка за месяц, потому что эти деньги вы потратить не можете. В день платежа он автоматически попадёт в журнал, повторно ничего не вычтется.</p>
+        <p class="hint">Деньги уже лежат отдельно. Сумма сразу вычитается из остатка.</p>
         <label class="chk"><input type="checkbox" id="recFut"><span>Оплачу с будущего дохода</span></label>
-        <p class="hint">Деньги на платёж ещё не пришли: до его даты он не уменьшает дневной лимит и не вызывает «Не хватает на платежи». В свой день он попадёт в журнал как обычный расход.</p>
+        <p class="hint">Деньги ещё не пришли: до своей даты платёж не уменьшает лимит.</p>
       </div>
-      <div class="btnrow">
+      <div class="btnrow stickyb">
         <button type="submit" class="primary" id="recSubmit">Добавить платёж</button>
         <button type="button" class="secondary" id="recCancel" hidden>Отмена</button>
       </div>
@@ -1200,6 +1230,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
       <button type="button" class="x" data-close aria-label="Закрыть">×</button>
     </div>
     <div class="stack">
+      <h3 class="grp">Внешний вид</h3>
       <div class="field"><label for="uiName">Название</label><input id="uiName" maxlength="30" autocomplete="off" placeholder="Кассовая книга"></div>
       <div class="field">
         <span class="lbl" id="lblColor">Цвет</span>
@@ -1227,6 +1258,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
           <button type="button" data-o="1" aria-pressed="false">Чёрный (OLED)</button>
         </div>
       </div>
+      <h3 class="grp sep">Данные и копии</h3>
       <div class="field">
         <span class="lbl" id="lblBk">Резервная копия</span>
         <p class="hint">Файл со всеми записями, категориями и настройками. Сохраните его в «Файлы» или отправьте себе в мессенджер. Из него можно восстановить данные на любом устройстве.</p>
@@ -1555,7 +1587,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
       if (res.length >= 500 || !x || typeof x.id !== 'string' || !/^[A-Za-z0-9]{1,24}$/.test(x.id) || typeof x.from !== 'string' || typeof x.to !== 'string' || x.from === x.to) return;
       var am = Number(x.amount), ts = Number(x.ts);
       if (!isFinite(am) || !(am > 0) || am > 1e9 || !isFinite(ts)) return;
-      res.push({ id: x.id, ts: ts, date: typeof x.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(x.date) ? x.date : '', from: x.from, to: x.to, amount: r2(am) });
+      res.push({ id: x.id, ts: ts, date: typeof x.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(x.date) ? x.date : '', from: x.from, to: x.to, amount: r2(am), note: typeof x.note === 'string' ? x.note.trim().slice(0, 60) : '' });
     });
     return res;
   }
@@ -1994,6 +2026,22 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     openOv('ovAdd', 'amount');
   }
   $('fab').addEventListener('click', openAdd);
+  function syncDChips() {
+    var v = $('date').value;
+    Array.prototype.forEach.call(document.querySelectorAll('.dchips .chip'), function (b) {
+      var d = new Date(); d.setDate(d.getDate() - (+b.getAttribute('data-d')));
+      b.setAttribute('aria-pressed', dateStr(d) === v ? 'true' : 'false');
+    });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.dchips .chip'), function (b) {
+    b.addEventListener('click', function () {
+      var d = new Date(); d.setDate(d.getDate() - (+b.getAttribute('data-d')));
+      $('date').value = dateStr(d); syncDChips();
+    });
+  });
+  $('date').addEventListener('input', syncDChips);
+  $('date').addEventListener('change', syncDChips);
+  new MutationObserver(syncDChips).observe($('ovAdd'), { attributes: true, attributeFilter: ['class'] });
   function syncEye() { $('eye').setAttribute('aria-pressed', document.documentElement.hasAttribute('data-hide') ? 'true' : 'false'); }
   syncEye();
   $('eye').addEventListener('click', function () {
@@ -2003,6 +2051,14 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     syncEye();
   });
   $('helpBtn').addEventListener('click', function () { openOv('ovHelp'); });
+  $('helpQ').addEventListener('input', function () {
+    var q = this.value.trim().toLowerCase();
+    Array.prototype.forEach.call(document.querySelectorAll('#ovHelp .guide > details'), function (d) {
+      var hit = !q || d.textContent.toLowerCase().indexOf(q) >= 0;
+      d.style.display = hit ? '' : 'none';
+      if (q && hit) d.open = true;
+    });
+  });
 
   /* Обучение */
   var tourI = 0, tourOpen = false, tourLast = null;
@@ -2473,6 +2529,8 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     $('accOnBox').hidden = !on;
     if (!on) return;
     $('accTotal').textContent = sgn(accTotal());
+    if (!renderAcc._init || settings.accs.length < 2) $('accNewD').open = settings.accs.length < 2;
+    renderAcc._init = true;
     $('accRows').innerHTML = settings.accs.map(function (a) {
       var bal = accBal(a.id);
       if (accEditId === a.id) {
@@ -2489,7 +2547,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     if ($('accXf').value === $('accXt').value && settings.accs.length > 1) $('accXt').value = settings.accs.filter(function (a) { return a.id !== $('accXf').value; })[0].id;
     $('accXfBox').hidden = settings.accs.length < 2;
     $('accXfList').innerHTML = settings.xfers.slice(-5).reverse().map(function (x) {
-      return '<div class="xrow"><span>' + (x.date ? new Date(+x.date.slice(0, 4), +x.date.slice(5, 7) - 1, +x.date.slice(8, 10)).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }) + ': ' : '') + esc(accName(x.from) || '?') + ' → ' + esc(accName(x.to) || '?') + ' · ' + money(x.amount) + '</span><button type="button" class="link" data-xdel="' + esc(x.id) + '">Удалить</button></div>';
+      return '<div class="xrow"><span>' + (x.date ? new Date(+x.date.slice(0, 4), +x.date.slice(5, 7) - 1, +x.date.slice(8, 10)).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }) + ': ' : '') + esc(accName(x.from) || '?') + ' → ' + esc(accName(x.to) || '?') + ' · ' + money(x.amount) + (x.note ? ' · ' + esc(x.note) : '') + '</span><button type="button" class="link" data-xdel="' + esc(x.id) + '">Удалить</button></div>';
     }).join('');
   }
   function accId() { return 'a' + Date.now().toString(36).slice(-5) + Math.random().toString(36).slice(2, 6); }
@@ -2521,7 +2579,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     if (dl) {
       var did = dl.getAttribute('data-adel');
       settings.accs = settings.accs.filter(function (a) { return a.id !== did; });
-      settings.xfers = settings.xfers.map(function (x) { return { id: x.id, ts: x.ts, date: x.date, amount: x.amount, from: x.from === did ? '' : x.from, to: x.to === did ? '' : x.to }; }).filter(function (x) { return x.from !== x.to; });
+      settings.xfers = settings.xfers.map(function (x) { return { id: x.id, ts: x.ts, date: x.date, amount: x.amount, note: x.note, from: x.from === did ? '' : x.from, to: x.to === did ? '' : x.to }; }).filter(function (x) { return x.from !== x.to; });
       accEditId = null;
       persistSettings(); renderAcc();
       toast('Счёт удалён. Его записи перешли на «' + settings.accs[0].name + '»');
@@ -2544,9 +2602,9 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     var f = $('accXf').value, t = $('accXt').value, am = parseAmt($('accXa').value);
     if (f === t) { toast('Выберите разные счета'); return; }
     if (!(am > 0) || am > 1e9) { toast('Введите сумму больше нуля'); $('accXa').focus(); return; }
-    settings.xfers.push({ id: 'x' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), ts: Date.now(), date: dateStr(new Date()), from: f, to: t, amount: am });
+    settings.xfers.push({ id: 'x' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), ts: Date.now(), date: dateStr(new Date()), from: f, to: t, amount: am, note: $('accXn').value.trim().slice(0, 60) });
     if (settings.xfers.length > 500) settings.xfers = settings.xfers.slice(-500);
-    $('accXa').value = '';
+    $('accXa').value = ''; $('accXn').value = '';
     persistSettings(); renderAcc();
     toast('Переведено');
   });
@@ -2688,6 +2746,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     if (e.target.closest('[data-open="day"]')) { renderDay(); openOv('ovDay'); return; }
     if (e.target.closest('[data-open="save"]')) openOv('ovSave');
   });
+  $('sLimitBtn').addEventListener('click', function () { renderDay(); openOv('ovDay'); });
   $('dayToSave').addEventListener('click', function () { openOv('ovSave'); });
   $('svLimGoals').addEventListener('change', function () {
     settings.limitGoals = $('svLimGoals').checked;
@@ -2997,6 +3056,12 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
       toast(sign > 0 ? 'Отложено' : 'Снято из копилки');
     }).catch(function () { toast('Не удалось сохранить. Попробуйте ещё раз.'); });
   }
+  $('svQuick').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-add]');
+    if (!b) return;
+    var cur = parseAmt($('svAmt').value);
+    $('svAmt').value = String(r2((isNaN(cur) ? 0 : cur) + (+b.getAttribute('data-add')))).replace('.', ',');
+  });
   $('svForm').addEventListener('submit', function (e) { e.preventDefault(); moveSave(1); });
   $('svTake').addEventListener('click', function () { moveSave(-1); });
   /* Резервная копия */
@@ -3639,9 +3704,9 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
       var hi = max > 0 ? x.t.inc / max * 100 : 0, ho = max > 0 ? x.t.out / max * 100 : 0;
       return '<div class="cmpcol' + (idx === 5 ? ' now' : '') + '"><div class="cmppair"><i class="in" style="height:' + hi.toFixed(1) + '%"></i><i class="out" style="height:' + ho.toFixed(1) + '%"></i></div><span>' + MON[x.d.getMonth()] + '</span></div>';
     }).join('');
-    $('cmpTable').innerHTML = arr.slice().reverse().map(function (x) {
+    $('cmpTable').innerHTML = arr.slice().reverse().filter(function (x) { return x.t.inc > 0 || x.t.out > 0; }).map(function (x) {
       return '<div class="cmprow"><span>' + cap(x.d.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' })) + '</span><span class="cmp-v">+' + money(r2(x.t.inc)) + '</span><span class="cmp-v">−' + money(r2(x.t.out)) + '</span></div>';
-    }).join('');
+    }).join('') || '<p class="hint">Пока нет записей за эти месяцы.</p>';
     var cur = arr[5], pd = new Date(view.y, view.m - 1, 1), prev = monthTotals(pd.getFullYear(), pd.getMonth());
     var cn = cap(cur.d.toLocaleDateString('ru-RU', { month: 'long' })), pn = cap(pd.toLocaleDateString('ru-RU', { month: 'long' }));
     $('cmpHead').textContent = cn + ' и ' + pn.toLowerCase();
@@ -3652,6 +3717,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     var names = Object.keys(cur.t.cats).concat(Object.keys(prev.cats).filter(function (c) { return !(c in cur.t.cats); }));
     names.sort(function (a, b) { return (cur.t.cats[b] || 0) - (cur.t.cats[a] || 0) || (prev.cats[b] || 0) - (prev.cats[a] || 0); });
     function delta(a, b) {
+      if (!(prev.out > 0)) return '<span class="cmp-v"></span>';
       var df = r2(a - b);
       if (Math.abs(df) < 0.005) return '<span class="cmp-v">без изменений</span>';
       return '<span class="cmp-v ' + (df > 0 ? 'up' : 'down') + '">' + (df > 0 ? '↑ +' : '↓ −') + money(Math.abs(df)) + '</span>';
@@ -3711,7 +3777,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
         return '<span class="rrow"><span class="rn">' + esc(a.name) + '</span><b>' + (bl < 0 ? '−' : '') + money(Math.abs(bl)) + '</b></span>';
       }).join('') + (settings.accs.length > 4 ? '<span class="tile-sub">и ещё ' + (settings.accs.length - 4) + '</span>' : '');
     }
-    var rs = $('recSub'), rl = $('recList');
+    var rs = $('recSub'), rl = $('recTileList');
     if (!rec.items.length) {
       rs.textContent = 'Не настроены. Нажмите, чтобы добавить аренду, кредит, подписки';
       rl.innerHTML = '';
@@ -3733,12 +3799,46 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
 
   /* Лимиты по категориям */
   function renderLimSheet() {
+    var key = view.y + '-' + pad(view.m + 1), pd = new Date(view.y, view.m - 1, 1), pk = pd.getFullYear() + '-' + pad(pd.getMonth() + 1), any = false;
+    $('limMonth').textContent = cap(new Date(view.y, view.m, 1).toLocaleDateString('ru-RU', { month: 'long' })) + ' ' + view.y;
     $('limList').innerHTML = CATS.out.map(function (c, i) {
-      var ic = iconFor('out', c), v = CATS.limits[c];
-      return '<div class="limrow"><label for="lim' + i + '">' + (ic ? '<span class="ci" aria-hidden="true">' + esc(ic) + '</span>' : '') + esc(c) + '</label>' +
-        '<input id="lim' + i + '" data-n="' + esc(c) + '" inputmode="decimal" autocomplete="off" placeholder="Без лимита" value="' + (v ? String(v).replace('.', ',') : '') + '"></div>';
+      var ic = iconFor('out', c), v = CATS.limits[c], sp = catSpent(c, key), prev = catSpent(c, pk);
+      if (prev > 0) any = true;
+      return '<div class="limitem" data-sp="' + sp + '" data-prev="' + prev + '"><div class="limrow"><label for="lim' + i + '">' + (ic ? '<span class="ci" aria-hidden="true">' + esc(ic) + '</span>' : '') + esc(c) + '</label>' +
+        '<input id="lim' + i + '" data-n="' + esc(c) + '" inputmode="decimal" autocomplete="off" placeholder="Без лимита" value="' + (v ? String(v).replace('.', ',') : '') + '"></div>' +
+        '<div class="bar" hidden><i></i></div><p class="lstat"></p></div>';
     }).join('');
+    $('limSuggest').hidden = !any;
+    Array.prototype.forEach.call($('limList').querySelectorAll('.limitem'), limUpdate);
   }
+  function limUpdate(item) {
+    var raw = item.querySelector('input').value.trim(), lim = raw ? parseAmt(raw) : 0, sp = +item.getAttribute('data-sp');
+    var bar = item.querySelector('.bar'), fill = bar.firstChild, st = item.querySelector('.lstat');
+    if (!(lim > 0)) lim = 0;
+    if (lim > 0) {
+      var over = sp > lim + 0.005, cls = over ? 'over' : (sp / lim >= 0.8 ? 'warn' : '');
+      bar.hidden = false;
+      fill.style.width = Math.min(100, sp / lim * 100).toFixed(1) + '%';
+      fill.className = cls;
+      st.className = 'lstat ' + cls;
+      st.textContent = over ? 'Потрачено ' + money(r2(sp)) + ', превышено на ' + money(r2(sp - lim)) : 'Потрачено ' + money(r2(sp)) + ', осталось ' + money(r2(lim - sp));
+    } else {
+      bar.hidden = true;
+      st.className = 'lstat';
+      st.textContent = sp > 0 ? 'Потрачено ' + money(r2(sp)) : '';
+    }
+  }
+  $('limList').addEventListener('input', function (e) { var it = e.target.closest('.limitem'); if (it) limUpdate(it); });
+  $('limSuggest').addEventListener('click', function () {
+    var n = 0;
+    Array.prototype.forEach.call($('limList').querySelectorAll('.limitem'), function (it) {
+      var inp = it.querySelector('input'), prev = +it.getAttribute('data-prev');
+      if (inp.value.trim() || !(prev > 0)) return;
+      inp.value = String(Math.ceil(prev / 100) * 100);
+      limUpdate(it); n++;
+    });
+    toast(n ? 'Подставил расходы прошлого месяца в ' + n + ' категориях. Поправьте и сохраните' : 'Все лимиты уже заполнены');
+  });
   $('limForm').addEventListener('submit', function (e) {
     e.preventDefault();
     var next = {}, bad = false;
@@ -3796,6 +3896,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
   }
   function renderRecSheet() {
     var card = $('recCard');
+    $('recListT').hidden = !rec.items.length;
     if (!rec.items.length) { card.hidden = true; return; }
     card.hidden = false;
     var items = rec.items.slice().sort(function (a, b) { return nextDate(a) - nextDate(b); });
