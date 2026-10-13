@@ -683,6 +683,8 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
 .limhead { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .limitem { display: flex; flex-direction: column; }
 .limitem .bar { margin-top: 8px; }
+.stat[data-stat] { cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform 0.12s ease; }
+.stat[data-stat]:active { transform: scale(0.97); }
 .sw[data-p="sunset"] i { background: #B1305A; }
 .sw[data-p="midnight"] i { background: #3B3FA8; }
 </style>
@@ -722,9 +724,9 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     <p class="hero-sub" id="balFc" hidden></p>
     <div class="spark" id="spark" hidden></div>
     <div class="stats">
-      <div class="stat"><span class="stat-lbl">Доходы</span><span class="stat-v in" id="inc">0&nbsp;₽</span></div>
-      <div class="stat"><span class="stat-lbl">Расходы</span><span class="stat-v out" id="exp">0&nbsp;₽</span></div>
-      <div class="stat" id="ioSv" hidden><span class="stat-lbl">Отложено</span><span class="stat-v sv" id="svV">0&nbsp;₽</span></div>
+      <div class="stat" data-stat="in" role="button" tabindex="0" aria-label="Добавить доход"><span class="stat-lbl">Доходы</span><span class="stat-v in" id="inc">0&nbsp;₽</span></div>
+      <div class="stat" data-stat="out" role="button" tabindex="0" aria-label="Добавить расход"><span class="stat-lbl">Расходы</span><span class="stat-v out" id="exp">0&nbsp;₽</span></div>
+      <div class="stat" id="ioSv" data-stat="save" role="button" tabindex="0" aria-label="Отложить в копилку" hidden><span class="stat-lbl">Отложено</span><span class="stat-v sv" id="svV">0&nbsp;₽</span></div>
     </div>
   </header>
 
@@ -956,7 +958,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     <input type="search" id="helpQ" class="search" placeholder="Найти в руководстве…" autocomplete="off">
     <div class="guide">
       <details open><summary>С чего начать</summary>
-        <p>Нажмите <b>«+ Запись»</b> внизу экрана, введите сумму, выберите тип (расход или доход) и категорию, при желании поменяйте дату и добавьте комментарий. Стрелки в верхней карточке переключают месяцы. Вверху крупно виден <b>остаток за месяц</b>: доходы минус расходы и минус отложенное.</p>
+        <p>Нажмите <b>«+ Запись»</b> внизу экрана, введите сумму, выберите тип (расход или доход) и категорию, при желании поменяйте дату и добавьте комментарий. Стрелки в верхней карточке переключают месяцы. Вверху крупно виден <b>остаток за месяц</b>: доходы минус расходы и минус отложенное. Нажмите на «Доходы», «Расходы» или «Отложено» в верхней карточке, чтобы сразу добавить такую запись.</p>
         <p>Если на экране записи-примеры, их можно убрать кнопкой «Убрать примеры» в самом низу.</p>
       </details>
       <details><summary>Изменить или удалить запись</summary>
@@ -2026,6 +2028,17 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     openOv('ovAdd', 'amount');
   }
   $('fab').addEventListener('click', openAdd);
+  function statTap(el) {
+    var k = el.getAttribute('data-stat');
+    if (k === 'save') { setSvTab('jar'); openOv('ovSave', settings.on ? 'svAmt' : null); return; }
+    openAdd();
+    var r = document.querySelector('input[name="type"][value="' + k + '"]');
+    if (r && !r.checked) { r.checked = true; r.dispatchEvent(new Event('change')); }
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.stat[data-stat]'), function (el) {
+    el.addEventListener('click', function () { statTap(el); });
+    el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); statTap(el); } });
+  });
   function syncDChips() {
     var v = $('date').value;
     Array.prototype.forEach.call(document.querySelectorAll('.dchips .chip'), function (b) {
