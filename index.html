@@ -18,8 +18,8 @@
 :root {
   --pl-brand: #0F4A40; --pl-ink: #FFFFFF; --pl-hero: #0F4A40; --pl-mute: #9CC6B9;
   --pd-brand: #5ED6B4; --pd-ink: #06201A; --pd-hero: #12453B; --pd-mute: #9CC6B9;
-  --pl-bg: #F1F4F2; --pl-text: #10201B; --pl-muted: #5F6F69; --pl-line: #DDE5E1; --pl-tint: #EDF2F0;
-  --pd-bg: #0D1412; --pd-surface: #141E1B; --pd-text: #E6F0EC; --pd-muted: #8CA098; --pd-line: #24332E; --pd-tint: #1B2824;
+  --pl-bg: #F1F4F2; --pl-text: #10201B; --pl-muted: #4A5A54; --pl-line: #DDE5E1; --pl-tint: #EDF2F0;
+  --pd-bg: #0D1412; --pd-surface: #141E1B; --pd-text: #E6F0EC; --pd-muted: #A9BDB5; --pd-line: #24332E; --pd-tint: #1B2824;
 
   --bg: var(--pl-bg);
   --surface: #FFFFFF;
@@ -53,10 +53,10 @@
 :root[data-palette="copper"] { --pl-brand: #8A3A18; --pl-ink: #FFFFFF; --pl-hero: #7A3417; --pl-mute: #E8C3AD; --pd-brand: #F0A47A; --pd-ink: #2E1306; --pd-hero: #5E2C14; --pd-mute: #E8C3AD; }
 
 /* Фон, карточки и тексты тоже окрашиваются в оттенок выбранной палитры */
-:root[data-palette="ocean"] { --pl-bg: #EEF3F8; --pl-text: #0F1D2E; --pl-muted: #596A7D; --pl-line: #D5DFEA; --pl-tint: #E6EEF6; --pd-bg: #0A1118; --pd-surface: #121C27; --pd-text: #E4EDF6; --pd-muted: #8A9BAE; --pd-line: #223244; --pd-tint: #192634; }
-:root[data-palette="plum"] { --pl-bg: #F5F0F7; --pl-text: #1F1226; --pl-muted: #6B5B74; --pl-line: #E1D6E6; --pl-tint: #EEE7F2; --pd-bg: #120D16; --pd-surface: #1C1521; --pd-text: #F0E8F4; --pd-muted: #A094A8; --pd-line: #33283B; --pd-tint: #261D2D; }
-:root[data-palette="graphite"] { --pl-bg: #F1F2F4; --pl-text: #161B20; --pl-muted: #5E666E; --pl-line: #DCDFE3; --pl-tint: #EBEDF0; --pd-bg: #0F1214; --pd-surface: #171B1F; --pd-text: #E8EBEE; --pd-muted: #8E969E; --pd-line: #2B3138; --pd-tint: #20252A; }
-:root[data-palette="copper"] { --pl-bg: #F7F1ED; --pl-text: #271610; --pl-muted: #75605A; --pl-line: #E6D9D0; --pl-tint: #F1E8E2; --pd-bg: #15100D; --pd-surface: #1E1713; --pd-text: #F4EBE5; --pd-muted: #A59388; --pd-line: #372B23; --pd-tint: #29201A; }
+:root[data-palette="ocean"] { --pl-bg: #EEF3F8; --pl-text: #0F1D2E; --pl-muted: #475A6E; --pl-line: #D5DFEA; --pl-tint: #E6EEF6; --pd-bg: #0A1118; --pd-surface: #121C27; --pd-text: #E4EDF6; --pd-muted: #A4B4C6; --pd-line: #223244; --pd-tint: #192634; }
+:root[data-palette="plum"] { --pl-bg: #F5F0F7; --pl-text: #1F1226; --pl-muted: #5A4A63; --pl-line: #E1D6E6; --pl-tint: #EEE7F2; --pd-bg: #120D16; --pd-surface: #1C1521; --pd-text: #F0E8F4; --pd-muted: #BBAEC3; --pd-line: #33283B; --pd-tint: #261D2D; }
+:root[data-palette="graphite"] { --pl-bg: #F1F2F4; --pl-text: #161B20; --pl-muted: #4C545C; --pl-line: #DCDFE3; --pl-tint: #EBEDF0; --pd-bg: #0F1214; --pd-surface: #171B1F; --pd-text: #E8EBEE; --pd-muted: #A7AEB6; --pd-line: #2B3138; --pd-tint: #20252A; }
+:root[data-palette="copper"] { --pl-bg: #F7F1ED; --pl-text: #271610; --pl-muted: #62504A; --pl-line: #E6D9D0; --pl-tint: #F1E8E2; --pd-bg: #15100D; --pd-surface: #1E1713; --pd-text: #F4EBE5; --pd-muted: #BDAC9F; --pd-line: #372B23; --pd-tint: #29201A; }
 
 /* Новые палитры */
 :root[data-palette="sunset"] { --pl-brand: #B1305A; --pl-ink: #FFFFFF; --pl-hero: #A02A52; --pl-mute: #F2BFD0; --pd-brand: #FF9EB8; --pd-ink: #2E0A16; --pd-hero: #5C1F36; --pd-mute: #F2BFD0; }
@@ -444,6 +444,7 @@ footer p { max-width: 52ch; }
 .seg span { display: block; text-align: center; padding: 10px 12px; border-radius: 10px; font-weight: 700; color: var(--muted); }
 .seg input[value="out"]:checked + span { background: var(--out); color: var(--on-sem); }
 .seg input[value="in"]:checked + span { background: var(--in); color: var(--on-sem); }
+.seg input[name="sved"]:checked + span { background: var(--gold); color: var(--on-sem); }
 .seg input:focus-visible + span { outline: 2px solid var(--brand); outline-offset: 2px; }
 
 .amountbox { position: relative; }
@@ -523,6 +524,8 @@ footer p { max-width: 52ch; }
 .chk input, .extchk input { flex: none; width: 20px; height: 20px; margin: 0; accent-color: var(--brand); }
 .extchk { display: flex; align-items: center; gap: 10px; min-height: 36px; padding: 0 0 8px 52px; font-size: 13px; font-weight: 600; color: var(--muted); }
 .row.ext .rowmain { opacity: 0.6; }
+.row.xf .rowmain { opacity: 0.75; }
+.amt-n.xf { color: var(--muted); font-weight: 700; }
 .shortcard { background: var(--out-tint); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 6px; }
 .shortcard .lbl { color: var(--out); }
 .short-v { font-family: var(--font-disp); font-weight: 500; font-size: 26px; color: var(--out); overflow-wrap: anywhere; line-height: 1.15; }
@@ -557,6 +560,8 @@ footer p { max-width: 52ch; }
   text-align: center;
   box-shadow: var(--shadow);
 }
+
+.toast-undo { background: none; border: 0; color: inherit; font: inherit; font-weight: 800; text-decoration: underline; text-underline-offset: 3px; min-height: 44px; padding: 0 4px; margin-left: 12px; }
 
 @media (prefers-reduced-motion: reduce) {
   .backdrop, .sheet { transition: none; }
@@ -687,6 +692,31 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
 .stat[data-stat]:active { transform: scale(0.97); }
 .sw[data-p="sunset"] i { background: #B1305A; }
 .sw[data-p="midnight"] i { background: #3B3FA8; }
+
+/* Крупные области нажатия: не меньше 44 пикселей */
+.link { position: relative; }
+.link::after { content: ''; position: absolute; inset: -12px -8px; }
+.rowedit, .rowdel { min-height: 44px; }
+.x { width: 44px; height: 44px; }
+.pill-x { min-width: 44px; height: 44px; }
+.gc-act button, .qbtn { height: 44px; }
+.chip { min-height: 44px; }
+.chk, .extchk { min-height: 44px; }
+.fold > summary { min-height: 44px; display: flex; align-items: center; }
+.sheet-head .x { margin: -4px 0; }
+
+/* Клавиатура на телефоне: окно и кнопка внизу остаются над ней */
+html.kb .overlay { inset: auto; left: 0; right: 0; top: var(--vvt, 0px); height: var(--vvh, 100%); }
+html.kb .sheet { max-height: var(--vvh, 92dvh); padding-bottom: 14px; }
+.tg{color:var(--gold);font-weight:700}
+.tagrow{display:flex;flex-wrap:wrap;gap:6px;margin:-4px 0 10px}
+.tagrow .chip,.tagsug .chip{padding:5px 12px;font-size:13px;min-height:36px}
+.tagsug{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tagsug:empty{display:none}
+.tgrow{display:flex;justify-content:space-between;gap:10px;align-items:center;width:100%;text-align:left;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--bg);min-height:48px;margin-bottom:8px;font-weight:700;color:var(--ink)}
+.tgrow small{display:block;font-weight:500;color:var(--muted);font-size:13px}
+.tgrow b{font-weight:800;white-space:nowrap}
+html[data-hide] .tgrow b{filter:blur(9px)}
 </style>
 <script>
 /* Сразу применяем сохранённые тему и режим, чтобы страница не мигала */
@@ -755,6 +785,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
   <section id="journal">
     <div class="jhead"><h2 class="sec">Записи</h2><button type="button" class="link" id="foldAll" hidden>Свернуть</button></div>
     <input id="q" type="search" class="search" placeholder="Поиск по записям" aria-label="Поиск по записям" autocomplete="off" hidden>
+    <div class="tagrow" id="tagRow" hidden></div>
     <div class="fbar" id="fbar" hidden><span id="fbarT"></span><button type="button" class="link" id="fbarX">Показать все</button></div>
     <div class="card" id="list"></div>
   </section>
@@ -825,7 +856,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
       <div class="field" id="accBox" hidden><span class="lbl">Счёт</span><ul class="pick" id="accChips"></ul></div>
       <div class="two">
         <div class="field"><label for="date">Дата</label><input id="date" type="date"><div class="dchips"><button type="button" class="chip" data-d="0">Сегодня</button><button type="button" class="chip" data-d="1">Вчера</button><button type="button" class="chip" data-d="2">Позавчера</button></div></div>
-        <div class="field"><label for="note">Комментарий</label><input id="note" maxlength="120" autocomplete="off" placeholder="Необязательно"></div>
+        <div class="field"><label for="note">Комментарий</label><input id="note" maxlength="120" autocomplete="off" placeholder="Необязательно, метка: #отпуск"><div class="tagsug" id="tagSug"></div></div>
       </div>
       <button class="primary stickyb" id="submit" type="submit">Записать</button>
       <button type="button" class="link" id="tplSave">Сохранить как быструю запись</button>
@@ -977,6 +1008,19 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
         <h4>Сворачивание записей</h4>
         <p>Кнопка «Свернуть» справа от заголовка «Записи» убирает весь список в одну строку: сколько записей и на какую сумму доходов и расходов. Нажмите на эту строку или «Развернуть», чтобы вернуть список. Выбор запоминается на этом устройстве.</p>
       </details>
+      <details><summary>Отмена удаления и правка записей</summary>
+        <p>После удаления записи, регулярного платежа, счёта, цели или перевода между счетами вверху на несколько секунд появляется кнопка <b>«Отменить»</b>: нажмите её, и всё вернётся.</p>
+        <p>Записи копилки теперь тоже можно править: нажмите на запись, затем «Изменить», и поменяйте сумму, дату, копилку или цель, комментарий. Переводы между копилками правятся парой: удалите обе половинки и сделайте перевод заново.</p>
+        <p>Переводы между счетами видны в журнале бледной строкой «Перевод между счетами». Они не влияют ни на остаток, ни на итоги месяца.</p>
+      </details>
+      <details><summary>Метки</summary>
+        <p>Метка помогает собрать вместе траты из разных категорий: например, всё, что связано с отпуском или ремонтом. Напишите в комментарии слово с решёткой: «Билеты #отпуск». Метка подсветится в журнале. Под полем комментария появляются подсказки уже использованных меток, нажмите на нужную, чтобы вставить её.</p>
+        <p>Нажмите на метку в журнале или на подсказку под строкой поиска (она появляется, когда вы нажали в поиск). Покажутся все записи с этой меткой за все месяцы и суммы расходов и доходов по ней. Кнопка «Все метки» открывает окно со списком меток и итогами по каждой.</p>
+      </details>
+      <details><summary>Быстрый вход на iPhone</summary>
+        <p>В «Оформлении» есть настройка <b>«Открывать новую запись при запуске приложения»</b>. Если включить, при открытии иконки с экрана «Домой» сразу появится форма новой записи, останется ввести сумму. Настройка действует только на этом устройстве.</p>
+        <p>На Android долгое нажатие на иконку показывает ярлыки «Расход», «Доход» и «Накопления» (после загрузки новой версии на GitHub и повторного добавления иконки). Ссылка вида <b>?add=out</b> в конце адреса тоже сразу открывает форму. На iPhone отдельные ярлыки через «Команды» не подходят: они откроются в Safari, где записей из иконки на экране нет.</p>
+      </details>
       <details><summary>Быстрая запись одной строкой</summary>
         <p>В окне новой записи вверху есть строка <b>«Быстро: кофе 250 вчера»</b>. Напишите траты как в заметке: сумму и слова. Примеры: «такси 480», «обед 650 вчера», «+80000 зарплата», «аптека 1,2к 12.10». Нажмите Enter или «Заполнить»: приложение подставит сумму, дату, категорию и комментарий. Проверьте и нажмите «Записать». Категория определяется по названию, по знакомым словам и по вашим прошлым записям с таким же комментарием. Если не нашлась, выберите её сами.</p>
       </details>
@@ -1002,9 +1046,10 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
         <p>В форме записи нажмите <b>«Править»</b> рядом с категориями. Там можно добавить свою категорию, удалить ненужную и нажать на круглый значок, чтобы выбрать картинку для категории.</p>
       </details>
       <details><summary>Счета: наличные, карты, банки</summary>
-        <p>Плитка «Счета» открывает окно, где можно завести несколько счетов и указать, сколько на каждом сейчас. Дальше при записи расхода или дохода выбирается счёт, и остаток каждого пересчитывается сам. Между счетами можно делать переводы: они не считаются доходом или расходом. Остаток месяца в шапке остаётся общим, а остатки по счетам показывают, сколько реально денег где лежит. Записи, сделанные до включения счетов, на остатки не влияют.</p>
+        <p>Плитка «Счета» открывает окно, где можно завести несколько счетов и указать, сколько на каждом сейчас. Дальше при записи расхода или дохода выбирается счёт, и остаток каждого пересчитывается сам. Между счетами можно делать переводы: они не считаются доходом или расходом. Остаток месяца в шапке остаётся общим, а остатки по счетам показывают, сколько реально денег где лежит. Суммы на счетах и «Остаток за месяц» могут не совпадать: счета считают все деньги с момента, как вы их завели, а остаток месяца учитывает только выбранный месяц, перенос и отложенное. Записи, сделанные до включения счетов, на остатки не влияют.</p>
       </details>
       <details><summary>Накопления (копилка)</summary>
+        <p>Как называются части: <b>«Накопления»</b> — весь раздел и плитка. <b>«Копилка»</b> — вкладка и все деньги, которые вы отложили. <b>«Общая копилка»</b> — часть этих денег, которая пока не отдана ни одной цели. <b>«Цели»</b> — вкладка с вашими целями.</p>
         <ul>
           <li>Нажмите плитку «Накопления» и включите функцию.</li>
           <li><b>«Отложить»</b> переводит сумму в копилку, <b>«Снять»</b> возвращает деньги обратно. Отложенное вычитается из остатка.</li>
@@ -1012,7 +1057,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
         </ul>
       </details>
       <details><summary>«Можно сегодня» и «Не хватает на платежи»</summary>
-        <p><b>«Можно сегодня»</b> — сколько можно потратить сегодня и не выйти за остаток. Расчёт: (остаток − предстоящие регулярные платежи) ÷ число оставшихся дней месяца, включая сегодня. Деньги, отложенные на другом счёте, и платежи «с будущего дохода» в расчёт не входят. Нажмите на плитку, и откроется окно «Лимит на день» с расчётом по шагам: доходы, расходы, платежи, число дней и итоговый лимит.</p>
+        <p><b>«Можно сегодня»</b> — сколько можно потратить сегодня и не выйти за остаток. Расчёт: (остаток − предстоящие регулярные платежи) ÷ число оставшихся дней месяца, включая сегодня. Деньги, отложенные отдельно на платёж, и платежи «с будущего дохода» в расчёт не входят. Нажмите на плитку, и откроется окно «Лимит на день» с расчётом по шагам: доходы, расходы, платежи, число дней и итоговый лимит.</p>
         <p>Взнос по целям по умолчанию из лимита не вычитается: он показан отдельной строкой «по целям ещё …» в плитке. Если хотите, чтобы цели жёстко уменьшали лимит, включите галочку <b>«Учитывать взнос по целям в лимите на день»</b> в окне «Накопления». Тогда при нехватке денег лимит может стать нулевым.</p>
         <p>Если денег меньше, чем нужно на ближайшие платежи (и на цели, когда галочка включена), вместо лимита появляется красная плитка <b>«Не хватает на платежи»</b> (или «на цели», «на платежи и цели») с суммой нехватки со знаком минус и шкалой покрытия. В плитке видно, из чего она складывается.</p>
       </details>
@@ -1022,10 +1067,10 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
       <details><summary>Регулярные платежи</summary>
         <p>Плитка «Регулярные платежи»: аренда, подписки, зарплата. Укажите сумму, категорию и день месяца, и запись сама появится в журнале в этот день каждый месяц. Предстоящие расходы заранее вычитаются из дневного лимита. На главном экране плитка показывает три ближайших платежа с датой и суммой, а также сколько уйдёт за ближайшие 30 дней.</p>
         <ul>
-          <li><b>«Отложено на другом счёте»</b>: деньги на платёж уже лежат отдельно. Сумма сразу вычитается из остатка, в день платежа попадает в журнал, повторно ничего не вычитается.</li>
+          <li><b>«Деньги на платёж отложены отдельно»</b>: деньги на платёж уже лежат отдельно. Сумма сразу вычитается из остатка, в день платежа попадает в журнал, повторно ничего не вычитается.</li>
           <li><b>«Оплачу с будущего дохода»</b>: деньги ещё не пришли. До даты платежа он не уменьшает дневной лимит и не вызывает «Не хватает на платежи», в свой день попадает в журнал как обычный расход.</li>
         </ul>
-        <p>Нажмите на платёж, чтобы изменить или удалить его. Уже созданные записи в журнале при этом остаются.</p>
+        <p>Если заведено несколько счетов, у платежа можно выбрать счёт: запись в день платежа появится именно на нём. Нажмите на платёж, чтобы изменить или удалить его. Уже созданные записи в журнале при этом остаются.</p>
       </details>
       <details><summary>Перенос остатка и итог месяца</summary>
         <p>Неизрасходованные деньги прибавляются к остатку следующего месяца: под остатком видна строка «включая … с прошлых месяцев». Перерасход тоже переносится.</p>
@@ -1036,6 +1081,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
       </details>
       <details><summary>Резервная копия</summary>
         <p>В окне оформления есть <b>«Сохранить копию»</b> и <b>«Загрузить копию»</b>. Копия — это файл со всеми записями, категориями, целями, регулярными платежами и настройками.</p>
+        <p>Когда вы выбираете файл, приложение ничего не меняет, а сначала показывает, сколько записей добавится, сколько изменится и сколько есть только у вас. Решайте после этого: «Добавить к текущим» или «Заменить всё копией».</p>
         <p><b>Делайте копию регулярно</b>, например раз в неделю и всегда перед очисткой браузера или сменой телефона. Если с последней копии прошло 5 дней и больше, на главном экране появится напоминание с кнопкой «Сохранить копию» и вариантом «Напомнить завтра». При загрузке записи добавляются к текущим, одинаковые заменяются.</p>
       </details>
       <details><summary>Где хранятся данные</summary>
@@ -1045,6 +1091,9 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
       </details>
       <details><summary>Обучение</summary>
         <p>При первом открытии приложение показывает короткое обучение из нескольких слайдов. Листайте кнопками «Далее» и «Назад» или свайпом, «Пропустить» закрывает его. Запустить обучение снова можно кнопкой <b>«Показать обучение»</b> внизу главного экрана.</p>
+      </details>
+      <details><summary>Работа без интернета</summary>
+        <p>После первого открытия по ссылке приложение запоминает себя в телефоне и открывается без интернета. Записи и так лежат на устройстве, поэтому добавлять и править их можно в любом месте. Если вышла новая версия, она подхватится при следующем открытии с интернетом.</p>
       </details>
       <details><summary>Иконка на экране «Домой» (iPhone)</summary>
         <p>В Safari откройте страницу, нажмите «Поделиться» и выберите «На экран „Домой“». Если иконка уже была добавлена раньше, удалите её и добавьте заново.</p>
@@ -1080,7 +1129,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
       <div class="jsplit" id="dayRows" style="display:flex;flex-direction:column;gap:8px"></div>
       <p class="hint" id="dayNote" hidden></p>
       <p class="hint">Лимит = доступные деньги ÷ оставшиеся дни месяца. Если сегодня потратить меньше, завтра лимит вырастет.</p>
-      <div class="qrow"><button type="button" class="qbtn" id="dayToSave">Открыть копилку</button><button type="button" class="qbtn" data-close>Закрыть</button></div>
+      <div class="qrow"><button type="button" class="qbtn" id="dayToSave">Открыть накопления</button><button type="button" class="qbtn" data-close>Закрыть</button></div>
     </div>
   </div>
 </div>
@@ -1120,6 +1169,9 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
           <div id="accXfList"></div>
         </details>
         <p class="hint">Переводы между счетами не считаются ни доходом, ни расходом. Если удалить счёт, его записи перейдут на первый счёт.</p>
+        <details class="fold"><summary>Почему сумма на счетах не равна «Остатку за месяц»</summary>
+          <p class="hint">Счета считают все деньги с того дня, как вы их завели: сумма, которую вы указали, плюс записи после этого. «Остаток за месяц» на главном экране считает только выбранный месяц, добавляет перенос с прошлых месяцев и вычитает деньги, отложенные в копилку и на платежи. Поэтому цифры могут отличаться, и это нормально.</p>
+        </details>
       </div>
       <button type="button" class="primary" data-close>Готово</button>
     </div>
@@ -1190,10 +1242,10 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
       <h2 id="recTitle">Регулярные платежи</h2>
       <button type="button" class="x" data-close aria-label="Закрыть">×</button>
     </div>
-    <p class="hint">Платёж сам появится в журнале в выбранный день каждого месяца. Предстоящие платежи заранее вычитаются из дневного лимита.</p>
+    <p class="hint">Платёж сам появится в журнале в выбранный день каждого месяца. Предстоящие платежи заранее вычитаются из дневного лимита. Если заведено несколько счетов, можно выбрать, с какого он спишется.</p>
     <details class="fold"><summary>Как это работает</summary>
       <p class="hint">Если день этого месяца уже прошёл, платёж начнётся со следующего месяца. Не добавляйте сюда то, что уже записали вручную.</p>
-      <p class="hint">«Отложено на другом счёте»: деньги уже лежат отдельно, сумма сразу вычитается из остатка. В день платежа он попадёт в журнал, повторно ничего не вычтется.</p>
+      <p class="hint">«Деньги на платёж отложены отдельно»: деньги уже лежат в стороне, сумма сразу вычитается из остатка. В день платежа он попадёт в журнал, повторно ничего не вычтется.</p>
       <p class="hint">«Оплачу с будущего дохода»: деньги ещё не пришли, поэтому платёж не уменьшает лимит до своей даты.</p>
     </details>
     <h3 class="lbl" id="recListT" hidden>Ваши платежи</h3>
@@ -1209,9 +1261,10 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
         <div class="field"><label for="recCat">Категория</label><select id="recCat"></select></div>
         <div class="field"><label for="recDay">День месяца</label><input id="recDay" inputmode="numeric" maxlength="2" autocomplete="off" placeholder="От 1 до 31"></div>
         <div class="field"><label for="recNote">Название</label><input id="recNote" maxlength="60" autocomplete="off" placeholder="Например, аренда"></div>
+        <div class="field" id="recAccBox" hidden><label for="recAcc">С какого счёта</label><select id="recAcc"></select></div>
       </div>
       <div class="chkwrap">
-        <label class="chk"><input type="checkbox" id="recExt"><span>Отложено на другом счёте</span></label>
+        <label class="chk"><input type="checkbox" id="recExt"><span>Деньги на платёж отложены отдельно</span></label>
         <p class="hint">Деньги уже лежат отдельно. Сумма сразу вычитается из остатка.</p>
         <label class="chk"><input type="checkbox" id="recFut"><span>Оплачу с будущего дохода</span></label>
         <p class="hint">Деньги ещё не пришли: до своей даты платёж не уменьшает лимит.</p>
@@ -1260,6 +1313,9 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
           <button type="button" data-o="1" aria-pressed="false">Чёрный (OLED)</button>
         </div>
       </div>
+      <h3 class="grp sep">Запуск</h3>
+      <label class="chk"><input type="checkbox" id="openAddChk"><span>Открывать новую запись при запуске приложения</span></label>
+      <p class="hint">Удобно, если почти всегда заходите, чтобы внести трату. Настройка действует только на этом устройстве.</p>
       <h3 class="grp sep">Данные и копии</h3>
       <div class="field">
         <span class="lbl" id="lblBk">Резервная копия</span>
@@ -1279,6 +1335,43 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
           <button type="button" class="link" id="bkNo">Отмена</button>
         </div>
       </div>
+      <button type="button" class="primary" data-close>Готово</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ovSvEdit" hidden>
+  <div class="backdrop" data-close></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sveTitle" tabindex="-1">
+    <div class="sheet-head">
+      <h2 id="sveTitle">Запись копилки</h2>
+      <button type="button" class="x" data-close aria-label="Закрыть">×</button>
+    </div>
+    <form id="sveForm" class="stack" novalidate>
+      <div class="seg" role="radiogroup" aria-label="Что сделано">
+        <label><input type="radio" name="sved" value="1" checked><span>Отложено</span></label>
+        <label><input type="radio" name="sved" value="-1"><span>Снято</span></label>
+      </div>
+      <div class="field"><label for="sveAmt">Сумма, ₽</label><input id="sveAmt" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+      <div class="field"><label for="sveTo">Копилка или цель</label><select id="sveTo"></select></div>
+      <div class="field" id="sveAccBox" hidden><label for="sveAcc">Со счёта / на счёт</label><select id="sveAcc"></select></div>
+      <div class="field"><label for="sveDate">Дата</label><input id="sveDate" type="date"></div>
+      <div class="field"><label for="sveNote">Комментарий</label><input id="sveNote" maxlength="120" autocomplete="off" placeholder="Необязательно"></div>
+      <button type="submit" class="primary stickyb">Сохранить</button>
+    </form>
+  </div>
+</div>
+
+<div class="overlay" id="ovTags" hidden>
+  <div class="backdrop" data-close></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="tagsTitle" tabindex="-1">
+    <div class="sheet-head">
+      <h2 id="tagsTitle">Метки</h2>
+      <button type="button" class="x" data-close aria-label="Закрыть">×</button>
+    </div>
+    <div class="stack">
+      <p class="hint">Метка — это слово с решёткой в комментарии, например «Билеты #отпуск». Здесь всё, что ушло и пришло по каждой метке, за всё время. Нажмите на метку, чтобы увидеть её записи.</p>
+      <div id="tagsList"></div>
       <button type="button" class="primary" data-close>Готово</button>
     </div>
   </div>
@@ -1460,12 +1553,20 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     var n = Number(s);
     return isFinite(n) ? r2(n) : NaN;
   }
-  function toast(msg) {
+  function toast(msg, undo) {
     var el = $('toast');
     el.textContent = msg;
+    if (undo) {
+      var ub = document.createElement('button');
+      ub.type = 'button';
+      ub.className = 'toast-undo';
+      ub.textContent = 'Отменить';
+      ub.addEventListener('click', function () { el.hidden = true; clearTimeout(toastTimer); undo(); });
+      el.appendChild(ub);
+    }
     el.hidden = false;
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { el.hidden = true; }, 3500);
+    toastTimer = setTimeout(function () { el.hidden = true; }, undo ? 7000 : 3500);
   }
   function applyWidths(root) {
     Array.prototype.forEach.call(root.querySelectorAll('[data-w]'), function (el) {
@@ -1642,7 +1743,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
         if (typeof x.from !== 'string' || !/^\d{4}-\d{2}$/.test(x.from)) return;
         items.push({
           id: x.id, type: x.type, cat: x.cat.slice(0, 30), amount: Math.min(r2(amt), 1e9), day: day,
-          note: typeof x.note === 'string' ? x.note.slice(0, 60) : '', ext: x.ext === true, fut: x.fut === true, from: x.from,
+          note: typeof x.note === 'string' ? x.note.slice(0, 60) : '', acc: (typeof x.acc === 'string' && /^[A-Za-z0-9]{1,24}$/.test(x.acc)) ? x.acc : '', ext: x.ext === true, fut: x.fut === true, from: x.from,
           done: Array.isArray(x.done) ? x.done.filter(function (k) { return typeof k === 'string' && /^\d{4}-\d{2}$/.test(k); }).slice(-60) : []
         });
       });
@@ -1679,7 +1780,26 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     render();
     materializeRecurring();
     maybeClose();
+    onLaunch();
   }
+
+  var launchDone = false;
+  function onLaunch() {
+    if (launchDone || loading) return;
+    launchDone = true;
+    var want = null;
+    try {
+      var m = /[?&#]add=(out|in|save)\b/.exec(location.search + location.hash);
+      if (m) { want = m[1]; try { history.replaceState(null, '', location.pathname); } catch (e) {} }
+    } catch (e) {}
+    if (!want && lsGet('kassa-openadd') === '1') want = 'out';
+    if (!want || openId || !lsGet('kassa-tour')) return;
+    if (want === 'save') { setSvTab('jar'); openOv('ovSave', settings.on ? 'svAmt' : null); return; }
+    openAdd();
+    var r = document.querySelector('input[name="type"][value="' + want + '"]');
+    if (r && !r.checked) { r.checked = true; r.dispatchEvent(new Event('change')); }
+  }
+  var renderHold = 0;
   function addTx(t) {
     if (store.mode === 'cloud') {
       var body = Object.assign({}, t);
@@ -1688,7 +1808,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     }
     txs.push(t);
     lsSave();
-    render();
+    if (!renderHold) render();
     return Promise.resolve();
   }
   function removeTx(id) {
@@ -1755,6 +1875,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
           render();
           materializeRecurring();
           maybeClose();
+          onLaunch();
         }, function () { useLocal(); });
         return;
       } catch (e) {}
@@ -1788,9 +1909,27 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
   }
   document.addEventListener('click', function (e) {
     if (e.target.closest('[data-close]')) closeOv();
-    if (selectedId && !e.target.closest('.row')) { selectedId = null; render(); }
+    if (selectedId && !e.target.closest('.row')) { selectedId = null; render('journal'); }
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeOv(); });
+  // Когда на телефоне открыта клавиатура, окно сжимается до видимой части экрана, а поле в фокусе прокручивается в видимое место
+  (function () {
+    var vv = window.visualViewport;
+    if (!vv) return;
+    var root = document.documentElement;
+    function fit() {
+      var kb = window.innerHeight - vv.height - vv.offsetTop > 80;
+      root.style.setProperty('--vvh', vv.height + 'px');
+      root.style.setProperty('--vvt', vv.offsetTop + 'px');
+      root.classList.toggle('kb', kb);
+      if (kb && openId) {
+        var f = document.activeElement;
+        if (f && f.scrollIntoView && /^(INPUT|SELECT|TEXTAREA)$/.test(f.tagName)) setTimeout(function () { try { f.scrollIntoView({ block: 'center' }); } catch (e) {} }, 60);
+      }
+    }
+    vv.addEventListener('resize', fit);
+    vv.addEventListener('scroll', fit);
+  })();
 
   var splitOn = false, splitRows = [];
   function splitCats() { return CATS[type].slice(); }
@@ -2003,11 +2142,44 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     renderTpl();
     selAcc = lsGet('kassa-acc-last') || '';
     renderAccPick();
+    renderTagSug();
     openOv('ovAdd', 'amount');
   }
+  var sveId = null;
+  function openSvEdit(t) {
+    sveId = t.id;
+    var neg = t.amount < 0;
+    document.querySelector('input[name="sved"][value="' + (neg ? '-1' : '1') + '"]').checked = true;
+    $('sveAmt').value = String(Math.abs(t.amount)).replace('.', ',');
+    $('sveTo').innerHTML = allPockets().map(function (q) { return '<option value="' + esc(q.id) + '">' + esc(q.name) + '</option>'; }).join('');
+    $('sveTo').value = goalName(t.goalId || '') || !t.goalId ? (t.goalId || '') : '';
+    $('sveAccBox').hidden = !accOn();
+    if (accOn()) fillSel($('sveAcc'), accOf(t));
+    $('sveDate').value = t.date;
+    $('sveNote').value = t.note || '';
+    openOv('ovSvEdit', 'sveAmt');
+  }
+  $('sveForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var base = txs.filter(function (x) { return x.id === sveId; })[0];
+    if (!base) { closeOv(); return; }
+    var a = parseAmt($('sveAmt').value);
+    if (!(a > 0) || a > 1e9) { toast('Введите сумму больше нуля'); $('sveAmt').focus(); return; }
+    var d = $('sveDate').value;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) { toast('Укажите дату'); $('sveDate').focus(); return; }
+    var sign = +document.querySelector('input[name="sved"]:checked').value, gid = $('sveTo').value;
+    var had = (base.goalId || '') === gid ? base.amount : 0;
+    if (sign < 0 && a > r2(pocketBal(gid) - had) + 0.005) { toast('В этой копилке меньше этой суммы'); return; }
+    var t = Object.assign({}, base, { amount: sign * a, date: d, note: $('sveNote').value.trim().slice(0, 120) });
+    delete t.example;
+    if (gid) t.goalId = gid; else delete t.goalId;
+    if (accOn()) { var sa = $('sveAcc').value; if (sa) t.acc = sa; else delete t.acc; }
+    updateTx(t).then(function () { render(); closeOv(); toast('Сохранено'); }).catch(function () { toast('Не удалось сохранить. Попробуйте ещё раз.'); });
+  });
   function openEdit(id) {
     var t = txs.filter(function (x) { return x.id === id; })[0];
-    if (!t || t.type === 'save') return;
+    if (!t) return;
+    if (t.type === 'save') { openSvEdit(t); return; }
     editingId = id;
     editingCat = { type: t.type, cat: t.cat };
     type = t.type;
@@ -2025,6 +2197,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     renderTpl();
     selAcc = accOf(t);
     renderAccPick();
+    renderTagSug();
     openOv('ovAdd', 'amount');
   }
   $('fab').addEventListener('click', openAdd);
@@ -2079,13 +2252,14 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     var nm = ui.name.trim() || DEFAULT_NAME;
     return [
       { v: '<div class="tm plain"><div class="ico">🪙</div></div>', t: 'Добро пожаловать в «' + esc(nm) + '»', p: 'Личная касса: доходы, расходы, накопления и лимит на каждый день. За минуту покажу, как всё устроено.' },
-      { v: '<div class="tm plain"><span class="fab">＋ Запись</span></div>', t: 'Записывайте доходы и расходы', p: 'Нажмите «Запись», введите сумму и выберите категорию. Один платёж можно разделить по нескольким категориям, а частые траты сохранить как быстрые записи.' },
+      { v: '<div class="tm plain"><span class="fab">＋ Запись</span></div>', t: 'Записывайте доходы и расходы', p: 'Нажмите «Запись», введите сумму и выберите категорию. Один платёж можно разделить по нескольким категориям, а частые траты сохранить как быстрые записи. Удалили лишнее? Вверху появится кнопка «Отменить».' },
       { v: '<div class="tm hero"><small>Остаток за месяц</small><b class="big">20 000 ₽</b><div class="chips"><span>Доходы<br>80 000</span><span>Расходы<br>50 000</span><span>Отложено<br>10 000</span></div></div>', t: 'Остаток месяца всегда на виду', p: 'Месяц переключается стрелками. Неизрасходованное можно переносить дальше, а кнопка с глазом прячет суммы от посторонних глаз.' },
       { v: '<div class="tm"><small>Можно сегодня</small><b class="big" style="margin-bottom:4px">2 500 ₽</b><div class="bar"><i style="width:40%;background:var(--brand)"></i></div><small style="text-transform:none;letter-spacing:0">лимит на день 2 500 ₽</small></div>', t: 'Сколько можно тратить сегодня', p: 'Приложение делит остаток на оставшиеся дни и вычитает ближайшие платежи. Включите накопления в плитке, и лимит появится на главном экране.' },
-      { v: '<div class="tm"><div class="row"><span>Отпуск</span><span style="color:var(--gold)">40%</span></div><div class="bar"><i style="width:40%"></i></div><small style="text-transform:none;letter-spacing:0">Откладывайте 10 000 ₽ в месяц · осталось 6 мес.</small></div>', t: 'Копилка и цели', p: 'Задайте сумму цели и за сколько месяцев её накопить, а приложение посчитает ежемесячный взнос. Деньги можно переводить между копилкой и целями.' },
-      { v: '<div class="tm"><div class="row"><span>💳 Карта</span><span>49 000 ₽</span></div><div class="row"><span>💵 Наличка</span><span>5 300 ₽</span></div><small style="text-transform:none;letter-spacing:0;margin-top:6px">Всего на счетах: 54 300 ₽</small></div>', t: 'Несколько счетов', p: 'В плитке «Счета» заведите наличные и карты и укажите, сколько на каждом. При записи выберите счёт, и остаток пересчитается сам. Переводы между счетами не считаются расходом.' },
-      { v: '<div class="tm"><div class="row"><span>🏠 Аренда</span><span>25 000 ₽</span></div><div class="row"><span>💳 Кредит</span><span>7 520 ₽</span></div><div class="row"><span>📱 Связь</span><span>600 ₽</span></div></div>', t: 'Регулярные платежи', p: 'Аренда, кредит, подписки: укажите сумму и день месяца, и запись сама появится в журнале. Если деньги уже отложены на другом счёте или придут позже, отметьте это галочкой.' },
+      { v: '<div class="tm"><div class="row"><span>Отпуск</span><span style="color:var(--gold)">40%</span></div><div class="bar"><i style="width:40%"></i></div><small style="text-transform:none;letter-spacing:0">Откладывайте 10 000 ₽ в месяц · осталось 6 мес.</small></div>', t: 'Накопления: копилка и цели', p: 'Задайте сумму цели и за сколько месяцев её накопить, а приложение посчитает ежемесячный взнос. Деньги можно переводить между копилкой и целями.' },
+      { v: '<div class="tm"><div class="row"><span>💳 Карта</span><span>49 000 ₽</span></div><div class="row"><span>💵 Наличка</span><span>5 300 ₽</span></div><small style="text-transform:none;letter-spacing:0;margin-top:6px">Всего на счетах: 54 300 ₽</small></div>', t: 'Несколько счетов', p: 'В плитке «Счета» заведите наличные и карты и укажите, сколько на каждом. При записи выберите счёт, и остаток пересчитается сам. Переводы между счетами видны в журнале бледной строкой и не считаются расходом.' },
+      { v: '<div class="tm"><div class="row"><span>🏠 Аренда</span><span>25 000 ₽</span></div><div class="row"><span>💳 Кредит</span><span>7 520 ₽</span></div><div class="row"><span>📱 Связь</span><span>600 ₽</span></div></div>', t: 'Регулярные платежи', p: 'Аренда, кредит, подписки: укажите сумму и день месяца, и запись сама появится в журнале. Если деньги на платёж уже отложены отдельно или придут позже, отметьте это галочкой.' },
       { v: '<div class="tm plain"><div class="ring"></div></div>', t: 'Куда уходят деньги', p: 'Кнопка с диаграммой в шапке показывает, на что разошлись доходы. Нажмите на категорию, и в журнале останутся только её траты. Ещё есть поиск и сравнение месяцев.' },
+      { v: '<div class="tm plain"><div class="ico">🏷️</div></div>', t: 'Метки', p: 'Добавьте в комментарий слово с решёткой, например «Билеты #отпуск». Нажмите на метку в журнале, и увидите все записи по ней и общую сумму. Так легко считать траты на отпуск, ремонт или подарки, даже если они в разных категориях.' },
       { v: '<div class="tm plain"><div class="ico">💾</div></div>', t: 'Сохраните свои данные', p: 'Записи хранятся только в браузере этого устройства. Делайте резервную копию в окне оформления (значок с ползунками), хотя бы раз в несколько дней.' },
       { v: '<div class="tm"><div class="row"><span>📖 Руководство пользователя</span><span>›</span></div><div class="row"><span>🎓 Показать обучение</span><span>›</span></div></div>', t: 'Руководство всегда под рукой', p: 'Внизу главного экрана есть кнопка «Руководство пользователя»: в нём по разделам описано всё, что умеет приложение. Рядом кнопка «Показать обучение», если захотите пройти его снова.' }
     ];
@@ -2366,7 +2540,8 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
   $('swatches').innerHTML = PALETTES.map(function (p) {
     return '<button type="button" class="sw" data-p="' + p.id + '" aria-pressed="false"><i aria-hidden="true"></i><span>' + p.name + '</span></button>';
   }).join('');
-  $('gear').addEventListener('click', function () { renderUiSheet(); openOv('ovSet'); });
+  $('gear').addEventListener('click', function () { renderUiSheet(); $('openAddChk').checked = lsGet('kassa-openadd') === '1'; openOv('ovSet'); });
+  $('openAddChk').addEventListener('change', function () { lsSet('kassa-openadd', this.checked ? '1' : '0'); toast(this.checked ? 'При запуске будет открываться новая запись' : 'Запуск как обычно'); });
   $('uiName').addEventListener('input', function () {
     ui.name = this.value.slice(0, 30);
     $('brand').textContent = ui.name.trim() || DEFAULT_NAME;
@@ -2409,11 +2584,10 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
   // Остаток, перенесённый в месяц key с прошлых месяцев (начиная с carryFrom)
   function carryIn(key) {
     if (!settings.carry || !settings.carryFrom || key <= settings.carryFrom) return 0;
-    var sum = 0;
-    txs.forEach(function (x) {
-      var m = x.date.slice(0, 7);
+    var sum = 0, mon = agg().mon;
+    Object.keys(mon).forEach(function (m) {
       if (m < settings.carryFrom || m >= key) return;
-      if (x.type === 'in') sum += x.amount; else sum -= x.amount;
+      sum += mon[m].inc - mon[m].out - mon[m].save;
     });
     return r2(sum);
   }
@@ -2454,14 +2628,8 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     var t = new Date();
     var ck = t.getFullYear() + '-' + pad(t.getMonth() + 1);
     var today = dateStr(t);
-    var inc = 0, exp = 0, svm = 0, spent = 0, total = 0;
-    txs.forEach(function (x) {
-      if (x.type === 'save') total += x.amount;
-      if (x.date.slice(0, 7) !== ck) return;
-      if (x.type === 'in') inc += x.amount;
-      else if (x.type === 'out') { exp += x.amount; if (x.date === today) spent += x.amount; }
-      else svm += x.amount;
-    });
+    var A = agg(), M = A.mon[ck] || { inc: 0, out: 0, save: 0 };
+    var inc = M.inc, exp = M.out, svm = M.save, spent = A.outDay[today] || 0, total = A.save;
     var carryV = carryIn(ck);
     inc += carryV;
     var goalsNeed = reserveNow(svm);
@@ -2591,11 +2759,16 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     var dl = e.target.closest('[data-adel]');
     if (dl) {
       var did = dl.getAttribute('data-adel');
+      var accBak = JSON.stringify(settings.accs), xfBak = JSON.stringify(settings.xfers);
       settings.accs = settings.accs.filter(function (a) { return a.id !== did; });
       settings.xfers = settings.xfers.map(function (x) { return { id: x.id, ts: x.ts, date: x.date, amount: x.amount, note: x.note, from: x.from === did ? '' : x.from, to: x.to === did ? '' : x.to }; }).filter(function (x) { return x.from !== x.to; });
       accEditId = null;
       persistSettings(); renderAcc();
-      toast('Счёт удалён. Его записи перешли на «' + settings.accs[0].name + '»');
+      toast('Счёт удалён. Его записи перешли на «' + settings.accs[0].name + '»', function () {
+        settings.accs = JSON.parse(accBak); settings.xfers = JSON.parse(xfBak);
+        persistSettings(); renderAcc();
+        toast('Счёт восстановлен');
+      });
       return;
     }
     var sv = e.target.closest('[data-asave]');
@@ -2625,8 +2798,16 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     var b = e.target.closest('[data-xdel]');
     if (!b) return;
     var id = b.getAttribute('data-xdel');
+    var xgone = settings.xfers.filter(function (x) { return x.id === id; })[0];
     settings.xfers = settings.xfers.filter(function (x) { return x.id !== id; });
     persistSettings(); renderAcc();
+    toast('Перевод удалён', function () {
+      if (!xgone) return;
+      settings.xfers.push(xgone);
+      settings.xfers.sort(function (a, b) { return a.ts - b.ts; });
+      persistSettings(); renderAcc();
+      toast('Перевод восстановлен');
+    });
   });
 
   function renderTiles() {
@@ -2684,11 +2865,11 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
       var inGoals = 0;
       settings.goals.forEach(function (g) { inGoals += goalSaved(g.id); });
       var free = pocketBal('');
-      $('sGoal').textContent = 'Сумма всех целей и свободных средств';
+      $('sGoal').textContent = 'Все цели и общая копилка вместе';
       var rows = settings.goals.map(function (g) {
         return '<div class="jrow"><span>' + esc(g.name) + '</span><b>' + money(goalSaved(g.id)) + '</b></div>';
       });
-      rows.push('<div class="jrow free"><span>Свободно, не распределено</span><b>' + money(free) + '</b></div>');
+      rows.push('<div class="jrow free"><span>Общая копилка: свободно</span><b>' + money(free) + '</b></div>');
       $('sSplit').innerHTML = rows.join('');
       $('sSplit').hidden = false;
     } else if (settings.goal > 0) {
@@ -2842,17 +3023,28 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     settings.goals.forEach(function (g) { sum += planFor(g.id); });
     return sum > 0 ? sum : settings.plan;
   }
-  function goalSaved(id) {
-    var sum = 0;
-    txs.forEach(function (t) { if (t.type === 'save' && t.goalId === id) sum += t.amount; });
-    return r2(sum);
+  // Один проход по записям: суммы по месяцам, копилкам и дням. Пересчитывается только когда записи изменились.
+  var aggC = null;
+  function agg() {
+    if (aggC && aggC.ref === txs && aggC.len === txs.length) return aggC;
+    var a = { ref: txs, len: txs.length, save: 0, goal: {}, mon: {}, outDay: {} };
+    txs.forEach(function (t) {
+      var m = t.date.slice(0, 7), o = a.mon[m] || (a.mon[m] = { inc: 0, out: 0, save: 0 });
+      if (t.type === 'save') {
+        a.save += t.amount; o.save += t.amount;
+        if (t.goalId) a.goal[t.goalId] = (a.goal[t.goalId] || 0) + t.amount;
+      } else if (t.type === 'in') o.inc += t.amount;
+      else { o.out += t.amount; a.outDay[t.date] = (a.outDay[t.date] || 0) + t.amount; }
+    });
+    aggC = a;
+    return a;
   }
+  function goalSaved(id) { return r2(agg().goal[id] || 0); }
   function pocketBal(id) {
     if (id) return goalSaved(id);
-    var tot = 0, gs = 0;
-    txs.forEach(function (t) { if (t.type === 'save') tot += t.amount; });
+    var gs = 0;
     settings.goals.forEach(function (g) { gs += goalSaved(g.id); });
-    return r2(tot - gs);
+    return r2(agg().save - gs);
   }
   function goalName(id) {
     var g = settings.goals.filter(function (x) { return x.id === id; })[0];
@@ -2949,10 +3141,16 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     var del = e.target.closest('[data-gdel]');
     if (del) {
       var id = del.getAttribute('data-gdel');
+      var ggone = settings.goals.filter(function (g) { return g.id === id; })[0], gidx = settings.goals.indexOf(ggone);
       settings.goals = settings.goals.filter(function (g) { return g.id !== id; });
       goalEditId = null;
       persistSettings();
-      toast('Цель удалена. Деньги остались в общей копилке');
+      toast('Цель удалена. Деньги остались в общей копилке', function () {
+        if (!ggone || settings.goals.some(function (g) { return g.id === ggone.id; })) return;
+        settings.goals.splice(Math.min(gidx, settings.goals.length), 0, ggone);
+        persistSettings();
+        toast('Цель восстановлена');
+      });
       return;
     }
     var sv = e.target.closest('[data-gsave]');
@@ -3179,7 +3377,23 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
           list.push(o);
         });
         bkPending = { txs: list, cats: b.cats, save: b.save, ui: b.ui, rec: b.rec, tpl: b.tpl };
-        $('bkText').textContent = 'В копии ' + list.length + ' записей' + (b.at ? ' от ' + new Date(b.at).toLocaleDateString('ru-RU') : '') + '. «Добавить к текущим» объединит их с теми, что уже есть (одинаковые заменятся). «Заменить всё копией» удалит все текущие записи, которых нет в копии, и оставит ровно то, что в файле. Категории, платежи и настройки в любом случае берутся из копии.';
+        var cur = {}, inCopy = {}, nNew = 0, nChg = 0, nSame = 0, nExtra = 0;
+        txs.forEach(function (t) { if (!t.example) cur[t.id] = t; });
+        list.forEach(function (t) {
+          inCopy[t.id] = 1;
+          var c = cur[t.id];
+          if (!c) nNew++;
+          else if (c.type === t.type && c.cat === t.cat && c.amount === t.amount && c.date === t.date && (c.note || '') === t.note && (c.goalId || '') === (t.goalId || '') && (c.acc || '') === (t.acc || '')) nSame++;
+          else nChg++;
+        });
+        Object.keys(cur).forEach(function (k) { if (!inCopy[k]) nExtra++; });
+        var sv = b.save || {}, nowN = Object.keys(cur).length;
+        $('bkText').innerHTML = 'Копия' + (b.at ? ' от ' + esc(new Date(b.at).toLocaleDateString('ru-RU')) : '') + ': записей ' + list.length + '. Сейчас в приложении: ' + nowN + '.' +
+          '<br>Добавится новых: <b>' + nNew + '</b>. Изменится: <b>' + nChg + '</b>. Совпадает: <b>' + nSame + '</b>.' +
+          '<br>Есть только у вас, в копии нет: <b>' + nExtra + '</b>. «Добавить к текущим» их оставит, «Заменить всё копией» удалит.' +
+          '<br>Категории, регулярные платежи (' + (b.rec && Array.isArray(b.rec.items) ? b.rec.items.length : 0) + '), цели (' + (Array.isArray(sv.goals) ? sv.goals.length : 0) + '), счета (' + (Array.isArray(sv.accs) ? sv.accs.length : 0) + ') и настройки берутся из копии и заменят нынешние.';
+        $('bkGo').textContent = 'Добавить к текущим' + (nNew + nChg ? ' (' + (nNew + nChg) + ')' : '');
+        $('bkRep').textContent = 'Заменить всё копией' + (nExtra ? ' (−' + nExtra + ')' : '');
         $('bkInfo').hidden = false;
       } catch (e) {
         bkPending = null; $('bkInfo').hidden = true;
@@ -3244,7 +3458,64 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     '<ellipse cx="32" cy="18" rx="20" ry="7"/><path d="M12 18v10c0 3.9 9 7 20 7s20-3.1 20-7V18"/>' +
     '<path d="M12 28v10c0 3.9 9 7 20 7s20-3.1 20-7V28"/><path d="M12 38v10c0 3.9 9 7 20 7s20-3.1 20-7V38"/></svg>';
 
+  var TAGRX = '(^|[^&\\p{L}\\p{N}_#])#([\\p{L}\\p{N}_]{1,24})';
+  function tagsOf(note) {
+    var r = [], m, re = new RegExp(TAGRX, 'gu');
+    while ((m = re.exec(note || ''))) { var k = m[2].toLowerCase(); if (r.indexOf(k) < 0) r.push(k); re.lastIndex = m.index + m[0].length - 0; }
+    return r;
+  }
+  function noteHtml(s) {
+    return esc(s).replace(new RegExp(TAGRX, 'gu'), function (a, pre, k) { return pre + '<span class="tg" data-tag="' + k.toLowerCase() + '">#' + k + '</span>'; });
+  }
+  function tagStats() {
+    var m = {};
+    txs.forEach(function (t) {
+      tagsOf(t.note).forEach(function (k) {
+        var o = m[k] || (m[k] = { k: k, n: 0, out: 0, inc: 0, last: '' });
+        o.n++;
+        if (t.type === 'out') o.out += t.amount; else if (t.type === 'in') o.inc += t.amount;
+        if (t.date > o.last) o.last = t.date;
+      });
+    });
+    return Object.keys(m).map(function (k) { return m[k]; }).sort(function (a, b) { return b.n - a.n || (a.last < b.last ? 1 : -1); });
+  }
+  function setTagSearch(k) {
+    $('q').value = '#' + k;
+    catFilter = null; selectedId = null;
+    render('journal');
+    var fb = $('fbar');
+    if (fb && fb.scrollIntoView) fb.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
+  function updateTagRow() {
+    var tr = $('tagRow'), q = $('q');
+    var show = !loading && !q.hidden && (document.activeElement === q || q.value.trim() !== '');
+    if (!show) { tr.hidden = true; return; }
+    var st = tagStats();
+    if (!st.length) { tr.hidden = true; return; }
+    tr.innerHTML = st.slice(0, 6).map(function (o) { return '<button type="button" class="chip" data-tg="' + esc(o.k) + '">#' + esc(o.k) + ' · ' + o.n + '</button>'; }).join('') +
+      (st.length > 6 ? '<button type="button" class="chip" data-tg-all>Все метки</button>' : '');
+    tr.hidden = false;
+  }
+  function renderTagSug() {
+    var box = $('tagSug');
+    var have = tagsOf($('note').value);
+    box.innerHTML = tagStats().filter(function (o) { return have.indexOf(o.k) < 0; }).slice(0, 8).map(function (o) { return '<button type="button" class="chip" data-addtag="' + esc(o.k) + '">#' + esc(o.k) + '</button>'; }).join('');
+  }
+  function renderTagsSheet() {
+    var st = tagStats();
+    $('tagsList').innerHTML = st.length ? st.map(function (o) {
+      var sums = [];
+      if (o.out > 0) sums.push('−' + money(r2(o.out)));
+      if (o.inc > 0) sums.push('+' + money(r2(o.inc)));
+      return '<button type="button" class="tgrow" data-tg="' + esc(o.k) + '"><span>#' + esc(o.k) + '<small>' + o.n + ' ' + (o.n % 10 === 1 && o.n % 100 !== 11 ? 'запись' : (o.n % 10 >= 2 && o.n % 10 <= 4 && (o.n % 100 < 10 || o.n % 100 >= 20) ? 'записи' : 'записей')) + '</small></span><b>' + sums.join(' · ') + '</b></button>';
+    }).join('') : '<p class="quiet">Пока нет ни одной метки. Добавьте в комментарий слово с решёткой, например «Билеты #отпуск».</p>';
+  }
+  function xfRow(x) {
+    var nt = accName(x.from) + ' → ' + accName(x.to) + (x.note ? ' · ' + x.note : '');
+    return '<li class="row xf"><div class="rowmain"><span class="av" aria-hidden="true">⇄</span><span class="what"><span class="cat">Перевод между счетами</span><span class="note">' + esc(nt) + '</span></span><span class="amt-n xf">' + money(x.amount) + '</span></div></li>';
+  }
   function row(t) {
+    if (t.type === 'xf') return xfRow(t.x);
     var sel = selectedId === t.id;
     var ic = t.type === 'save' ? '' : iconFor(t.type, t.cat);
     var letter = t.type === 'save' ? (t.amount < 0 ? '←' : '→') : (ic || t.cat.charAt(0).toUpperCase());
@@ -3256,9 +3527,9 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     return '<li class="row' + (sel ? ' sel' : '') + '" style="--cc:' + catColor(t.cat) + '"><button type="button" class="rowmain" data-sel="' + esc(t.id) + '" aria-expanded="' + (sel ? 'true' : 'false') + '">' +
       '<span class="av ' + t.type + (ic ? ' ico' : '') + '" aria-hidden="true">' + esc(letter) + '</span>' +
       '<span class="what"><span class="cat">' + esc(t.cat) + (t.example ? '<em class="ex">пример</em>' : '') + (t.auto ? '<em class="ex">авто</em>' : '') + '</span>' +
-      (note ? '<span class="note">' + esc(note) + '</span>' : '') + '</span>' +
+      (note ? '<span class="note">' + noteHtml(note) + '</span>' : '') + '</span>' +
       '<span class="amt-n ' + t.type + '">' + amount + '</span></button>' +
-      (sel ? '<div class="rowact">' + (t.type !== 'save' ? '<button type="button" class="rowedit" data-edit="' + esc(t.id) + '">Изменить</button>' : '') +
+      (sel ? '<div class="rowact">' + (t.type !== 'save' || !/^Перевод/.test(t.note || '') ? '<button type="button" class="rowedit" data-edit="' + esc(t.id) + '">Изменить</button>' : '') +
       '<button type="button" class="rowdel" data-id="' + esc(t.id) + '">Удалить запись</button></div>' : '') + '</li>';
   }
 
@@ -3308,12 +3579,14 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
   function catAttr(n) {
     return ' style="--cc:' + catColor(n) + '" class="cl' + (catFilter === n ? ' on' : '') + '" data-cat="' + esc(n) + '" role="button" tabindex="0" aria-pressed="' + (catFilter === n ? 'true' : 'false') + '"';
   }
-  function render() {
+  function render(mode) {
+    var light = mode === 'journal';
     var key = view.y + '-' + pad(view.m + 1);
     $('monthLabel').textContent = cap(new Date(view.y, view.m, 1).toLocaleDateString('ru-RU', { month: 'long' })) + ' ' + view.y;
 
     var mt = txs.filter(function (t) { return t.date.slice(0, 7) === key; });
     var mtAll = mt;
+    if (!light) {
     var inc = 0, exp = 0, sv = 0;
     mt.forEach(function (t) {
       if (t.type === 'in') inc += t.amount;
@@ -3380,27 +3653,32 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     } else {
       box.hidden = true;
     }
+    }
 
     // журнал
     var list = $('list');
     var fb = $('fbar');
     var qRaw = $('q').value.trim(), qv = qRaw.toLowerCase();
     $('q').hidden = loading || txs.length === 0;
+    var isTag = /^#[\p{L}\p{N}_]+$/u.test(qv);
+    updateTagRow();
     if ((catFilter || qv) && !loading) {
       mt = (qv ? txs : mtAll).filter(function (t) {
         if (catFilter && !(t.type === 'out' && t.cat === catFilter)) return false;
         if (!qv) return true;
+        if (isTag) return tagsOf(t.note).indexOf(qv.slice(1)) >= 0;
         var hay = ((t.note || '') + ' ' + t.cat + ' ' + String(t.amount) + ' ' + String(t.amount).replace('.', ',') + ' ' + (t.goalId ? goalName(t.goalId) : '')).toLowerCase();
         return hay.indexOf(qv) >= 0;
       });
-      var fsum = 0; mt.forEach(function (t) { if (t.type === 'out') fsum += t.amount; });
+      var fsum = 0, fin = 0; mt.forEach(function (t) { if (t.type === 'out') fsum += t.amount; else if (t.type === 'in') fin += t.amount; });
       var fic = catFilter ? iconFor('out', catFilter) : '';
       var parts = [];
       if (catFilter) parts.push('Расходы: ' + (fic ? fic + ' ' : '') + catFilter);
-      if (qv) parts.push('Поиск «' + qRaw.slice(0, 30) + '» по всем месяцам');
-      $('fbarT').textContent = parts.join(' · ') + ' · найдено ' + mt.length + (catFilter && !qv ? ' · ' + money(r2(fsum)) : '');
+      if (qv) parts.push(isTag ? 'Метка ' + qRaw.slice(0, 26) + ' по всем месяцам' : 'Поиск «' + qRaw.slice(0, 30) + '» по всем месяцам');
+      $('fbarT').textContent = parts.join(' · ') + ' · найдено ' + mt.length + (catFilter && !qv ? ' · ' + money(r2(fsum)) : '') + (isTag ? (fsum > 0 ? ' · −' + money(r2(fsum)) : '') + (fin > 0 ? ' · +' + money(r2(fin)) : '') : '');
       fb.hidden = false;
     } else fb.hidden = true;
+    var xfM = (!catFilter && !qv && !loading && settings.accs.length > 1) ? settings.xfers.filter(function (x) { return x.date && x.date.slice(0, 7) === key; }) : [];
     if (loading) {
       list.innerHTML = '<p class="load">Загружаю записи…</p>';
     } else if (txs.length === 0) {
@@ -3408,11 +3686,12 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
         '<p class="quiet">Добавьте первую трату или доход. Чтобы увидеть, как всё выглядит, загрузите примеры.</p>' +
         '<div class="btnrow"><button type="button" class="primary" data-act="add">Добавить запись</button>' +
         '<button type="button" class="secondary" data-act="seed">Загрузить примеры</button></div></div>';
-    } else if (mt.length === 0) {
+    } else if (mt.length === 0 && !xfM.length) {
       list.innerHTML = '<p class="load">' + (catFilter || qv ? 'Ничего не найдено.' : 'В этом месяце записей нет.') + '</p>';
     } else {
       var byDay = {};
       mt.forEach(function (t) { (byDay[t.date] = byDay[t.date] || []).push(t); });
+      if (!jFolded) xfM.forEach(function (x) { (byDay[x.date] = byDay[x.date] || []).push({ type: 'xf', id: x.id, date: x.date, createdAt: x.ts, x: x }); });
       var jin = 0, jout = 0;
       mt.forEach(function (t) { if (t.type === 'in') jin += t.amount; else if (t.type === 'out') jout += t.amount; });
       var n = mt.length;
@@ -3433,11 +3712,13 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     fa.hidden = loading || txs.length === 0 || mt.length === 0;
     fa.textContent = jFolded ? 'Развернуть' : 'Свернуть';
 
-    renderTiles();
-    renderQuick();
-    renderSaveSheet();
-    checkDone();
-    renderAccUi();
+    if (!light) {
+      renderTiles();
+      renderQuick();
+      renderSaveSheet();
+      checkDone();
+      renderAccUi();
+    }
 
     $('clearEx').hidden = !txs.some(function (t) { return t.example; });
     $('storeNote').textContent = store.mode === 'cloud'
@@ -3475,8 +3756,36 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     if (li) { e.preventDefault(); toggleCat(li); }
   });
   $('fbarX').addEventListener('click', function () { catFilter = null; $('q').value = ''; render(); });
+  $('list').addEventListener('click', function (e) {
+    var tg = e.target.closest('.tg[data-tag]');
+    if (tg) { e.stopPropagation(); e.preventDefault(); setTagSearch(tg.getAttribute('data-tag')); }
+  }, true);
+  $('q').addEventListener('focus', updateTagRow);
+  $('q').addEventListener('blur', function () { setTimeout(updateTagRow, 250); });
+  $('tagRow').addEventListener('click', function (e) {
+    var b = e.target.closest('button');
+    if (!b) return;
+    if (b.hasAttribute('data-tg-all')) { renderTagsSheet(); openOv('ovTags'); return; }
+    setTagSearch(b.getAttribute('data-tg'));
+  });
+  $('tagsList').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-tg]');
+    if (!b) return;
+    var k = b.getAttribute('data-tg');
+    closeOv();
+    setTimeout(function () { setTagSearch(k); }, 30);
+  });
+  $('tagSug').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-addtag]');
+    if (!b) return;
+    var v = $('note').value.replace(/\s+$/, '');
+    $('note').value = ((v ? v + ' ' : '') + '#' + b.getAttribute('data-addtag')).slice(0, 120);
+    renderTagSug();
+    $('note').focus();
+  });
+  $('note').addEventListener('input', renderTagSug);
   var qTimer = null;
-  $('q').addEventListener('input', function () { clearTimeout(qTimer); qTimer = setTimeout(function () { selectedId = null; render(); }, 150); });
+  $('q').addEventListener('input', function () { clearTimeout(qTimer); qTimer = setTimeout(function () { selectedId = null; render('journal'); }, 150); });
   $('list').addEventListener('click', function (e) {
     if (e.target.closest('[data-act="seed"]')) { loadExamples(); return; }
     if (e.target.closest('[data-act="add"]')) { openAdd(); return; }
@@ -3485,8 +3794,13 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     var del = e.target.closest('button[data-id]');
     if (del) {
       var id = del.getAttribute('data-id');
+      var gone = txs.filter(function (x) { return x.id === id; })[0];
       selectedId = null;
-      removeTx(id).catch(function () { toast('Не удалось удалить. Попробуйте ещё раз.'); });
+      removeTx(id).then(function () {
+        if (gone) toast('Запись удалена', function () {
+          addTx(gone).then(function () { toast('Запись восстановлена'); }).catch(function () { toast('Не удалось восстановить запись.'); });
+        });
+      }).catch(function () { toast('Не удалось удалить. Попробуйте ещё раз.'); });
       render();
       return;
     }
@@ -3494,7 +3808,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     if (sel) {
       var sid = sel.getAttribute('data-sel');
       selectedId = selectedId === sid ? null : sid;
-      render();
+      render('journal');
       var again = $('list').querySelector('[data-sel="' + sid + '"]');
       if (again) again.focus();
     }
@@ -3566,7 +3880,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     if (dateStr(d) > dateStr(t)) return d;
     return clampDate(t.getFullYear(), t.getMonth() + 1, it.day);
   }
-  // Сумма платежей, отложенных на другом счёте и ещё не наступивших в этом месяце
+  // Сумма платежей, отложенных отдельно и ещё не наступивших в этом месяце
   function extOut() {
     var t = new Date(), mk = t.getFullYear() + '-' + pad(t.getMonth() + 1), total = 0;
     rec.items.forEach(function (it) {
@@ -3600,13 +3914,16 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     });
     if (!jobs.length) return;
     recBusy = true;
+    renderHold++;
     var added = 0, changed = false;
     try {
       for (var i = 0; i < jobs.length; i++) {
         var j = jobs[i], id = 'r_' + j.it.id + '_' + j.key;
         var exists = txs.some(function (x) { return x.id === id; });
         if (!exists) {
-          await addTx({ id: id, type: j.it.type, cat: j.it.cat, amount: j.it.amount, note: j.it.note, date: j.date, createdAt: Date.now() + i, auto: true, recId: j.it.id });
+          var atx = { id: id, type: j.it.type, cat: j.it.cat, amount: j.it.amount, note: j.it.note, date: j.date, createdAt: Date.now() + i, auto: true, recId: j.it.id };
+          if (accOn() && j.it.acc && accById(j.it.acc)) atx.acc = j.it.acc;
+          await addTx(atx);
           added++;
         }
         j.it.done.push(j.key);
@@ -3616,6 +3933,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
       toast('Не удалось добавить регулярные платежи.');
     }
     recBusy = false;
+    renderHold--;
     if (changed) persistRec();
     if (added) toast(added === 1 ? 'Добавлен регулярный платёж' : 'Добавлено регулярных платежей: ' + added);
     render();
@@ -3876,6 +4194,10 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     $('recCat').innerHTML = list.map(function (c) { return '<option>' + esc(c) + '</option>'; }).join('');
     if (selected) $('recCat').value = selected;
   }
+  function fillRecAcc(v) {
+    $('recAccBox').hidden = settings.accs.length < 2;
+    if (settings.accs.length > 1) fillSel($('recAcc'), v || '');
+  }
   function setRecType(tp) {
     recType = tp;
     var r = document.querySelector('input[name="rtype"][value="' + tp + '"]');
@@ -3889,6 +4211,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     $('recNote').value = '';
     $('recExt').checked = false;
     $('recFut').checked = false;
+    fillRecAcc('');
     fillRecCats('');
     $('recFormTitle').textContent = 'Новый платёж';
     $('recSubmit').textContent = 'Добавить платёж';
@@ -3897,12 +4220,12 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
   function recRow(it) {
     var ic = iconFor(it.type, it.cat), sel = recSel === it.id;
     var title = it.note || it.cat;
-    var sub = (it.note ? it.cat + ' · ' : '') + 'каждое ' + it.day + '-е число · следующее ' + fmtShort(nextDate(it));
+    var sub = (it.note ? it.cat + ' · ' : '') + 'каждое ' + it.day + '-е число · следующее ' + fmtShort(nextDate(it)) + (settings.accs.length > 1 && accById(it.acc || '') ? ' · ' + accName(it.acc || '') : '');
     return '<li class="row' + (it.ext ? ' ext' : '') + '"><button type="button" class="rowmain" data-rsel="' + esc(it.id) + '" aria-expanded="' + (sel ? 'true' : 'false') + '">' +
       '<span class="av ' + it.type + (ic ? ' ico' : '') + '" aria-hidden="true">' + esc(ic || it.cat.charAt(0).toUpperCase()) + '</span>' +
-      '<span class="what"><span class="cat">' + esc(title) + (it.ext ? '<em class="ex">с другого счёта</em>' : '') + (it.fut && !it.ext ? '<em class="ex">с будущего дохода</em>' : '') + '</span><span class="note">' + esc(sub) + '</span></span>' +
+      '<span class="what"><span class="cat">' + esc(title) + (it.ext ? '<em class="ex">отложено отдельно</em>' : '') + (it.fut && !it.ext ? '<em class="ex">с будущего дохода</em>' : '') + '</span><span class="note">' + esc(sub) + '</span></span>' +
       '<span class="amt-n ' + it.type + '">' + (it.type === 'in' ? '+' : '−') + money(it.amount) + '</span></button>' +
-      '<label class="extchk"><input type="checkbox" data-rext="' + esc(it.id) + '"' + (it.ext ? ' checked' : '') + '><span>Отложено на другом счёте</span></label>' +
+      '<label class="extchk"><input type="checkbox" data-rext="' + esc(it.id) + '"' + (it.ext ? ' checked' : '') + '><span>Деньги на платёж отложены отдельно</span></label>' +
       '<label class="extchk"><input type="checkbox" data-rfut="' + esc(it.id) + '"' + (it.fut ? ' checked' : '') + '><span>Оплачу с будущего дохода</span></label>' +
       (sel ? '<div class="rowact"><button type="button" class="rowedit" data-redit="' + esc(it.id) + '">Изменить</button>' +
         '<button type="button" class="rowdel" data-rdel="' + esc(it.id) + '">Удалить</button></div>' : '') + '</li>';
@@ -3925,6 +4248,7 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     $('recNote').value = it.note;
     $('recExt').checked = !!it.ext;
     $('recFut').checked = !!it.fut;
+    fillRecAcc(it.acc || '');
     fillRecCats(it.cat);
     $('recFormTitle').textContent = 'Изменить платёж';
     $('recSubmit').textContent = 'Сохранить';
@@ -3940,13 +4264,19 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     var del = e.target.closest('[data-rdel]');
     if (del) {
       var did = del.getAttribute('data-rdel');
+      var rgone = rec.items.filter(function (x) { return x.id === did; })[0], ridx = rec.items.indexOf(rgone);
       rec.items = rec.items.filter(function (x) { return x.id !== did; });
       recSel = null;
       if (recEditId === did) resetRecForm();
       persistRec();
       renderRecSheet();
       render();
-      toast('Платёж удалён. Уже созданные записи остались в журнале.');
+      toast('Платёж удалён. Созданные записи остались в журнале.', function () {
+        if (!rgone || rec.items.some(function (x) { return x.id === rgone.id; })) return;
+        rec.items.splice(Math.min(ridx, rec.items.length), 0, rgone);
+        persistRec(); renderRecSheet(); render();
+        toast('Платёж восстановлен');
+      });
       return;
     }
     var ed = e.target.closest('[data-redit]');
@@ -3996,18 +4326,19 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
     if (!cat) { toast('Выберите категорию'); return; }
     var note = $('recNote').value.trim().slice(0, 60);
     var ext = $('recExt').checked, fut = $('recFut').checked;
+    var racc = (settings.accs.length > 1 && accById($('recAcc').value)) ? $('recAcc').value : '';
     var it;
     if (recEditId) {
       it = rec.items.filter(function (x) { return x.id === recEditId; })[0];
       if (!it) { resetRecForm(); return; }
       var wasExt = it.ext;
-      it.type = recType; it.cat = cat; it.amount = amt; it.day = day; it.note = note; it.ext = ext; it.fut = fut;
+      it.type = recType; it.cat = cat; it.amount = amt; it.day = day; it.note = note; it.ext = ext; it.fut = fut; it.acc = racc;
       toast('Сохранено');
     } else {
       if (rec.items.length >= 50) { toast('Слишком много регулярных платежей'); return; }
       var t = new Date();
       var start = dateStr(clampDate(t.getFullYear(), t.getMonth(), day)) > dateStr(t) ? t : new Date(t.getFullYear(), t.getMonth() + 1, 1);
-      it = { id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), type: recType, cat: cat, amount: amt, day: day, note: note, ext: ext, fut: fut,
+      it = { id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), type: recType, cat: cat, amount: amt, day: day, note: note, acc: racc, ext: ext, fut: fut,
         from: start.getFullYear() + '-' + pad(start.getMonth() + 1), done: [] };
       rec.items.push(it);
       toast(ext ? 'Платёж добавлен. Сумма вычтена из остатка как отложенная' : 'Платёж добавлен. Первое добавление: ' + fmtShort(nextDate(it)));
@@ -4035,6 +4366,13 @@ html[data-hide] :is(.arow b, #accTotal, #accSub, .xrow span) { filter: blur(9px)
       openOv('ovRec');
     }
   });
+
+  // Работа без интернета: только в версии на https (GitHub Pages) или локально
+  try {
+    if ('serviceWorker' in navigator && ((location.protocol === 'https:' && /github\.io$/.test(location.hostname)) || location.hostname === 'localhost')) {
+      window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+    }
+  } catch (e) {}
 
   $('date').value = dateStr(new Date());
   ui = lsLoadUi();
