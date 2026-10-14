@@ -745,6 +745,50 @@ html[data-locked] .lockscr, .lockscr.setup { display: flex; }
 .lk-coin .cf { position: absolute; inset: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #5A3E00; backface-visibility: hidden; -webkit-backface-visibility: hidden; background: radial-gradient(circle at 32% 28%, #FFE9A3, #E9B93B 60%, #B98A18); border: 3px solid #D9A92B; box-shadow: inset 0 0 0 3px rgba(255,255,255,.35); }
 .lk-coin .cf-b { transform: rotateY(180deg); }
 .lk-res { margin: 0; min-height: 22px; font-weight: 800; font-size: 17px; }
+.tm-hero { background: var(--tint); border-radius: 18px; padding: 14px 16px; }
+.tm-date { font-weight: 800; font-size: 18px; }
+.tm-date small { font-weight: 600; font-size: 13px; color: var(--muted); margin-left: 6px; }
+.tm-nums { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+.tm-nums small { display: block; color: var(--muted); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; }
+.tm-nums b { display: block; font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.tm-nums b.neg { color: var(--out); }
+.tm-nums em { display: block; font-style: normal; font-size: 13px; font-weight: 700; color: var(--in); }
+.tm-nums em:empty { display: none; }
+.tm-nums em.dn { color: var(--out); }
+.tm-ev { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
+.tm-ev:empty { display: none; }
+.tm-svg { width: 100%; height: auto; touch-action: none; cursor: ew-resize; user-select: none; -webkit-user-select: none; display: block; }
+.tm-svg text { font-family: inherit; fill: var(--muted); font-size: 9px; }
+.tm-jumps { display: flex; flex-wrap: wrap; gap: 6px; }
+.tm-jumps .chip { min-height: 38px; padding: 6px 12px; font-size: 13px; }
+.tm-sl { padding: 8px 0; }
+.tm-sl label { display: flex; justify-content: space-between; gap: 8px; font-weight: 700; font-size: 14px; }
+.tm-sl label span { color: var(--muted); font-weight: 600; text-align: right; }
+.tm-sl input[type=range] { width: 100%; accent-color: var(--brand); margin: 6px 0 0; min-height: 32px; }
+.tm-goal { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 14px; }
+.tm-goal small { display: block; color: var(--muted); }
+.tm-goal b { text-align: right; }
+.tm-goal .good { color: var(--in); }
+.tm-goal .bad { color: var(--out); }
+html[data-hide] :is(.tm-nums b, .tm-nums em, .tm-sl label span, .tm-ev) { filter: blur(9px); }
+.bud-sum { background: var(--tint); border-radius: 18px; padding: 14px 16px; display: grid; gap: 6px; }
+.bud-sum div { display: flex; justify-content: space-between; gap: 10px; font-size: 15px; }
+.bud-sum b { font-variant-numeric: tabular-nums; }
+.bud-st { margin: 0; font-weight: 700; font-size: 14px; }
+.bud-st.ok { color: var(--in); }
+.bud-st.bad { color: var(--out); }
+.bud-pct { display: flex; flex-wrap: wrap; gap: 6px; }
+.bud-pct .chip { min-height: 40px; padding: 6px 14px; }
+.bud-pct .chip[aria-pressed="true"] { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
+.bud-row { padding: 12px 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: center; }
+.bud-row .bn { font-weight: 700; font-size: 15px; }
+.bud-row .bn small { font-weight: 500; color: var(--muted); font-size: 12px; margin-left: 4px; }
+.bud-row .br { text-align: right; font-weight: 800; font-variant-numeric: tabular-nums; }
+.bud-row .bs { color: var(--muted); font-size: 13px; }
+.bud-row .bd { text-align: right; font-size: 13px; font-weight: 700; color: var(--in); }
+.bud-row .bd.dn { color: var(--out); }
+.bud-row .bar { grid-column: 1 / -1; height: 6px; margin-top: 4px; }
+html[data-hide] :is(.bud-sum b, .bud-row .br, .bud-row .bs, .bud-row .bd, .bud-st) { filter: blur(9px); }
 </style>
 <script>
 /* Сразу применяем сохранённые тему и режим, чтобы страница не мигала */
@@ -1046,6 +1090,17 @@ html[data-locked] .lockscr, .lockscr.setup { display: flex; }
         <p>Метка помогает собрать вместе траты из разных категорий: например, всё, что связано с отпуском или ремонтом. Напишите в комментарии слово с решёткой: «Билеты #отпуск». Метка подсветится в журнале. Под полем комментария появляются подсказки уже использованных меток, нажмите на нужную, чтобы вставить её.</p>
         <p>Нажмите на метку в журнале или на подсказку под строкой поиска (она появляется, когда вы нажали в поиск). Покажутся все записи с этой меткой за все месяцы и суммы расходов и доходов по ней. Кнопка «Все метки» открывает окно со списком меток и итогами по каждой.</p>
       </details>
+      <details><summary>Рекомендуемый бюджет</summary>
+        <p>В окне «Лимиты по категориям» нажмите «Рекомендуемый бюджет по доходу». Приложение покажет, сколько процентов вашего дохода уходит на каждую категорию сейчас и сколько стоит тратить, чтобы откладывать выбранную долю (10, 15, 20 или 30%).</p>
+        <p>Доход берётся по вашим записям. Если зарплата каждый раз разная, впишите примерную сумму в поле «Доход в месяц». Обязательные категории (жильё, связь, здоровье и платежи, которые идут автоматически) приложение не сокращает, остальные уменьшает примерно пропорционально. Если даже так не хватает, оно честно скажет и предложит меньший процент.</p>
+        <p>Кнопка «Подставить в лимиты» заполняет лимиты по категориям рекомендуемыми суммами. Проверьте их и нажмите «Сохранить». Это ориентир, а не обязанность: настоящие траты зависят от вашей жизни.</p>
+      </details>
+      <details><summary>Машина времени</summary>
+        <p>Откройте «Сравнение и динамика» и нажмите «Машина времени». Это прогноз на год вперёд: линия показывает, сколько будет свободных денег или денег в копилке в любой день. Проведите по графику пальцем или нажмите «Конец месяца», «Через 3 мес.», «Через год», и сверху покажется выбранная дата и суммы.</p>
+        <p>Прогноз строится из ваших регулярных платежей и ваших обычных трат за последние три месяца. Крупные разовые покупки в среднем не учитываются. Если деньги по прогнозу закончатся, на графике появится красная точка и дата.</p>
+        <p>Ниже раздел «А что, если…»: сдвиньте ползунок трат в категории или добавьте сумму «Откладывать ещё» или «Дополнительный доход», и линия перестроится. Пунктиром остаётся прогноз без изменений, так видно разницу. В разделе «Цели» показано, когда накопится каждая цель и на сколько раньше или позже она наступит в вашем сценарии. Освободившиеся от сокращения трат деньги по умолчанию идут в копилку, это можно выключить галочкой.</p>
+        <p>Это оценка по привычкам, а не предсказание. Пока записей мало (меньше двух месяцев), доход оценивается по внесённому как поступающий раз в месяц. Если зарплата каждый раз разная, впишите примерную сумму в поле «Доход в месяц» в окне машины времени, и прогноз будет считаться с ней.</p>
+      </details>
       <details><summary>Пин-код и Face ID</summary>
         <p>В «Оформлении», в разделе «Защита», можно включить пин-код из четырёх цифр. Тогда при открытии приложения сначала появится экран ввода. Если телефон поддерживает Face ID или Touch ID, включите и его: пин-код тогда нужен только как запасной вариант.</p>
         <p>Выберите, когда блокировать: сразу, как только вышли из приложения (при этом содержимое не видно и в списке открытых приложений), через минуту или только при новом запуске. После пяти неверных попыток нужно подождать полминуты.</p>
@@ -1241,6 +1296,7 @@ html[data-locked] .lockscr, .lockscr.setup { display: flex; }
       <button type="button" class="x" data-close aria-label="Закрыть">×</button>
     </div>
     <div class="stack">
+      <button type="button" class="secondary" id="tmOpen">⏳ Машина времени: что будет дальше</button>
       <div>
         <span class="lbl">Последние 6 месяцев</span>
         <div class="cmpbars" id="cmpBars"></div>
@@ -1257,6 +1313,42 @@ html[data-locked] .lockscr, .lockscr.setup { display: flex; }
   </div>
 </div>
 
+<div class="overlay" id="ovTm" hidden>
+  <div class="backdrop" data-close></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="tmTitle" tabindex="-1">
+    <div class="sheet-head">
+      <h2 id="tmTitle">Машина времени</h2>
+      <button type="button" class="x" data-close aria-label="Закрыть">×</button>
+    </div>
+    <div class="stack">
+      <div class="tm-hero">
+        <div class="tm-date" id="tmDate"></div>
+        <div class="tm-nums">
+          <div><small>Свободные деньги</small><b id="tmBal"></b><em id="tmBalD"></em></div>
+          <div><small>Копилка</small><b id="tmJar"></b><em id="tmJarD"></em></div>
+        </div>
+        <p class="tm-ev" id="tmEv"></p>
+      </div>
+      <div class="segb" id="tmMetric" role="group" aria-label="Что показывать на графике">
+        <button type="button" data-mt="bal" aria-pressed="true">Свободные деньги</button>
+        <button type="button" data-mt="jar" aria-pressed="false">Копилка</button>
+      </div>
+      <svg id="tmSvg" class="tm-svg" viewBox="0 0 340 190" role="img" aria-label="График будущего остатка. Проведите по нему пальцем, чтобы выбрать день"></svg>
+      <div class="tm-jumps" id="tmJumps"></div>
+      <p class="hint" id="tmWarn"></p>
+      <div class="field"><label for="tmInc">Доход в месяц, ₽</label><input id="tmInc" inputmode="decimal" autocomplete="off" placeholder="Считать по моим записям"><p class="hint" id="tmIncH"></p></div>
+      <h3 class="grp">А что, если…</h3>
+      <div id="tmSliders"></div>
+      <label class="chk"><input type="checkbox" id="tmToJar" checked><span>Освободившиеся деньги откладывать в копилку</span></label>
+      <button type="button" class="link" id="tmReset">Сбросить сценарий</button>
+      <h3 class="grp sep">Цели</h3>
+      <div id="tmGoals"></div>
+      <p class="hint" id="tmNote"></p>
+      <button type="button" class="primary" data-close>Готово</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="ovLim" hidden>
   <div class="backdrop" data-close></div>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="limTitle" tabindex="-1">
@@ -1265,11 +1357,36 @@ html[data-locked] .lockscr, .lockscr.setup { display: flex; }
       <button type="button" class="x" data-close aria-label="Закрыть">×</button>
     </div>
     <p class="hint">Сколько вы готовы тратить на категорию за месяц. Пустое поле значит «без лимита».</p>
+    <button type="button" class="secondary" id="budOpen">Рекомендуемый бюджет по доходу</button>
     <div class="limhead"><span class="lbl" id="limMonth"></span><button type="button" class="link" id="limSuggest">Заполнить по прошлому месяцу</button></div>
     <form id="limForm" class="stack" novalidate>
       <div class="limlist" id="limList"></div>
       <button type="submit" class="primary stickyb">Сохранить</button>
     </form>
+  </div>
+</div>
+
+<div class="overlay" id="ovBud" hidden>
+  <div class="backdrop" data-close></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="budTitle" tabindex="-1">
+    <div class="sheet-head">
+      <h2 id="budTitle">Рекомендуемый бюджет</h2>
+      <button type="button" class="x" data-close aria-label="Закрыть">×</button>
+    </div>
+    <div class="stack">
+      <p class="hint">Показывает, сколько процентов дохода уходит на каждую категорию сейчас и сколько стоит тратить, чтобы откладывать нужную долю.</p>
+      <div class="field"><label for="budInc">Доход в месяц, ₽</label><input id="budInc" inputmode="decimal" autocomplete="off" placeholder="Считать по моим записям"><p class="hint" id="budIncH"></p></div>
+      <div>
+        <span class="lbl" id="budPctL">Сколько откладывать от дохода</span>
+        <div class="bud-pct" id="budPct" role="group" aria-labelledby="budPctL"></div>
+      </div>
+      <div class="bud-sum" id="budSum"></div>
+      <p class="bud-st" id="budSt"></p>
+      <div id="budRows"></div>
+      <p class="hint" id="budNote"></p>
+      <button type="button" class="primary" id="budApply">Подставить в лимиты</button>
+      <button type="button" class="link" data-close>Закрыть</button>
+    </div>
   </div>
 </div>
 
@@ -2332,6 +2449,8 @@ html[data-locked] .lockscr, .lockscr.setup { display: flex; }
       { v: '<div class="tm"><div class="row"><span>🏠 Аренда</span><span>25 000 ₽</span></div><div class="row"><span>💳 Кредит</span><span>7 520 ₽</span></div><div class="row"><span>📱 Связь</span><span>600 ₽</span></div></div>', t: 'Регулярные платежи', p: 'Аренда, кредит, подписки: укажите сумму и день месяца, и запись сама появится в журнале. Если деньги на платёж уже отложены отдельно или придут позже, отметьте это галочкой.' },
       { v: '<div class="tm plain"><div class="ring"></div></div>', t: 'Куда уходят деньги', p: 'Кнопка с диаграммой в шапке показывает, на что разошлись доходы. Нажмите на категорию, и в журнале останутся только её траты. Ещё есть поиск и сравнение месяцев.' },
       { v: '<div class="tm plain"><div class="ico">🏷️</div></div>', t: 'Метки', p: 'Добавьте в комментарий слово с решёткой, например «Билеты #отпуск». Нажмите на метку в журнале, и увидите все записи по ней и общую сумму. Так легко считать траты на отпуск, ремонт или подарки, даже если они в разных категориях.' },
+      { v: '<div class="tm plain"><div class="ico">🎯</div></div>', t: 'Сколько тратить', p: 'В окне «Лимиты по категориям» есть рекомендуемый бюджет: сколько процентов дохода уходит на каждую категорию и сколько стоит тратить, чтобы откладывать 10, 20 или 30%. Одной кнопкой его можно превратить в лимиты.' },
+      { v: '<div class="tm plain"><div class="ico">⏳</div></div>', t: 'Машина времени', p: 'В «Сравнении и динамике» есть прогноз на год вперёд. Проведите пальцем по графику и увидите, сколько денег будет в любой день. А ползунки покажут, как сократить траты, чтобы цель наступила раньше.' },
       { v: '<div class="tm plain"><div class="ico">🔒</div></div>', t: 'Защита', p: 'В «Оформлении» можно включить пин-код и вход по Face ID, чтобы приложение не открывалось для посторонних. А раз в неделю оно само сохраняет три последние копии записей на телефоне.' },
       { v: '<div class="tm plain"><div class="ico">💾</div></div>', t: 'Сохраните свои данные', p: 'Записи хранятся только в браузере этого устройства. Делайте резервную копию в окне оформления (значок с ползунками), хотя бы раз в несколько дней.' },
       { v: '<div class="tm"><div class="row"><span>📖 Руководство пользователя</span><span>›</span></div><div class="row"><span>🎓 Показать обучение</span><span>›</span></div></div>', t: 'Руководство всегда под рукой', p: 'Внизу главного экрана есть кнопка «Руководство пользователя»: в нём по разделам описано всё, что умеет приложение. Рядом кнопка «Показать обучение», если захотите пройти его снова.' }
@@ -4441,6 +4560,368 @@ html[data-locked] .lockscr, .lockscr.setup { display: flex; }
     }
   });
 
+
+
+
+  // Рекомендуемый бюджет в процентах от дохода
+  var BUD_FIXED = /жиль|аренд|коммун|связь|интернет|здоров|кредит|ипотек|налог|страхов/i;
+  var budRec = {};
+  function budData() {
+    var t0 = tmDay0(), todayS = dateStr(t0), fromS = dateStr(tmAddDays(t0, -90));
+    var real = txs.filter(function (t) { return !t.example; });
+    var first = real.reduce(function (m, t) { return !m || t.date < m ? t.date : m; }, '');
+    var span = first ? Math.max(1, Math.round((t0 - new Date(+first.slice(0, 4), +first.slice(5, 7) - 1, +first.slice(8, 10))) / 86400000) + 1) : 0;
+    var D = Math.max(14, Math.min(90, span || 14)), k = 30.4 / D;
+    var by = {}, inc = 0;
+    real.forEach(function (t) {
+      if (t.date < fromS || t.date >= todayS) return;
+      if (t.type === 'out') { var o = by[t.cat] || (by[t.cat] = { all: 0, auto: 0 }); o.all += t.amount; if (t.auto) o.auto += t.amount; }
+      else if (t.type === 'in' && !t.auto) inc += t.amount;
+    });
+    var autoIn = inc / Math.max(D, 30.4) * 30.4, ovr = +lsGet('kassa-tm-inc') || 0;
+    var cats = Object.keys(by).map(function (n) {
+      return { n: n, act: by[n].all * k, fixed: BUD_FIXED.test(n) || by[n].auto >= by[n].all * 0.5 };
+    }).filter(function (c) { return c.act > 0; }).sort(function (a, b) { return b.act - a.act; });
+    return { cats: cats, autoIn: autoIn, ovr: ovr, income: ovr > 0 ? ovr : autoIn, low: span < 45, D: D };
+  }
+  function budPctVal() { var v = +lsGet('kassa-bud-pct'); return v > 0 && v < 90 ? v : 20; }
+  function renderBud() {
+    var d = budData(), inc = d.income, pct = budPctVal();
+    $('budIncH').textContent = d.ovr > 0 ? 'Считаю с вашим доходом. Очистите поле, чтобы вернуться к оценке по записям.' : (d.autoIn > 0 ? 'По вашим записям выходит около ' + money(Math.round(d.autoIn)) + ' в месяц. Если доход каждый раз разный, впишите примерную сумму.' : 'Впишите, сколько вы получаете в месяц, и я посчитаю.');
+    $('budPct').innerHTML = [10, 15, 20, 30].map(function (p) { return '<button type="button" class="chip" data-bp="' + p + '" aria-pressed="' + (p === pct ? 'true' : 'false') + '">' + p + '%</button>'; }).join('');
+    var sum = $('budSum'), st = $('budSt'), rows = $('budRows');
+    budRec = {};
+    if (!(inc > 0)) { sum.hidden = true; st.textContent = ''; rows.innerHTML = ''; $('budApply').hidden = true; $('budNote').textContent = ''; return; }
+    sum.hidden = false; $('budApply').hidden = false;
+    var S = inc * pct / 100, A = inc - S, T = d.cats.reduce(function (a, c) { return a + c.act; }, 0);
+    var flexT = d.cats.filter(function (c) { return !c.fixed; }).reduce(function (a, c) { return a + c.act; }, 0);
+    var cutFrac = 0, short = 0;
+    if (T > A) {
+      var need = T - A;
+      cutFrac = flexT > 0 ? Math.min(need / flexT, 0.6) : 0;
+      short = Math.max(0, need - flexT * cutFrac);
+    }
+    var recSum = 0;
+    d.cats.forEach(function (c) {
+      var r = c.fixed ? c.act : c.act * (1 - cutFrac);
+      r = (c.fixed || !(cutFrac > 0)) ? Math.round(r / 100) * 100 : Math.floor(r / 100) * 100;
+      if (!c.fixed && c.act > 0 && r <= 0) r = 0;
+      c.rec = r; recSum += r; budRec[c.n] = r;
+    });
+    sum.innerHTML = '<div><span>Доход в месяц</span><b>' + money(Math.round(inc)) + '</b></div>' +
+      '<div><span>Откладывать ' + pct + '%</span><b>' + money(Math.round(S)) + '</b></div>' +
+      '<div><span>На траты остаётся</span><b>' + money(Math.round(A)) + '</b></div>' +
+      '<div><span>Сейчас тратите в среднем</span><b>' + money(Math.round(T)) + ' · ' + Math.round(T / inc * 100) + '%</b></div>';
+    if (T <= A) { st.className = 'bud-st ok'; st.textContent = 'Вы укладываетесь: можно откладывать ' + pct + '%, и ещё останется около ' + money(Math.round(A - T)) + ' в месяц.'; }
+    else if (short > 50) { st.className = 'bud-st bad'; st.textContent = 'Чтобы откладывать ' + pct + '%, нужно сократить траты на ' + money(Math.round(T - A)) + ', но даже при сокращении необязательных категорий не хватает ещё ' + money(Math.round(short)) + '. Попробуйте меньший процент накоплений.'; }
+    else { st.className = 'bud-st bad'; st.textContent = 'Чтобы откладывать ' + pct + '%, нужно сократить траты на ' + money(Math.round(T - A)) + ' в месяц. Ниже показано, где.'; }
+    rows.innerHTML = d.cats.map(function (c) {
+      var ic = iconFor('out', c.n), dl = c.rec - c.act, bad = dl < -50;
+      var w = Math.min(100, c.act / Math.max(c.act, c.rec, 1) * 100);
+      return '<div class="bud-row"><span class="bn">' + (ic ? esc(ic) + ' ' : '') + esc(c.n) + (c.fixed ? '<small>обязательная</small>' : '') + '</span>' +
+        '<span class="br">' + money(c.rec) + ' · ' + Math.round(c.rec / inc * 100) + '%</span>' +
+        '<span class="bs">сейчас ' + money(Math.round(c.act)) + ' · ' + Math.round(c.act / inc * 100) + '%</span>' +
+        '<span class="bd' + (bad ? ' dn' : '') + '">' + (Math.abs(dl) < 50 ? 'без изменений' : (dl < 0 ? '−' : '+') + money(Math.abs(Math.round(dl / 100) * 100))) + '</span></div>';
+    }).join('');
+    $('budNote').textContent = 'Расчёт по вашим тратам за последние ' + d.D + ' дн. в пересчёте на месяц. Обязательные категории (жильё, связь, здоровье и платежи, которые идут автоматически) не сокращаются, остальные уменьшаются примерно пропорционально. Для ориентира: часто советуют около половины дохода на необходимое, треть на желания и от 10 до 20% откладывать.' + (d.low ? ' Записей пока мало, поэтому цифры приблизительные.' : '');
+  }
+  $('budOpen').addEventListener('click', function () { renderBud(); $('budInc').value = (+lsGet('kassa-tm-inc') > 0) ? String(+lsGet('kassa-tm-inc')).replace('.', ',') : ''; openOv('ovBud'); });
+  $('budInc').addEventListener('input', function () {
+    var v = parseAmt(this.value);
+    if (v > 0 && v < 1e9) lsSet('kassa-tm-inc', Math.round(v)); else { try { localStorage.removeItem('kassa-tm-inc'); } catch (e) {} }
+    renderBud();
+  });
+  $('budPct').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-bp]');
+    if (!b) return;
+    lsSet('kassa-bud-pct', b.getAttribute('data-bp'));
+    renderBud();
+  });
+  $('budApply').addEventListener('click', function () {
+    renderLimSheet();
+    var n = 0;
+    Array.prototype.forEach.call($('limList').querySelectorAll('.limitem'), function (it) {
+      var inp = it.querySelector('input'), name = inp.getAttribute('data-n');
+      if (budRec[name] > 0) { inp.value = String(budRec[name]); limUpdate(it); n++; }
+    });
+    openOv('ovLim');
+    toast(n ? 'Подставил рекомендуемые лимиты в ' + n + ' категориях. Проверьте и нажмите «Сохранить»' : 'Пока нечего подставлять');
+  });
+
+  // Машина времени: прогноз на год вперёд по вашим привычкам и сценарии «а что, если»
+  var TM_H = 365;
+  var tm = { metric: 'bal', range: 183, idx: 30, cuts: {}, xSave: 0, xInc: 0, toJar: true, base: null, cats: [] };
+  function tmDay0() { var d = new Date(); d.setHours(0, 0, 0, 0); return d; }
+  function tmAddDays(d, n) { var x = new Date(d.getTime()); x.setDate(x.getDate() + n); return x; }
+  function tmPrep() {
+    var t0 = tmDay0(), nowKey = monthKey(t0);
+    var mt = txs.filter(function (t) { return t.date.slice(0, 7) === nowKey; }), inc = 0, exp = 0, sv = 0;
+    mt.forEach(function (t) { if (t.type === 'in') inc += t.amount; else if (t.type === 'out') exp += t.amount; else sv += t.amount; });
+    var B0 = r2(carryIn(nowKey) + inc - exp - sv - extOut());
+    var J0 = r2(agg().save);
+    var real = txs.filter(function (t) { return !t.example; });
+    var first = real.reduce(function (m, t) { return !m || t.date < m ? t.date : m; }, '');
+    var span = 0;
+    if (first) span = Math.max(1, Math.round((t0 - new Date(+first.slice(0, 4), +first.slice(5, 7) - 1, +first.slice(8, 10))) / 86400000) + 1);
+    var D = Math.max(14, Math.min(90, span || 14));
+    var fromS = dateStr(tmAddDays(t0, -90)), todayS = dateStr(t0);
+    var byCat = {}, sumIn = 0, sumSave = 0;
+    real.forEach(function (t) {
+      if (t.date < fromS || t.date >= todayS || t.auto) return;
+      if (t.type === 'out') { var c = byCat[t.cat] || (byCat[t.cat] = {}); c[t.date] = (c[t.date] || 0) + t.amount; }
+      else if (t.type === 'in') sumIn += t.amount;
+      else if (t.type === 'save' && (t.note || '').indexOf('Перевод ') !== 0) sumSave += t.amount;
+    });
+    var cats = Object.keys(byCat).map(function (n) {
+      var vals = Object.keys(byCat[n]).map(function (d) { return byCat[n][d]; }).sort(function (a, b) { return b - a; });
+      if (D >= 30) vals = vals.slice(2);
+      var tot = vals.reduce(function (a, b) { return a + b; }, 0);
+      return { n: n, avg: tot / D };
+    }).filter(function (c) { return c.avg > 0; }).sort(function (a, b) { return b.avg - a.avg; });
+    var ev = [];
+    for (var i = 0; i <= TM_H; i++) ev.push({ inc: 0, out: 0, list: [] });
+    rec.items.forEach(function (it) {
+      for (var k = 0; k <= 13; k++) {
+        var y = t0.getFullYear(), m = t0.getMonth() + k;
+        var dt = clampDate(y + Math.floor(m / 12), ((m % 12) + 12) % 12, it.day);
+        var key = monthKey(dt), idx = Math.round((dt - t0) / 86400000);
+        if (key < it.from || idx <= 0 || idx > TM_H) continue;
+        if (k === 0 && (it.done.indexOf(key) >= 0 || (it.ext && it.type === 'out'))) continue;
+        if (it.type === 'in') ev[idx].inc += it.amount; else ev[idx].out += it.amount;
+        ev[idx].list.push((it.type === 'in' ? '+' : '−') + money(it.amount) + ' ' + (it.note || it.cat));
+      }
+    });
+    var autoIn = sumIn / Math.max(D, 30.4), ovr = +lsGet('kassa-tm-inc') || 0;
+    return { t0: t0, B0: B0, J0: J0, cats: cats, avgIn: ovr > 0 ? ovr / 30.4 : autoIn, autoIn: autoIn, ovr: ovr, lowIn: span < 60 && !(ovr > 0), avgSave: Math.max(0, sumSave / D), ev: ev, low: span < 14, D: D };
+  }
+  function tmRun(sc) {
+    var b = tm.base, B = b.B0, J = b.J0, arrB = [B], arrJ = [J];
+    var outBase = 0, outSc = 0;
+    b.cats.forEach(function (c) { outBase += c.avg; outSc += c.avg * (1 + (sc.cuts[c.n] || 0) / 100); });
+    var freed = Math.max(0, outBase - outSc);
+    var jarFlow = (sc.toJar ? freed : 0) + b.avgSave + sc.xSave / 30.4;
+    for (var i = 1; i <= TM_H; i++) {
+      var e = b.ev[i];
+      B += e.inc - e.out + b.avgIn + sc.xInc / 30.4 - outSc - jarFlow;
+      J += jarFlow;
+      arrB.push(B); arrJ.push(J);
+    }
+    return { B: arrB, J: arrJ, freed: freed };
+  }
+  function tmGoalEta(run) {
+    var list = allPockets().filter(function (q) { return q.target > 0; }).map(function (q) { return { name: q.name, id: q.id, rem: Math.max(0, r2(q.target - pocketBal(q.id))) }; });
+    var free = settings.goal > 0 ? 0 : Math.max(0, pocketBal(''));
+    list.sort(function (a, b) { return a.rem - b.rem; });
+    var cum = 0;
+    return list.map(function (g) {
+      cum += g.rem;
+      var need = cum - free, eta = null;
+      if (g.rem <= 0) eta = 0;
+      else if (need <= 0) eta = 0;
+      else for (var i = 1; i <= TM_H; i++) { if (run.J[i] - run.J[0] >= need) { eta = i; break; } }
+      return { name: g.name, rem: g.rem, eta: eta };
+    });
+  }
+  function tmScenario() { return { cuts: tm.cuts, xSave: tm.xSave, xInc: tm.xInc, toJar: tm.toJar }; }
+  function tmIsSc() {
+    return tm.xSave > 0 || tm.xInc > 0 || Object.keys(tm.cuts).some(function (k) { return tm.cuts[k] !== 0; });
+  }
+  function tmDateText(i, long) {
+    var d = tmAddDays(tm.base.t0, i);
+    return d.toLocaleDateString('ru-RU', long ? { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' } : { day: 'numeric', month: 'long' });
+  }
+  function tmAgo(i) {
+    if (i === 0) return 'сегодня';
+    if (i < 60) return 'через ' + i + ' дн.';
+    var m = Math.round(i / 30.4);
+    return m < 12 ? 'через ' + m + ' мес.' : 'через год';
+  }
+  function tmEtaText(i) {
+    if (i === null) return 'дальше чем через год';
+    if (i === 0) return 'уже хватает';
+    var d = tmAddDays(tm.base.t0, i);
+    return d.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' }) + ' (' + tmAgo(i) + ')';
+  }
+  function tmDelta(a, b) {
+    if (a === null && b === null) return '';
+    if (a === null) return '<span class="good">теперь достижимо в течение года</span>';
+    if (b === null) return '<span class="bad">отодвигается дальше года</span>';
+    var diff = a - b;
+    if (Math.abs(diff) < 3) return '';
+    var w = Math.round(Math.abs(diff) / 7), txt = Math.abs(diff) < 14 ? Math.abs(diff) + ' дн.' : (Math.abs(diff) >= 60 ? Math.round(Math.abs(diff) / 30.4) + ' мес.' : w + ' нед.');
+    return diff > 0 ? '<span class="good">на ' + txt + ' раньше</span>' : '<span class="bad">на ' + txt + ' позже</span>';
+  }
+  var tmRunBase = null, tmRunSc = null, tmEtaB = [], tmEtaS = [];
+  function tmCompute() {
+    tm.base = tmPrep();
+    tmRunBase = tmRun({ cuts: {}, xSave: 0, xInc: 0, toJar: tm.toJar });
+    tmRecalc();
+  }
+  function tmRecalc() {
+    tmRunSc = tmIsSc() ? tmRun(tmScenario()) : tmRunBase;
+    tmEtaB = tmGoalEta(tmRunBase);
+    tmEtaS = tmGoalEta(tmRunSc);
+  }
+  function tmFmt(v) { return (v < 0 ? '−' : '') + money(Math.abs(Math.round(v))); }
+  function tmDraw() {
+    var b = tm.base, W = 340, Hh = 190, L = 6, R = 6, T = 14, Bt = 24, n = tm.range;
+    var key = tm.metric === 'bal' ? 'B' : 'J';
+    var sc = tmRunSc[key], bs = tmRunBase[key], hasSc = tmRunSc !== tmRunBase;
+    var mn = 0, mx = 0, i;
+    for (i = 0; i <= n; i++) { mn = Math.min(mn, sc[i], bs[i]); mx = Math.max(mx, sc[i], bs[i]); }
+    if (mx - mn < 1) mx = mn + 1;
+    var pad2 = (mx - mn) * 0.08; mn -= pad2; mx += pad2;
+    var X = function (k) { return L + (W - L - R) * k / n; };
+    var Y = function (v) { return T + (Hh - T - Bt) * (1 - (v - mn) / (mx - mn)); };
+    var path = function (arr) { var d = ''; var step = n > 200 ? 2 : 1; for (var k = 0; k <= n; k += step) d += (k ? 'L' : 'M') + X(k).toFixed(1) + ' ' + Y(arr[k]).toFixed(1); if (n % step) d += 'L' + X(n).toFixed(1) + ' ' + Y(arr[n]).toFixed(1); return d; };
+    var col = tm.metric === 'bal' ? 'var(--in)' : 'var(--gold)';
+    var svg = '';
+    var y0 = Y(0);
+    svg += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y0.toFixed(1) + '" y2="' + y0.toFixed(1) + '" stroke="var(--line)" stroke-width="1"/>';
+    var anyNeg = false; for (i = 0; i <= n; i++) { if (sc[i] < 0 || bs[i] < 0) { anyNeg = true; break; } }
+    if (anyNeg) svg += '<rect x="' + L + '" y="' + y0.toFixed(1) + '" width="' + (W - L - R) + '" height="' + (Hh - Bt - y0).toFixed(1) + '" fill="var(--out)" opacity=".07"/>';
+    // подписи месяцев
+    var t0 = b.t0, lastM = -1;
+    for (i = 0; i <= n; i++) {
+      var dd = tmAddDays(t0, i);
+      if (dd.getDate() === 1 && dd.getMonth() % (n > 200 ? 2 : 1) === 0) {
+        svg += '<line x1="' + X(i).toFixed(1) + '" x2="' + X(i).toFixed(1) + '" y1="' + T + '" y2="' + (Hh - Bt) + '" stroke="var(--line)" stroke-width=".5" stroke-dasharray="2 3"/><text x="' + X(i).toFixed(1) + '" y="' + (Hh - 8) + '" text-anchor="middle">' + MON[dd.getMonth()] + '</text>';
+      }
+    }
+    if (hasSc) svg += '<path d="' + path(bs) + '" fill="none" stroke="var(--muted)" stroke-width="1.6" stroke-dasharray="4 4" opacity=".7"/>';
+    svg += '<path d="' + path(sc) + '" fill="none" stroke="' + col + '" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>';
+    // метки достижения целей
+    tmEtaS.forEach(function (g) {
+      if (g.eta && g.eta <= n) svg += '<g><circle cx="' + X(g.eta).toFixed(1) + '" cy="' + Y(sc[g.eta]).toFixed(1) + '" r="4.5" fill="var(--gold)" stroke="var(--surface)" stroke-width="1.5"/></g>';
+    });
+    var neg = null; for (i = 0; i <= n; i++) { if (tmRunSc.B[i] < 0) { neg = i; break; } }
+    if (neg !== null && tm.metric === 'bal') svg += '<circle cx="' + X(neg).toFixed(1) + '" cy="' + Y(sc[neg]).toFixed(1) + '" r="4.5" fill="var(--out)" stroke="var(--surface)" stroke-width="1.5"/>';
+    // курсор
+    var ci = Math.min(tm.idx, n), cx = X(ci);
+    svg += '<line x1="' + cx.toFixed(1) + '" x2="' + cx.toFixed(1) + '" y1="' + T + '" y2="' + (Hh - Bt) + '" stroke="var(--ink)" stroke-width="1.2" opacity=".55"/>';
+    svg += '<circle cx="' + cx.toFixed(1) + '" cy="' + Y(sc[ci]).toFixed(1) + '" r="6" fill="' + col + '" stroke="var(--surface)" stroke-width="2.5"/>';
+    svg += '<text x="' + L + '" y="9" text-anchor="start">' + tmFmt(mx) + '</text>';
+    if (y0 > T + 12 && y0 < Hh - Bt - 4) svg += '<text x="' + (W - R) + '" y="' + (y0 - 3).toFixed(1) + '" text-anchor="end">0</text>';
+    $('tmSvg').innerHTML = svg;
+    // шапка
+    var i2 = ci, rb = tmRunSc, rb0 = tmRunBase;
+    $('tmDate').innerHTML = esc(tmDateText(i2, false)) + '<small>' + esc(tmAgo(i2)) + '</small>';
+    var bEl = $('tmBal'), jEl = $('tmJar');
+    bEl.textContent = tmFmt(rb.B[i2]); bEl.className = rb.B[i2] < 0 ? 'neg' : '';
+    jEl.textContent = tmFmt(rb.J[i2]);
+    var setD = function (el, a, c) {
+      var dl = a - c;
+      if (!hasSc || Math.abs(dl) < 1) { el.textContent = ''; el.className = ''; return; }
+      el.textContent = (dl > 0 ? '+' : '−') + money(Math.abs(Math.round(dl))) + ' к базовому';
+      el.className = dl < 0 ? 'dn' : '';
+    };
+    setD($('tmBalD'), rb.B[i2], rb0.B[i2]); setD($('tmJarD'), rb.J[i2], rb0.J[i2]);
+    var evs = b.ev[i2] ? b.ev[i2].list : [];
+    $('tmEv').textContent = evs.length ? 'В этот день: ' + evs.join(', ') : (i2 === 0 ? 'Сегодняшний остаток. Проведите пальцем по графику.' : '');
+    var warn = '';
+    var nb = null; for (i = 0; i <= TM_H; i++) { if (rb0.B[i] < 0) { nb = i; break; } }
+    if (b.B0 < 0) warn = 'Сейчас свободные деньги уже в минусе.';
+    else if (nb !== null) warn = 'При текущих привычках свободные деньги закончатся примерно ' + tmDateText(nb, false) + ' (' + tmAgo(nb) + ').';
+    else warn = 'При текущих привычках свободные деньги не закончатся в течение года.';
+    if (hasSc) { var ns = null; for (i = 0; i <= TM_H; i++) { if (rb.B[i] < 0) { ns = i; break; } } warn += ns === null ? ' В вашем сценарии не закончатся.' : ' В вашем сценарии: ' + tmDateText(ns, false) + '.'; }
+    $('tmWarn').textContent = warn;
+  }
+  function tmGoals() {
+    var box = $('tmGoals');
+    if (!tmEtaS.length) { box.innerHTML = '<p class="hint">Здесь появится, когда вы достигнете целей. Задайте цель с суммой в разделе накоплений.</p>'; return; }
+    box.innerHTML = tmEtaS.map(function (g, i) {
+      var b = tmEtaB[i] ? tmEtaB[i].eta : null, c = g.eta;
+      var dl = tmIsSc() ? tmDelta(b, c) : '';
+      var bn = tmEtaB.filter(function (x) { return x.name === g.name; })[0];
+      var bEta = bn ? bn.eta : null;
+      dl = tmIsSc() ? tmDelta(bEta, g.eta) : '';
+      return '<div class="tm-goal"><span>' + esc(g.name) + '<small>осталось ' + money(g.rem) + '</small></span><b>' + esc(tmEtaText(g.eta)) + (dl ? '<small>' + dl + '</small>' : '') + '</b></div>';
+    }).join('');
+  }
+  function tmSliders() {
+    var h = '';
+    tm.base.cats.slice(0, 3).forEach(function (c) {
+      var v = tm.cuts[c.n] || 0, mo = Math.round(c.avg * 30.4 * v / 100);
+      h += '<div class="tm-sl"><label for="tmc_' + esc(c.n) + '">' + esc(c.n) + '<span id="tmcv_' + esc(c.n) + '">' + (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v) + '%' + (v ? ' · ' + (mo < 0 ? '−' : '+') + money(Math.abs(mo)) + '/мес' : ' · сейчас ' + money(Math.round(c.avg * 30.4)) + '/мес') + '</span></label><input type="range" min="-100" max="50" step="5" value="' + v + '" id="tmc_' + esc(c.n) + '" data-tmcat="' + esc(c.n) + '"></div>';
+    });
+    h += '<div class="tm-sl"><label for="tmXs">Откладывать ещё<span id="tmXsv"></span></label><input type="range" min="0" max="30000" step="500" value="' + tm.xSave + '" id="tmXs"></div>';
+    h += '<div class="tm-sl"><label for="tmXi">Дополнительный доход<span id="tmXiv"></span></label><input type="range" min="0" max="50000" step="1000" value="' + tm.xInc + '" id="tmXi"></div>';
+    $('tmSliders').innerHTML = h;
+    tmSlLabels();
+  }
+  function tmSlLabels() {
+    $('tmXsv').textContent = tm.xSave ? '+' + money(tm.xSave) + '/мес' : 'нет';
+    $('tmXiv').textContent = tm.xInc ? '+' + money(tm.xInc) + '/мес' : 'нет';
+    tm.base.cats.slice(0, 3).forEach(function (c) {
+      var v = tm.cuts[c.n] || 0, mo = Math.round(c.avg * 30.4 * v / 100), el = document.getElementById('tmcv_' + c.n);
+      if (el) el.textContent = (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v) + '%' + (v ? ' · ' + (mo < 0 ? '−' : '+') + money(Math.abs(mo)) + '/мес' : ' · сейчас ' + money(Math.round(c.avg * 30.4)) + '/мес');
+    });
+  }
+  function tmJumps() {
+    var t0 = tm.base.t0, eom = Math.round((new Date(t0.getFullYear(), t0.getMonth() + 1, 0) - t0) / 86400000);
+    var jumps = [['Сегодня', 0], ['Конец месяца', Math.max(1, eom)], ['Через 3 мес.', 91], ['Через полгода', 183], ['Через год', 365]];
+    $('tmJumps').innerHTML = jumps.map(function (j) { return '<button type="button" class="chip" data-tj="' + j[1] + '">' + j[0] + '</button>'; }).join('');
+  }
+  function tmAll() { tmRecalc(); tmDraw(); tmGoals(); }
+  function openTm() {
+    tmCompute();
+    tm.idx = Math.min(tm.idx, TM_H); tm.range = 183; tm.idx = 30;
+    tmSliders(); tmJumps(); tmAll();
+    var real = txs.some(function (t) { return !t.example; });
+    $('tmNote').textContent = 'Это прогноз по вашим привычкам за последние ' + tm.base.D + ' дн. (разовые крупные траты в среднем не учитываются) и по регулярным платежам, а не предсказание.' + (tm.base.low || !real ? ' Записей пока мало, поэтому прогноз грубый: чем больше записей, тем он точнее.' : '') + (tm.base.lowIn ? ' Доход оценён по уже внесённым записям как поступающий раз в месяц. Если выплат в месяц несколько (аванс и зарплата), добавьте их в «Регулярные платежи», и прогноз станет точнее.' : '');
+    Array.prototype.forEach.call($('tmMetric').children, function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-mt') === tm.metric ? 'true' : 'false'); });
+    $('tmToJar').checked = tm.toJar;
+    $('tmInc').value = tm.base.ovr > 0 ? String(tm.base.ovr).replace('.', ',') : '';
+    tmIncHint();
+    openOv('ovTm');
+  }
+  function tmIncHint() {
+    var b = tm.base;
+    $('tmIncH').textContent = b.ovr > 0 ? 'Прогноз считается с вашим доходом. Очистите поле, чтобы вернуться к оценке по записям.' : 'Сейчас по вашим записям выходит около ' + money(Math.round(b.autoIn * 30.4)) + ' в месяц. Если зарплата каждый раз разная, впишите примерную сумму, и прогноз будет считаться с ней.';
+  }
+  $('tmInc').addEventListener('input', function () {
+    var v = parseAmt(this.value);
+    if (v > 0 && v < 1e9) lsSet('kassa-tm-inc', Math.round(v)); else { try { localStorage.removeItem('kassa-tm-inc'); } catch (e) {} }
+    tmCompute(); tmIncHint(); tmDraw(); tmGoals();
+  });
+  function tmScrub(e) {
+    var svg = $('tmSvg'), r = svg.getBoundingClientRect();
+    var x = (e.clientX - r.left) / r.width * 340, n = tm.range;
+    tm.idx = Math.max(0, Math.min(n, Math.round((x - 6) / (340 - 12) * n)));
+    tmDraw();
+  }
+  var tmDrag = false;
+  $('tmSvg').addEventListener('pointerdown', function (e) { tmDrag = true; try { this.setPointerCapture(e.pointerId); } catch (er) {} tmScrub(e); });
+  $('tmSvg').addEventListener('pointermove', function (e) { if (tmDrag) tmScrub(e); });
+  $('tmSvg').addEventListener('pointerup', function () { tmDrag = false; });
+  $('tmSvg').addEventListener('pointercancel', function () { tmDrag = false; });
+  $('tmJumps').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-tj]');
+    if (!b) return;
+    var v = +b.getAttribute('data-tj');
+    tm.range = v > 183 ? 365 : (v > 91 ? 183 : (v > 60 ? 120 : 90));
+    if (v === 0) tm.range = Math.max(tm.range, 90);
+    tm.idx = v;
+    tmDraw();
+  });
+  $('tmMetric').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-mt]');
+    if (!b) return;
+    tm.metric = b.getAttribute('data-mt');
+    Array.prototype.forEach.call($('tmMetric').children, function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+    tmDraw();
+  });
+  $('tmSliders').addEventListener('input', function (e) {
+    var t = e.target;
+    if (t.id === 'tmXs') tm.xSave = +t.value;
+    else if (t.id === 'tmXi') tm.xInc = +t.value;
+    else if (t.getAttribute('data-tmcat')) { var v = +t.value; if (v) tm.cuts[t.getAttribute('data-tmcat')] = v; else delete tm.cuts[t.getAttribute('data-tmcat')]; }
+    else return;
+    tmSlLabels(); tmAll();
+  });
+  $('tmToJar').addEventListener('change', function () { tm.toJar = this.checked; tmCompute(); tmDraw(); tmGoals(); });
+  $('tmReset').addEventListener('click', function () { tm.cuts = {}; tm.xSave = 0; tm.xInc = 0; tmSliders(); tmAll(); });
+  $('tmOpen').addEventListener('click', openTm);
 
   // Автокопии на устройстве: раз в неделю, последние 3
   function autoBackup() {
