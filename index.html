@@ -717,12 +717,41 @@ html.kb .sheet { max-height: var(--vvh, 92dvh); padding-bottom: 14px; }
 .tgrow small{display:block;font-weight:500;color:var(--muted);font-size:13px}
 .tgrow b{font-weight:800;white-space:nowrap}
 html[data-hide] .tgrow b{filter:blur(9px)}
+html[data-locked] body > *:not(#lockScr) { visibility: hidden; }
+.lockscr { position: fixed; inset: 0; z-index: 9999; background: var(--bg); display: none; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
+html[data-locked] .lockscr, .lockscr.setup { display: flex; }
+.lk-in { width: 100%; max-width: 320px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.lk-ico { font-size: 40px; line-height: 1; }
+.lk-in h2 { margin: 0; font-size: 20px; }
+.lk-s { margin: 0; min-height: 20px; font-size: 14px; color: var(--muted); }
+.lk-dots { display: flex; gap: 16px; margin: 4px 0 6px; }
+.lk-dots i { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--brand); }
+.lk-dots i.on { background: var(--brand); }
+.lk-dots.shake { animation: lkshake .4s; }
+@keyframes lkshake { 20%, 60% { transform: translateX(-9px); } 40%, 80% { transform: translateX(9px); } }
+.lk-pad { display: grid; grid-template-columns: repeat(3, 76px); gap: 14px; justify-content: center; }
+.lk-pad button { width: 76px; height: 76px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-size: 26px; font-weight: 700; font-family: inherit; }
+.lk-pad button:active { background: var(--tint); }
+.lk-pad button.ghost { border-color: transparent; background: transparent; font-size: 15px; font-weight: 600; }
+.lk-pad button.off { visibility: hidden; pointer-events: none; }
+.lk-pad button:disabled { opacity: .4; }
+.autobk { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); font-size: 14px; }
+.autobk small { display: block; color: var(--muted); }
+.lk-coinbox { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.lk-coinbox[hidden] { display: none; }
+.lk-coinwrap { height: 0; perspective: 500px; display: flex; justify-content: center; }
+.lk-coinwrap.on { height: 84px; margin-top: 4px; }
+.lk-coin { position: relative; width: 64px; height: 64px; transform-style: preserve-3d; }
+.lk-coin .cf { position: absolute; inset: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #5A3E00; backface-visibility: hidden; -webkit-backface-visibility: hidden; background: radial-gradient(circle at 32% 28%, #FFE9A3, #E9B93B 60%, #B98A18); border: 3px solid #D9A92B; box-shadow: inset 0 0 0 3px rgba(255,255,255,.35); }
+.lk-coin .cf-b { transform: rotateY(180deg); }
+.lk-res { margin: 0; min-height: 22px; font-weight: 800; font-size: 17px; }
 </style>
 <script>
 /* Сразу применяем сохранённые тему и режим, чтобы страница не мигала */
 (function () {
   try {
     if (localStorage.getItem('kassa-hide') === '1') document.documentElement.setAttribute('data-hide', '');
+    if (localStorage.getItem('kassa-lock')) document.documentElement.setAttribute('data-locked', '');
     document.documentElement.setAttribute('data-style', localStorage.getItem('kassa-style') === 'classic' ? 'classic' : 'glass');
     if (localStorage.getItem('kassa-oled') === '1') document.documentElement.setAttribute('data-oled', '');
     var u = JSON.parse(localStorage.getItem('kassa-ui-v1') || 'null');
@@ -1016,6 +1045,15 @@ html[data-hide] .tgrow b{filter:blur(9px)}
       <details><summary>Метки</summary>
         <p>Метка помогает собрать вместе траты из разных категорий: например, всё, что связано с отпуском или ремонтом. Напишите в комментарии слово с решёткой: «Билеты #отпуск». Метка подсветится в журнале. Под полем комментария появляются подсказки уже использованных меток, нажмите на нужную, чтобы вставить её.</p>
         <p>Нажмите на метку в журнале или на подсказку под строкой поиска (она появляется, когда вы нажали в поиск). Покажутся все записи с этой меткой за все месяцы и суммы расходов и доходов по ней. Кнопка «Все метки» открывает окно со списком меток и итогами по каждой.</p>
+      </details>
+      <details><summary>Пин-код и Face ID</summary>
+        <p>В «Оформлении», в разделе «Защита», можно включить пин-код из четырёх цифр. Тогда при открытии приложения сначала появится экран ввода. Если телефон поддерживает Face ID или Touch ID, включите и его: пин-код тогда нужен только как запасной вариант.</p>
+        <p>Выберите, когда блокировать: сразу, как только вышли из приложения (при этом содержимое не видно и в списке открытых приложений), через минуту или только при новом запуске. После пяти неверных попыток нужно подождать полминуты.</p>
+        <p>Это защита от случайного взгляда: записи на телефоне при этом не шифруются. Если забыли пин-код и не можете войти по Face ID, придётся удалить иконку с экрана «Домой» и добавить её заново, а затем загрузить резервную копию. Поэтому делайте копии.</p>
+        <p>На экране блокировки есть кнопка «Подбросить монетку»: она работает и без пин-кода, никаких данных не показывает.</p>
+      </details>
+      <details><summary>Автокопии на устройстве</summary>
+        <p>Раз в неделю приложение само сохраняет у себя копию записей и хранит три последних. Посмотреть их можно в «Оформлении», в разделе «Данные и копии». Нажмите «Посмотреть», и вы увидите, что изменится, прежде чем что-то восстановить. Автокопии помогают, если случайно удалили лишнее. Но они лежат в том же месте, что и сами записи, и пропадут при очистке данных сайта, поэтому файл копии («Сохранить копию» → «Сохранить в Файлы» или iCloud) всё равно нужен.</p>
       </details>
       <details><summary>Быстрый вход на iPhone</summary>
         <p>В «Оформлении» есть настройка <b>«Открывать новую запись при запуске приложения»</b>. Если включить, при открытии иконки с экрана «Домой» сразу появится форма новой записи, останется ввести сумму. Настройка действует только на этом устройстве.</p>
@@ -1313,6 +1351,15 @@ html[data-hide] .tgrow b{filter:blur(9px)}
           <button type="button" data-o="1" aria-pressed="false">Чёрный (OLED)</button>
         </div>
       </div>
+      <h3 class="grp sep">Защита</h3>
+      <p class="hint" id="lkInfo"></p>
+      <div class="qrow">
+        <button type="button" class="qbtn" id="lkOn">Включить пин-код</button>
+        <button type="button" class="qbtn" id="lkChange" hidden>Сменить пин-код</button>
+        <button type="button" class="qbtn" id="lkOff" hidden>Выключить</button>
+      </div>
+      <label class="chk" id="lkFidBox" hidden><input type="checkbox" id="lkFid"><span>Входить по Face ID или Touch ID</span></label>
+      <div class="field" id="lkAfterBox" hidden><label for="lkAfter">Блокировать</label><select id="lkAfter"><option value="0">Сразу, как только вышли из приложения</option><option value="60">Через 1 минуту</option><option value="-1">Только при новом запуске</option></select></div>
       <h3 class="grp sep">Запуск</h3>
       <label class="chk"><input type="checkbox" id="openAddChk"><span>Открывать новую запись при запуске приложения</span></label>
       <p class="hint">Удобно, если почти всегда заходите, чтобы внести трату. Настройка действует только на этом устройстве.</p>
@@ -1325,6 +1372,7 @@ html[data-hide] .tgrow b{filter:blur(9px)}
           <button type="button" class="qbtn" id="bkLoad">Загрузить копию</button>
         </div>
         <button type="button" class="link" id="bkCsv">Экспорт в таблицу (CSV для Excel)</button>
+        <div id="autoBk"></div>
         <input type="file" id="bkFile" accept=".json,application/json" hidden>
         <div id="bkInfo" hidden>
           <p class="hint" id="bkText"></p>
@@ -1374,6 +1422,29 @@ html[data-hide] .tgrow b{filter:blur(9px)}
       <div id="tagsList"></div>
       <button type="button" class="primary" data-close>Готово</button>
     </div>
+  </div>
+</div>
+
+<div class="lockscr" id="lockScr" role="dialog" aria-modal="true" aria-labelledby="lkT">
+  <div class="lk-in">
+    <div class="lk-ico" aria-hidden="true">🔒</div>
+    <h2 id="lkT">Введите пин-код</h2>
+    <p class="lk-s" id="lkS" aria-live="polite"></p>
+    <div class="lk-dots" id="lkDots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <div class="lk-pad" id="lkPad">
+      <button type="button" data-k="1">1</button><button type="button" data-k="2">2</button><button type="button" data-k="3">3</button>
+      <button type="button" data-k="4">4</button><button type="button" data-k="5">5</button><button type="button" data-k="6">6</button>
+      <button type="button" data-k="7">7</button><button type="button" data-k="8">8</button><button type="button" data-k="9">9</button>
+      <button type="button" class="ghost" id="lkFace" aria-label="Войти по Face ID">Face ID</button><button type="button" data-k="0">0</button><button type="button" class="ghost" id="lkDel" aria-label="Стереть цифру">⌫</button>
+    </div>
+    <div class="lk-coinbox" id="lkCoinBox">
+      <div class="lk-coinwrap"><div class="lk-coin" id="lkCoin" hidden><span class="cf cf-f">Орёл</span><span class="cf cf-b">Решка</span></div></div>
+      <p class="lk-res" id="lkRes" aria-live="polite"></p>
+      <button type="button" class="link" id="lkCoinBtn">🪙 Подбросить монетку</button>
+    </div>
+    <button type="button" class="link" id="lkCancel" hidden>Отмена</button>
+    <button type="button" class="link muted" id="lkForgot">Забыли пин-код?</button>
+    <p class="hint" id="lkForgotT" hidden>Если вы вошли по Face ID, пин-код можно сменить в «Оформлении». Если не получается войти совсем, удалите иконку с экрана «Домой», добавьте её снова и загрузите резервную копию. Без копии данные не вернуть.</p>
   </div>
 </div>
 
@@ -1787,6 +1858,7 @@ html[data-hide] .tgrow b{filter:blur(9px)}
   function onLaunch() {
     if (launchDone || loading) return;
     launchDone = true;
+    autoBackup();
     var want = null;
     try {
       var m = /[?&#]add=(out|in|save)\b/.exec(location.search + location.hash);
@@ -2260,6 +2332,7 @@ html[data-hide] .tgrow b{filter:blur(9px)}
       { v: '<div class="tm"><div class="row"><span>🏠 Аренда</span><span>25 000 ₽</span></div><div class="row"><span>💳 Кредит</span><span>7 520 ₽</span></div><div class="row"><span>📱 Связь</span><span>600 ₽</span></div></div>', t: 'Регулярные платежи', p: 'Аренда, кредит, подписки: укажите сумму и день месяца, и запись сама появится в журнале. Если деньги на платёж уже отложены отдельно или придут позже, отметьте это галочкой.' },
       { v: '<div class="tm plain"><div class="ring"></div></div>', t: 'Куда уходят деньги', p: 'Кнопка с диаграммой в шапке показывает, на что разошлись доходы. Нажмите на категорию, и в журнале останутся только её траты. Ещё есть поиск и сравнение месяцев.' },
       { v: '<div class="tm plain"><div class="ico">🏷️</div></div>', t: 'Метки', p: 'Добавьте в комментарий слово с решёткой, например «Билеты #отпуск». Нажмите на метку в журнале, и увидите все записи по ней и общую сумму. Так легко считать траты на отпуск, ремонт или подарки, даже если они в разных категориях.' },
+      { v: '<div class="tm plain"><div class="ico">🔒</div></div>', t: 'Защита', p: 'В «Оформлении» можно включить пин-код и вход по Face ID, чтобы приложение не открывалось для посторонних. А раз в неделю оно само сохраняет три последние копии записей на телефоне.' },
       { v: '<div class="tm plain"><div class="ico">💾</div></div>', t: 'Сохраните свои данные', p: 'Записи хранятся только в браузере этого устройства. Делайте резервную копию в окне оформления (значок с ползунками), хотя бы раз в несколько дней.' },
       { v: '<div class="tm"><div class="row"><span>📖 Руководство пользователя</span><span>›</span></div><div class="row"><span>🎓 Показать обучение</span><span>›</span></div></div>', t: 'Руководство всегда под рукой', p: 'Внизу главного экрана есть кнопка «Руководство пользователя»: в нём по разделам описано всё, что умеет приложение. Рядом кнопка «Показать обучение», если захотите пройти его снова.' }
     ];
@@ -2540,7 +2613,7 @@ html[data-hide] .tgrow b{filter:blur(9px)}
   $('swatches').innerHTML = PALETTES.map(function (p) {
     return '<button type="button" class="sw" data-p="' + p.id + '" aria-pressed="false"><i aria-hidden="true"></i><span>' + p.name + '</span></button>';
   }).join('');
-  $('gear').addEventListener('click', function () { renderUiSheet(); $('openAddChk').checked = lsGet('kassa-openadd') === '1'; openOv('ovSet'); });
+  $('gear').addEventListener('click', function () { renderUiSheet(); renderLockSettings(); renderAutoBk(); $('openAddChk').checked = lsGet('kassa-openadd') === '1'; openOv('ovSet'); });
   $('openAddChk').addEventListener('change', function () { lsSet('kassa-openadd', this.checked ? '1' : '0'); toast(this.checked ? 'При запуске будет открываться новая запись' : 'Запуск как обычно'); });
   $('uiName').addEventListener('input', function () {
     ui.name = this.value.slice(0, 30);
@@ -3358,13 +3431,9 @@ html[data-hide] .tgrow b{filter:blur(9px)}
   var bkReplace = false;
   $('bkRep').addEventListener('click', function () { bkReplace = true; $('bkGo').click(); });
   $('bkNo').addEventListener('click', function () { bkPending = null; $('bkInfo').hidden = true; });
-  $('bkFile').addEventListener('change', function () {
-    var f = this.files && this.files[0];
-    if (!f) return;
-    var r = new FileReader();
-    r.onload = function () {
+  function bkParse(text) {
       try {
-        var b = JSON.parse(String(r.result));
+        var b = JSON.parse(text);
         if (!b || b.app !== 'kassa' || !Array.isArray(b.txs)) throw new Error('bad');
         var list = [];
         b.txs.forEach(function (t) {
@@ -3399,7 +3468,12 @@ html[data-hide] .tgrow b{filter:blur(9px)}
         bkPending = null; $('bkInfo').hidden = true;
         toast('Это не файл копии «Кассовой книги»');
       }
-    };
+  }
+  $('bkFile').addEventListener('change', function () {
+    var f = this.files && this.files[0];
+    if (!f) return;
+    var r = new FileReader();
+    r.onload = function () { bkParse(String(r.result)); };
     r.onerror = function () { toast('Не удалось прочитать файл'); };
     r.readAsText(f);
   });
@@ -4366,6 +4440,250 @@ html[data-hide] .tgrow b{filter:blur(9px)}
       openOv('ovRec');
     }
   });
+
+
+  // Автокопии на устройстве: раз в неделю, последние 3
+  function autoBackup() {
+    if (loading || !txs.some(function (t) { return !t.example; })) return;
+    var arr = [];
+    try { arr = JSON.parse(lsGet('kassa-auto-bk') || '[]'); if (!Array.isArray(arr)) arr = []; } catch (e) { arr = []; }
+    var last = arr.length ? arr[arr.length - 1].at : 0;
+    if (Date.now() - last < 6 * 86400000) return;
+    var json = JSON.stringify(buildBackup());
+    var n = txs.filter(function (t) { return !t.example; }).length;
+    arr.push({ at: Date.now(), n: n, json: json });
+    while (arr.length > 3) arr.shift();
+    for (var tries = 0; tries < 3; tries++) {
+      try { localStorage.setItem('kassa-auto-bk', JSON.stringify(arr)); return; } catch (e) { if (arr.length > 1) arr.shift(); else return; }
+    }
+  }
+  function renderAutoBk() {
+    var arr = [];
+    try { arr = JSON.parse(lsGet('kassa-auto-bk') || '[]'); if (!Array.isArray(arr)) arr = []; } catch (e) { arr = []; }
+    var box = $('autoBk');
+    if (!arr.length) { box.innerHTML = ''; return; }
+    box.innerHTML = '<p class="hint">Автокопии на этом устройстве: раз в неделю приложение само сохраняет последние три. Они спасут от случайного удаления, но пропадут, если очистить данные сайта, поэтому файл копии всё равно нужен.</p>' +
+      arr.slice().reverse().map(function (c, i) {
+        return '<div class="autobk"><span>' + esc(new Date(c.at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })) + '<small>записей: ' + (+c.n || 0) + '</small></span><button type="button" class="qbtn" data-ab="' + (arr.length - 1 - i) + '">Посмотреть</button></div>';
+      }).join('');
+  }
+  $('autoBk').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-ab]');
+    if (!b) return;
+    var arr = [];
+    try { arr = JSON.parse(lsGet('kassa-auto-bk') || '[]'); } catch (er) {}
+    var c = arr[+b.getAttribute('data-ab')];
+    if (!c) return;
+    bkParse(c.json);
+    var bi = $('bkInfo');
+    if (bi && bi.scrollIntoView) bi.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  });
+
+  // Пин-код и Face ID
+  var LK = null, lkMode = 'unlock', lkBuf = '', lkFirst = '', lkBusy = false, lkHiddenAt = 0, fidOk = false;
+  function lkLoad() {
+    try { var o = JSON.parse(lsGet('kassa-lock') || 'null'); LK = o && typeof o.h === 'string' && typeof o.s === 'string' ? o : null; } catch (e) { LK = null; }
+  }
+  function lkSave() { if (LK) lsSet('kassa-lock', JSON.stringify(LK)); else { try { localStorage.removeItem('kassa-lock'); } catch (e) {} } }
+  function hashPin(pin, salt) {
+    var str = salt + ':' + pin;
+    try {
+      if (window.crypto && crypto.subtle && window.TextEncoder) {
+        return crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)).then(function (b) {
+          return Array.prototype.map.call(new Uint8Array(b), function (x) { return ('0' + x.toString(16)).slice(-2); }).join('');
+        });
+      }
+    } catch (e) {}
+    var h = 5381;
+    for (var i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
+    return Promise.resolve('f' + (h >>> 0).toString(16));
+  }
+  function b64(buf) { var s2 = ''; new Uint8Array(buf).forEach(function (x) { s2 += String.fromCharCode(x); }); return btoa(s2); }
+  function unb64(t) { var b = atob(t), u = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
+  function fidCheck(cb) {
+    try {
+      if (window.isSecureContext && window.PublicKeyCredential && PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
+        PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable().then(function (v) { fidOk = !!v; cb(); }).catch(function () { cb(); });
+        return;
+      }
+    } catch (e) {}
+    cb();
+  }
+  function fidEnroll() {
+    return navigator.credentials.create({ publicKey: {
+      challenge: crypto.getRandomValues(new Uint8Array(32)),
+      rp: { name: 'Кассовая книга', id: location.hostname },
+      user: { id: crypto.getRandomValues(new Uint8Array(16)), name: 'kassa', displayName: 'Кассовая книга' },
+      pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }],
+      authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'discouraged' },
+      timeout: 60000, attestation: 'none'
+    } }).then(function (c) { return b64(c.rawId); });
+  }
+  function fidAsk() {
+    return navigator.credentials.get({ publicKey: {
+      challenge: crypto.getRandomValues(new Uint8Array(32)),
+      rpId: location.hostname,
+      allowCredentials: [{ type: 'public-key', id: unb64(LK.fid), transports: ['internal'] }],
+      userVerification: 'required', timeout: 60000
+    } });
+  }
+  var lkFails = 0, lkUntil = 0, lkTick = null;
+  function lkRender() {
+    var d = $('lkDots').children;
+    for (var i = 0; i < 4; i++) d[i].className = i < lkBuf.length ? 'on' : '';
+    var unl = lkMode === 'unlock';
+    $('lkFace').classList.toggle('off', !(unl && LK && LK.fid && fidOk));
+    $('lkCoinBox').hidden = !unl;
+    $('lkForgot').hidden = !unl;
+    $('lkForgotT').hidden = true;
+    $('lkCancel').hidden = unl;
+  }
+  function lkShow(mode, title, sub) {
+    lkMode = mode; lkBuf = ''; lkFirst = '';
+    $('lkT').textContent = title;
+    $('lkS').textContent = sub || '';
+    $('lockScr').classList.toggle('setup', mode !== 'unlock');
+    lkRender();
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  }
+  function lkShake(msg) {
+    var d = $('lkDots');
+    d.classList.remove('shake'); void d.offsetWidth; d.classList.add('shake');
+    $('lkS').textContent = msg || '';
+    try { if (navigator.vibrate) navigator.vibrate(60); } catch (e) {}
+  }
+  function lkUnlock() {
+    document.documentElement.removeAttribute('data-locked');
+    lkFails = 0; lkBuf = ''; lkRender();
+    $('lkS').textContent = '';
+  }
+  function lkLock() {
+    if (!LK || document.documentElement.hasAttribute('data-locked')) return;
+    if (openId) closeOv(true);
+    document.documentElement.setAttribute('data-locked', '');
+    lkShow('unlock', 'Введите пин-код');
+    if (!document.hidden) lkFace();
+  }
+  function lkFace() {
+    if (!(LK && LK.fid && fidOk) || lkMode !== 'unlock') return;
+    fidAsk().then(function () { if (lkMode === 'unlock') lkUnlock(); }).catch(function () {});
+  }
+  function lkWait() {
+    var left = Math.ceil((lkUntil - Date.now()) / 1000);
+    if (left > 0) { $('lkS').textContent = 'Слишком много попыток. Подождите ' + left + ' с'; return true; }
+    return false;
+  }
+  function lkPress(dg) {
+    if (lkBusy) return;
+    if (lkMode === 'unlock' && lkWait()) return;
+    if (lkBuf.length >= 4) return;
+    lkBuf += dg;
+    lkRender();
+    if (lkBuf.length === 4) lkDone();
+  }
+  function lkDone() {
+    var pin = lkBuf;
+    lkBusy = true;
+    var finish = function () { lkBusy = false; };
+    if (lkMode === 'set1') {
+      lkFirst = pin; lkBuf = ''; lkMode = 'set2';
+      $('lkT').textContent = 'Повторите пин-код'; $('lkS').textContent = '';
+      lkRender(); finish(); return;
+    }
+    if (lkMode === 'set2') {
+      if (pin !== lkFirst) { lkShake('Не совпало. Придумайте заново'); lkMode = 'set1'; lkBuf = ''; lkFirst = ''; $('lkT').textContent = 'Придумайте пин-код'; lkRender(); finish(); return; }
+      var salt = Math.random().toString(36).slice(2) + Date.now().toString(36);
+      hashPin(pin, salt).then(function (h) {
+        LK = { s: salt, h: h, fid: LK && LK.fid ? LK.fid : '', after: LK && LK.after != null ? LK.after : 60 };
+        lkSave();
+        $('lockScr').classList.remove('setup'); lkBuf = '';
+        lkRender(); renderLockSettings();
+        toast('Пин-код включён');
+        finish();
+      });
+      return;
+    }
+    hashPin(pin, LK.s).then(function (h) {
+      if (h === LK.h) {
+        if (lkMode === 'unlock') lkUnlock();
+        else if (lkMode === 'off') { LK = null; lkSave(); $('lockScr').classList.remove('setup'); lkBuf = ''; lkRender(); renderLockSettings(); toast('Пин-код выключен'); }
+        else if (lkMode === 'change') lkShow('set1', 'Придумайте новый пин-код', 'Четыре цифры');
+      } else {
+        lkFails++;
+        lkBuf = '';
+        if (lkFails >= 5) { lkUntil = Date.now() + (lkFails >= 10 ? 300000 : 30000); lkShake(''); lkWait(); }
+        else lkShake('Неверный пин-код');
+        lkRender();
+      }
+      finish();
+    });
+  }
+  $('lkPad').addEventListener('click', function (e) {
+    var b = e.target.closest('button');
+    if (!b) return;
+    if (b.id === 'lkDel') { if (!lkBusy) { lkBuf = lkBuf.slice(0, -1); lkRender(); } return; }
+    if (b.id === 'lkFace') { lkFace(); return; }
+    var k = b.getAttribute('data-k');
+    if (k != null) lkPress(k);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (!$('lockScr').offsetParent && getComputedStyle($('lockScr')).display === 'none') return;
+    if (/^[0-9]$/.test(e.key)) { lkPress(e.key); e.preventDefault(); }
+    else if (e.key === 'Backspace' && !lkBusy) { lkBuf = lkBuf.slice(0, -1); lkRender(); e.preventDefault(); }
+  }, true);
+  var lkCoinAnim = null;
+  $('lkCoinBtn').addEventListener('click', function () {
+    var coin = $('lkCoin'), wrap = coin.parentNode, res = $('lkRes');
+    var heads = crypto.getRandomValues(new Uint8Array(1))[0] % 2 === 0;
+    var end = 1800 + (heads ? 0 : 180);
+    var calm = false;
+    try { calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+    wrap.classList.add('on'); coin.hidden = false; res.textContent = '';
+    if (lkCoinAnim) { try { lkCoinAnim.cancel(); } catch (e) {} }
+    var done = function () { res.textContent = heads ? 'Орёл!' : 'Решка!'; try { if (navigator.vibrate) navigator.vibrate(40); } catch (e) {} };
+    if (!coin.animate) { coin.style.transform = 'rotateY(' + end + 'deg)'; done(); return; }
+    lkCoinAnim = coin.animate([
+      { transform: 'translateY(0) rotateY(0deg)' },
+      { transform: 'translateY(-34px) rotateY(' + (end / 2) + 'deg)', offset: 0.5 },
+      { transform: 'translateY(0) rotateY(' + end + 'deg)' }
+    ], { duration: calm ? 1 : 1200, easing: 'cubic-bezier(.3,.6,.4,1)', fill: 'forwards' });
+    lkCoinAnim.onfinish = done;
+  });
+  $('lkForgot').addEventListener('click', function () { $('lkForgotT').hidden = !$('lkForgotT').hidden; });
+  $('lkCancel').addEventListener('click', function () { $('lockScr').classList.remove('setup'); lkMode = 'unlock'; lkBuf = ''; lkRender(); });
+  function renderLockSettings() {
+    var on = !!LK;
+    $('lkInfo').textContent = on ? 'Пин-код включён. Без него приложение не откроется. Это защита от случайного взгляда: сами записи на телефоне при этом не шифруются.' : 'Закрывает приложение пин-кодом из четырёх цифр. Подходит, если телефон иногда оказывается в чужих руках.';
+    $('lkOn').hidden = on; $('lkChange').hidden = !on; $('lkOff').hidden = !on;
+    $('lkAfterBox').hidden = !on;
+    $('lkFidBox').hidden = !(on && fidOk);
+    if (on) { $('lkFid').checked = !!LK.fid; $('lkAfter').value = String(LK.after != null ? LK.after : 60); }
+  }
+  $('lkOn').addEventListener('click', function () { closeOv(true); lkShow('set1', 'Придумайте пин-код', 'Четыре цифры'); });
+  $('lkChange').addEventListener('click', function () { closeOv(true); lkShow('change', 'Введите текущий пин-код'); });
+  $('lkOff').addEventListener('click', function () { closeOv(true); lkShow('off', 'Введите пин-код, чтобы выключить'); });
+  $('lkAfter').addEventListener('change', function () { if (LK) { LK.after = +this.value; lkSave(); } });
+  $('lkFid').addEventListener('change', function () {
+    var box = this;
+    if (!LK) return;
+    if (!box.checked) { LK.fid = ''; lkSave(); toast('Face ID выключен'); return; }
+    fidEnroll().then(function (id) { LK.fid = id; lkSave(); toast('Face ID включён'); }).catch(function () {
+      box.checked = false; toast('Не получилось включить Face ID');
+    });
+  });
+  document.addEventListener('visibilitychange', function () {
+    if (!LK) return;
+    if (document.hidden) { lkHiddenAt = Date.now(); if (LK.after === 0) lkLock(); }
+    else if (LK.after > 0 && lkHiddenAt && Date.now() - lkHiddenAt > LK.after * 1000) lkLock();
+  });
+  function lkInit() {
+    lkLoad();
+    if (!LK) { document.documentElement.removeAttribute('data-locked'); renderLockSettings(); fidCheck(renderLockSettings); return; }
+    lkShow('unlock', 'Введите пин-код');
+    renderLockSettings();
+    fidCheck(function () { renderLockSettings(); lkRender(); lkFace(); });
+  }
+  lkInit();
 
   // Работа без интернета: только в версии на https (GitHub Pages) или локально
   try {
