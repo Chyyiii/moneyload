@@ -812,10 +812,11 @@ html[data-hide] .limsum b { filter: blur(9px); }
 .piewrap circle[stroke="#B8C4BF"] { stroke: var(--muted); stroke-opacity: .26; }
 [style*="B8C4BF"] { background: color-mix(in srgb, var(--muted) 30%, transparent) !important; }
 .overlay button.link { min-height: 44px; }
-.setgrp > summary { display: flex; flex-direction: column; align-items: flex-start; text-align: left; gap: 2px; padding-right: 28px; }
-.setgrp > summary::after { content: '›'; position: absolute; right: 16px; top: 50%; margin-top: -14px; transform: rotate(90deg); color: var(--muted); font-size: 20px; }
-.setgrp { position: relative; }
-.setgrp[open] > summary::after { transform: rotate(-90deg); margin-top: -10px; }
+.setgrp > summary { position: relative; display: flex; flex-direction: column; align-items: flex-start; text-align: left; gap: 2px; padding-right: 28px; }
+.setgrp > summary::after { content: '›'; position: absolute; right: -2px; top: 50%; margin-top: -14px; transform: rotate(90deg); color: var(--muted); font-size: 20px; }
+.setgrp[open] { padding-bottom: 14px; }
+.setgrp > :last-child { margin-bottom: 0; }
+.setgrp[open] > summary::after { transform: rotate(-90deg); margin-top: -12px; }
 .setgrp .ssub { font-weight: 500; font-size: 13px; color: var(--muted); }
 #tmWarn.bud-st { margin: 0; }
 </style>
@@ -1204,7 +1205,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
         <p>Значок с ползунками в верхней карточке открывает настройки: своё название книги, цвет (7 палитр) и режим (авто, светлый, тёмный). Там же переключается стиль: «Стекло» (полупрозрачные карточки, кольцо лимита дня, график остатка за месяц, анимации, цвета категорий) или «Классика» (прежний строгий вид). Для тёмного режима можно включить чёрный фон: на OLED-экранах он экономит заряд. Стиль и чёрный фон запоминаются на этом устройстве.</p>
       </details>
       <details><summary>Резервная копия</summary>
-        <p>В окне оформления есть <b>«Сохранить копию»</b> и <b>«Загрузить копию»</b>. Копия — это файл со всеми записями, категориями, целями, регулярными платежами и настройками.</p>
+        <p>В «Настройках» в разделе «Данные и копии» есть <b>«Сохранить копию»</b> и <b>«Загрузить копию»</b>. Копия — это файл со всеми записями, категориями, целями, регулярными платежами и настройками, включая название, цвет, тему, стиль и чёрный фон.</p>
         <p>Когда вы выбираете файл, приложение ничего не меняет, а сначала показывает, сколько записей добавится, сколько изменится и сколько есть только у вас. Решайте после этого: «Добавить к текущим» или «Заменить всё копией».</p>
         <p><b>Делайте копию регулярно</b>, например раз в неделю и всегда перед очисткой браузера или сменой телефона. Если с последней копии прошло 5 дней и больше, на главном экране появится напоминание с кнопкой «Сохранить копию» и вариантом «Напомнить завтра». При загрузке записи добавляются к текущим, одинаковые заменяются.</p>
       </details>
@@ -3578,7 +3579,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
       if (t.acc) o.acc = t.acc;
       return o;
     }), cats: catsBody(), save: { accs: settings.accs, xfers: settings.xfers, on: settings.on, plan: settings.plan, goal: settings.goal, carry: settings.carry, limitGoals: settings.limitGoals, carryFrom: settings.carryFrom, closed: settings.closed, goals: settings.goals, months: settings.months, goalStart: settings.goalStart },
-      tpl: { items: tpl.items }, ui: { name: ui.name.trim(), palette: ui.palette, mode: ui.mode }, rec: { items: rec.items } };
+      tpl: { items: tpl.items }, ui: { name: ui.name.trim(), palette: ui.palette, mode: ui.mode, style: STYLE, oled: OLED }, rec: { items: rec.items } };
   }
   function downloadText(name, text) {
     var blob = new Blob([text], { type: 'application/json' });
@@ -3731,6 +3732,9 @@ html[data-hide] .limsum b { filter: blur(9px); }
       CATS = cleanCats(b.cats);
       settings = cleanSettings(b.save);
       ui = cleanUi(b.ui);
+      if (b.ui && (b.ui.style === 'glass' || b.ui.style === 'classic')) STYLE = b.ui.style;
+      if (b.ui && typeof b.ui.oled === 'boolean') OLED = b.ui.oled;
+      applyLook();
       rec = cleanRec(b.rec);
       tpl = cleanTpl(b.tpl);
       persistTpl();
