@@ -5427,6 +5427,26 @@ html[data-hide] .limsum b { filter: blur(9px); }
   }
   lkInit();
 
+  // Новый день: приложение на экране «Домой» может жить в фоне сутками, поэтому пересчитываем при возвращении и в полночь
+  var lastDay = dateStr(new Date());
+  function dayCheck() {
+    if (loading) return;
+    var d = dateStr(new Date());
+    if (d === lastDay) return;
+    var wasCur = view.y === +lastDay.slice(0, 4) && view.m === +lastDay.slice(5, 7) - 1;
+    if ($('date').value === lastDay) $('date').value = d;
+    lastDay = d;
+    if (wasCur) view = { y: +d.slice(0, 4), m: +d.slice(5, 7) - 1 };
+    aggC = null;
+    render();
+    materializeRecurring();
+    maybeClose();
+  }
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) dayCheck(); });
+  window.addEventListener('pageshow', dayCheck);
+  window.addEventListener('focus', dayCheck);
+  setInterval(dayCheck, 30000);
+
   // Работа без интернета: только в версии на https (GitHub Pages) или локально
   try {
     if ('serviceWorker' in navigator && ((location.protocol === 'https:' && /github\.io$/.test(location.hostname)) || location.hostname === 'localhost')) {
