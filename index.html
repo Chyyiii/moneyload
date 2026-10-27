@@ -845,6 +845,14 @@ html[data-hide] .limsum b { filter: blur(9px); }
 .chipsrow button { border: 1px solid var(--line); background: var(--tint); border-radius: 999px; padding: 0 14px; min-height: 40px; font-weight: 700; font-size: 14px; }
 .loancard { padding: 14px 16px; display: grid; gap: 10px; }
 .loancard p { margin: 0; line-height: 1.5; font-size: 14px; }
+.amountbox.reqbox::before { content: "*"; position: absolute; left: 10px; top: 8px; color: var(--out); font-weight: 800; font-size: 20px; }
+.amountbox.bad input { border-bottom-color: var(--out); animation: reqshake .3s; }
+.amountbox.bad .cur { color: var(--out); }
+input.bad { border-color: var(--out); box-shadow: 0 0 0 3px color-mix(in srgb, var(--out) 22%, transparent); animation: reqshake .3s; }
+label.req::after { content: " *"; color: var(--out); font-weight: 800; }
+.field.bad > label { color: var(--out); }
+.field.bad input, .field.bad select { border-color: var(--out); box-shadow: 0 0 0 3px color-mix(in srgb, var(--out) 22%, transparent); animation: reqshake .3s; }
+@keyframes reqshake { 25%, 75% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
 #tmWarn.bud-st { margin: 0; }
 </style>
 <script>
@@ -1122,6 +1130,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
     <div class="guide">
       <details open><summary>С чего начать</summary>
         <p>Нажмите <b>«+ Запись»</b> внизу экрана, введите сумму, выберите тип (расход или доход) и категорию, при желании поменяйте дату и добавьте комментарий. Стрелки в верхней карточке переключают месяцы. Вверху крупно виден <b>остаток за месяц</b>: доходы минус расходы и минус отложенное. Нажмите на «Доходы», «Расходы» или «Отложено» в верхней карточке, чтобы сразу добавить такую запись.</p>
+        <p>Обязательные поля помечены красной звёздочкой <b style="color:var(--out)">*</b>. Если такое поле пустое, при сохранении оно подсветится красным.</p>
         <p>Любое окно закрывается свайпом вниз: потяните его за шапку или за верх содержимого. Крестик и тап по затемнению тоже работают.</p>
         <p>Если на экране записи-примеры, их можно убрать кнопкой «Убрать примеры» в самом низу.</p>
       </details>
@@ -1954,6 +1963,23 @@ html[data-hide] .limsum b { filter: blur(9px); }
     return t && (t.type === 'in' || t.type === 'out' || t.type === 'save') && typeof t.amount === 'number' && isFinite(t.amount) &&
       typeof t.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(t.date) && typeof t.cat === 'string';
   }
+  // Обязательные поля: звёздочка у названия и подсветка, если поле не заполнено
+  function flag(el) {
+    var dt = el.closest && el.closest('details'); if (dt) dt.open = true;
+    var f = el.closest ? (el.closest('.field, .amountbox') || el) : null;
+    if (f) {
+      f.classList.remove('bad'); void f.offsetWidth; f.classList.add('bad');
+      var off = function () { f.classList.remove('bad'); el.removeEventListener('input', off); el.removeEventListener('change', off); };
+      el.addEventListener('input', off); el.addEventListener('change', off);
+    }
+    try { el.focus(); el.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {}
+  }
+  (function () {
+    ['amount','date','sveAmt','sveDate','accNName','accNBal','accMBal','accXa','gName','xfAmt','svAmt','exAmt','recAmount','recDay','dWho','dAmt'].forEach(function (id) {
+      var l = document.querySelector('label[for="' + id + '"]');
+      if (l) { l.classList.add('req'); var bx = l.closest('.amountbox'); if (bx) bx.classList.add('reqbox'); }
+    });
+  })();
   function parseAmt(raw) {
     var s = String(raw).replace(/\s/g, '').replace(',', '.');
     if (!s) return NaN;
@@ -2592,7 +2618,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
   $('tplEdit').addEventListener('click', function () { tplEditMode = !tplEditMode; renderTpl(); });
   $('tplSave').addEventListener('click', function () {
     var a = parseAmt($('amount').value);
-    if (!(a > 0) || a > 1e9) { toast('Сначала введите сумму'); $('amount').focus(); return; }
+    if (!(a > 0) || a > 1e9) { toast('Сначала введите сумму'); flag($('amount')); return; }
     if (tpl.items.length >= 12) { toast('Не больше 12 быстрых записей'); return; }
     var note = $('note').value.trim().slice(0, 120);
     if (tpl.items.some(function (x) { return x.type === type && x.cat === selCat && x.amount === a && x.note === note; })) { toast('Такая быстрая запись уже есть'); return; }
@@ -2638,9 +2664,9 @@ html[data-hide] .limsum b { filter: blur(9px); }
     var base = txs.filter(function (x) { return x.id === sveId; })[0];
     if (!base) { closeOv(); return; }
     var a = parseAmt($('sveAmt').value);
-    if (!(a > 0) || a > 1e9) { toast('Введите сумму больше нуля'); $('sveAmt').focus(); return; }
+    if (!(a > 0) || a > 1e9) { toast('Введите сумму больше нуля'); flag($('sveAmt')); return; }
     var d = $('sveDate').value;
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) { toast('Укажите дату'); $('sveDate').focus(); return; }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) { toast('Укажите дату'); flag($('sveDate')); return; }
     var sign = +document.querySelector('input[name="sved"]:checked').value, gid = $('sveTo').value;
     var had = (base.goalId || '') === gid ? base.amount : 0;
     if (sign < 0 && a > r2(pocketBal(gid) - had) + 0.005) { toast('В этой копилке меньше этой суммы'); return; }
@@ -2878,7 +2904,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
   $('ipNone').addEventListener('click', function () { setIcon(''); });
   function applyCustomIcon() {
     var g = firstGlyph($('ipCustom').value);
-    if (!g) { toast('Вставьте эмодзи или символ'); $('ipCustom').focus(); return; }
+    if (!g) { toast('Вставьте эмодзи или символ'); flag($('ipCustom')); return; }
     setIcon(g);
   }
   $('ipApply').addEventListener('click', applyCustomIcon);
@@ -2896,9 +2922,9 @@ html[data-hide] .limsum b { filter: blur(9px); }
   function addCategory() {
     var inp = $('newCat');
     var name = inp.value.trim().slice(0, 30);
-    if (!name) { inp.focus(); return; }
+    if (!name) { toast('Введите название категории'); flag(inp); return; }
     var dup = CATS[type].some(function (c) { return c.toLowerCase() === name.toLowerCase(); });
-    if (dup) { toast('Такая категория уже есть'); inp.focus(); return; }
+    if (dup) { toast('Такая категория уже есть'); flag(inp); return; }
     if (CATS[type].length >= 40) { toast('Слишком много категорий'); return; }
     CATS[type].push(name);
     if (newIcon) CATS.icons[type + '|' + name] = newIcon;
@@ -2919,10 +2945,10 @@ html[data-hide] .limsum b { filter: blur(9px); }
   $('f').addEventListener('submit', function (e) {
     e.preventDefault();
     var amt = parseAmt($('amount').value);
-    if (!(amt > 0)) { toast('Введите сумму больше нуля'); $('amount').focus(); return; }
-    if (amt > 1e9) { toast('Слишком большая сумма'); $('amount').focus(); return; }
+    if (!(amt > 0)) { toast('Введите сумму больше нуля'); flag($('amount')); return; }
+    if (amt > 1e9) { toast('Слишком большая сумма'); flag($('amount')); return; }
     var d = $('date').value;
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) { toast('Укажите дату'); $('date').focus(); return; }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) { toast('Укажите дату'); flag($('date')); return; }
     var note = $('note').value.trim().slice(0, 120);
     if (splitOn && !editingId) {
       var parts = [], ssum = 0, okRows = true;
@@ -2931,8 +2957,8 @@ html[data-hide] .limsum b { filter: blur(9px); }
         if (!(a > 0)) { okRows = false; return; }
         parts.push({ cat: r.cat, amt: a }); ssum += a;
       });
-      if (!okRows || parts.length < 2) { toast('Введите сумму в каждой строке'); return; }
-      if (Math.abs(r2(ssum) - amt) > 0.005) { toast('Суммы частей должны давать ' + money(amt)); return; }
+      if (!okRows || parts.length < 2) { toast('Введите сумму в каждой строке'); var emp = [].slice.call($('splitRows').querySelectorAll('[data-sa]')).filter(function (x) { return !(parseAmt(x.value) > 0); })[0]; if (emp) flag(emp); return; }
+      if (Math.abs(r2(ssum) - amt) > 0.005) { toast('Суммы частей должны давать ' + money(amt)); var f1 = $('splitRows').querySelector('[data-sa]'); if (f1) flag(f1); return; }
       var sbtn = $('submit');
       sbtn.disabled = true;
       (async function () {
@@ -3198,8 +3224,8 @@ html[data-hide] .limsum b { filter: blur(9px); }
     $('accRows').innerHTML = settings.accs.map(function (a) {
       var bal = accBal(a.id);
       if (accEditId === a.id) {
-        return '<div class="gcard editing"><div class="field"><label for="aeName">Название</label><input id="aeName" maxlength="24" autocomplete="off" value="' + esc(a.name) + '"></div>' +
-          '<div class="field"><label for="aeBal">Сейчас на счёте, ₽</label><input id="aeBal" inputmode="decimal" autocomplete="off" value="' + String(bal).replace('.', ',') + '"></div>' +
+        return '<div class="gcard editing"><div class="field"><label class="req" for="aeName">Название</label><input id="aeName" maxlength="24" autocomplete="off" value="' + esc(a.name) + '"></div>' +
+          '<div class="field"><label class="req" for="aeBal">Сейчас на счёте, ₽</label><input id="aeBal" inputmode="decimal" autocomplete="off" value="' + String(bal).replace('.', ',') + '"></div>' +
           '<div class="gc-act"><button type="button" class="main" data-asave="' + esc(a.id) + '">Сохранить</button><button type="button" data-acancel="1">Отмена</button>' +
           (a.id ? '<button type="button" data-adel="' + esc(a.id) + '">Удалить</button>' : '') + '</div></div>';
       }
@@ -3218,7 +3244,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
   function accBalIn(el) { var v = el.value.trim() === '' ? 0 : parseAmt(el.value); return (isFinite(v) && Math.abs(v) <= 1e9) ? v : NaN; }
   $('accOnBtn').addEventListener('click', function () {
     var bal = accBalIn($('accMBal'));
-    if (isNaN(bal)) { toast('Проверьте сумму'); $('accMBal').focus(); return; }
+    if (isNaN(bal)) { toast('Проверьте сумму'); flag($('accMBal')); return; }
     settings.accs = [{ id: '', name: $('accMName').value.trim().slice(0, 24) || 'Основной', start: bal, since: Date.now() }];
     persistSettings();
     renderAcc();
@@ -3226,8 +3252,8 @@ html[data-hide] .limsum b { filter: blur(9px); }
   });
   $('accNAdd').addEventListener('click', function () {
     var nm = $('accNName').value.trim().slice(0, 24), bal = accBalIn($('accNBal'));
-    if (!nm) { toast('Введите название'); $('accNName').focus(); return; }
-    if (isNaN(bal)) { toast('Проверьте сумму'); $('accNBal').focus(); return; }
+    if (!nm) { toast('Введите название'); flag($('accNName')); return; }
+    if (isNaN(bal)) { toast('Проверьте сумму'); flag($('accNBal')); return; }
     if (settings.accs.length >= 12) { toast('Слишком много счетов'); return; }
     if (settings.accs.some(function (a) { return a.name.toLowerCase() === nm.toLowerCase(); })) { toast('Такой счёт уже есть'); return; }
     settings.accs.push({ id: accId(), name: nm, start: bal, since: Date.now() });
@@ -3259,8 +3285,8 @@ html[data-hide] .limsum b { filter: blur(9px); }
     var id = sv.getAttribute('data-asave'), a = accById(id);
     if (!a) return;
     var nm = $('aeName').value.trim().slice(0, 24), nb = accBalIn($('aeBal'));
-    if (!nm) { toast('Введите название'); return; }
-    if (isNaN(nb)) { toast('Проверьте сумму'); return; }
+    if (!nm) { toast('Введите название'); flag($('aeName')); return; }
+    if (isNaN(nb)) { toast('Проверьте сумму'); flag($('aeBal')); return; }
     if (settings.accs.some(function (x) { return x.id !== id && x.name.toLowerCase() === nm.toLowerCase(); })) { toast('Такой счёт уже есть'); return; }
     a.start = r2(a.start + (nb - accBal(id)));
     a.name = nm;
@@ -3270,7 +3296,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
   $('accXgo').addEventListener('click', function () {
     var f = $('accXf').value, t = $('accXt').value, am = parseAmt($('accXa').value);
     if (f === t) { toast('Выберите разные счета'); return; }
-    if (!(am > 0) || am > 1e9) { toast('Введите сумму больше нуля'); $('accXa').focus(); return; }
+    if (!(am > 0) || am > 1e9) { toast('Введите сумму больше нуля'); flag($('accXa')); return; }
     settings.xfers.push({ id: 'x' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), ts: Date.now(), date: dateStr(new Date()), from: f, to: t, amount: am, note: $('accXn').value.trim().slice(0, 60) });
     if (settings.xfers.length > 500) settings.xfers = settings.xfers.slice(-500);
     $('accXa').value = ''; $('accXn').value = '';
@@ -3578,7 +3604,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
         '<div class="gc-sum"><b class="goalv">' + money(saved) + '</b>' + (has ? '<span class="goalv">из ' + money(q.target) + '</span>' : '') + '</div>' +
         (has ? '<div class="mini gold"><i style="width:' + pct.toFixed(1) + '%"></i></div>' : '') + meta;
       if (editing) {
-        html += '<div class="gform">' + (q.id ? '<div class="field"><label for="geName">Название</label><input id="geName" maxlength="30" autocomplete="off" value="' + esc(q.name) + '"></div>' : '') +
+        html += '<div class="gform">' + (q.id ? '<div class="field"><label class="req" for="geName">Название</label><input id="geName" maxlength="30" autocomplete="off" value="' + esc(q.name) + '"></div>' : '') +
           '<div class="setgrid"><div class="field"><label for="geTarget">Сумма цели, ₽</label><input id="geTarget" inputmode="decimal" autocomplete="off" placeholder="Необязательно" value="' + (q.target ? String(q.target).replace('.', ',') : '') + '"></div>' +
           '<div class="field"><label for="geMonths">За сколько месяцев</label><input id="geMonths" inputmode="numeric" maxlength="3" autocomplete="off" placeholder="Например, 12" value="' + (q.months || '') + '"></div></div>' +
           '<p class="hint" id="geHint"></p>' +
@@ -3619,9 +3645,9 @@ html[data-hide] .limsum b { filter: blur(9px); }
   $('goalList').addEventListener('input', function (e) { if (e.target.id === 'geTarget' || e.target.id === 'geMonths') updateEditHint(); });
   $('goalList').addEventListener('click', function (e) {
     var gx = e.target.closest('[data-gxf]');
-    if (gx) { xfFrom = ''; xfTo = gx.getAttribute('data-gxf'); xfOpen = true; goalEditId = null; renderGoals(); setSvTab('jar'); $('xfAmt').focus(); return; }
+    if (gx) { xfFrom = ''; xfTo = gx.getAttribute('data-gxf'); xfOpen = true; goalEditId = null; renderGoals(); setSvTab('jar'); flag($('xfAmt')); return; }
     var add = e.target.closest('[data-gadd]');
-    if (add) { $('svTo').value = add.getAttribute('data-gadd'); goalEditId = null; renderGoals(); setSvTab('jar'); $('svAmt').focus(); return; }
+    if (add) { $('svTo').value = add.getAttribute('data-gadd'); goalEditId = null; renderGoals(); setSvTab('jar'); flag($('svAmt')); return; }
     var ed = e.target.closest('[data-gedit]');
     if (ed) { goalEditId = ed.getAttribute('data-gedit'); goalAdding = false; renderGoals(); var t = $('geTarget'); if (t) t.focus(); return; }
     if (e.target.closest('[data-gcancel]')) { goalEditId = null; renderGoals(); return; }
@@ -3653,7 +3679,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
       var g = settings.goals.filter(function (x) { return x.id === gid; })[0];
       if (!g) return;
       var nm = $('geName').value.trim().slice(0, 30);
-      if (!nm) { toast('Введите название цели'); return; }
+      if (!nm) { toast('Введите название цели'); flag($('geName')); return; }
       if (months > 0 && (target !== g.target || months !== g.months || !g.start)) g.start = curKey();
       g.name = nm; g.target = target; g.months = months;
     }
@@ -3669,12 +3695,12 @@ html[data-hide] .limsum b { filter: blur(9px); }
   $('goalForm').addEventListener('submit', function (e) {
     e.preventDefault();
     var nm = $('gName').value.trim().slice(0, 30);
-    if (!nm) { toast('Введите название цели'); $('gName').focus(); return; }
+    if (!nm) { toast('Введите название цели'); flag($('gName')); return; }
     var tr = $('gTarget').value.trim(), t = tr ? parseAmt(tr) : 0;
-    if (!(t >= 0) || t > 1e9) { toast('Проверьте сумму цели'); return; }
+    if (!(t >= 0) || t > 1e9) { toast('Проверьте сумму цели'); flag($('gTarget')); return; }
     if (settings.goals.length >= 8) { toast('Не больше 8 целей'); return; }
     var gmr = $('gMonths').value.trim(), gm = gmr ? parseInt(gmr, 10) : 0;
-    if (!(gm >= 0) || gm > 600) { toast('Проверьте срок'); return; }
+    if (!(gm >= 0) || gm > 600) { toast('Проверьте срок'); flag($('gMonths')); return; }
     var id = 'g' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
     settings.goals.push({ id: id, name: nm, target: t, months: gm, start: curKey() });
     $('gName').value = ''; $('gTarget').value = ''; $('gMonths').value = ''; $('gnHint').textContent = '';
@@ -3726,7 +3752,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
   $('xfForm').addEventListener('submit', function (e) {
     e.preventDefault();
     var a = parseAmt($('xfAmt').value);
-    if (!(a > 0) || a > 1e9) { toast('Введите сумму больше нуля'); $('xfAmt').focus(); return; }
+    if (!(a > 0) || a > 1e9) { toast('Введите сумму больше нуля'); flag($('xfAmt')); return; }
     if (xfFrom === xfTo) { toast('Выберите разные копилки'); return; }
     if (a > pocketBal(xfFrom) + 0.005) { toast('В «' + pName(xfFrom) + '» меньше этой суммы'); return; }
     var d = dateStr(new Date()), now = Date.now();
@@ -3742,7 +3768,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
   });
   function moveSave(sign) {
     var a = parseAmt($('svAmt').value);
-    if (!(a > 0) || a > 1e9) { toast('Введите сумму больше нуля'); $('svAmt').focus(); return; }
+    if (!(a > 0) || a > 1e9) { toast('Введите сумму больше нуля'); flag($('svAmt')); return; }
     var gid = $('svTo').value;
     if (sign < 0 && a > pocketBal(gid) + 0.005) { toast('В этой копилке меньше этой суммы'); return; }
     var t = { id: newId(), type: 'save', cat: 'Накопления', amount: sign * a, note: '', date: dateStr(new Date()), createdAt: Date.now() };
@@ -4704,7 +4730,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
       if (!(v > 0) || v > 1e9) { bad = true; return; }
       next[inp.getAttribute('data-n')] = v;
     });
-    if (bad) { toast('Проверьте суммы: нужны числа больше нуля'); return; }
+    if (bad) { toast('Проверьте суммы: нужны числа больше нуля'); var bi = [].slice.call(document.querySelectorAll('#limList input')).filter(function (x) { var q = x.value.trim(); return q && !(parseAmt(q) > 0); })[0]; if (bi) flag(bi); return; }
     CATS.limits = next;
     changeCats();
     closeOv();
@@ -4985,7 +5011,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
     var it = rec.items.filter(function (x) { return x.id === recEditId; })[0];
     if (!it || !it.loan) { closeOv(); return; }
     var x = parseAmt($('exAmt').value);
-    if (!(x > 0)) { toast('Введите сумму больше нуля'); $('exAmt').focus(); return; }
+    if (!(x > 0)) { toast('Введите сумму больше нуля'); flag($('exAmt')); return; }
     if (x > it.loan.bal + 0.005) { toast('Сумма больше остатка долга'); return; }
     try {
       var atx = { id: newId(), type: 'out', cat: it.cat, amount: x, note: 'Досрочно: ' + (it.note || it.cat), date: dateStr(new Date()), createdAt: Date.now(), auto: true };
@@ -5003,9 +5029,9 @@ html[data-hide] .limsum b { filter: blur(9px); }
   $('recForm').addEventListener('submit', function (e) {
     e.preventDefault();
     var amt = parseAmt($('recAmount').value);
-    if (!(amt > 0) || amt > 1e9) { toast('Введите сумму больше нуля'); $('recAmount').focus(); return; }
+    if (!(amt > 0) || amt > 1e9) { toast('Введите сумму больше нуля'); flag($('recAmount')); return; }
     var day = parseInt($('recDay').value, 10);
-    if (!(day >= 1 && day <= 31)) { toast('Укажите день месяца от 1 до 31'); $('recDay').focus(); return; }
+    if (!(day >= 1 && day <= 31)) { toast('Укажите день месяца от 1 до 31'); flag($('recDay')); return; }
     var cat = $('recCat').value;
     if (!cat) { toast('Выберите категорию'); return; }
     var note = $('recNote').value.trim().slice(0, 60);
@@ -5131,8 +5157,8 @@ html[data-hide] .limsum b { filter: blur(9px); }
     var who = $('dWho').value.replace(/\s+/g, ' ').trim().slice(0, 30);
     var amt = parseAmt($('dAmt').value);
     var date = $('dDate').value;
-    if (!who) { toast('Укажите, кто это'); $('dWho').focus(); return; }
-    if (!(amt > 0) || amt > 1e9) { toast('Введите сумму больше нуля'); $('dAmt').focus(); return; }
+    if (!who) { toast('Укажите, кто это'); flag($('dWho')); return; }
+    if (!(amt > 0) || amt > 1e9) { toast('Введите сумму больше нуля'); flag($('dAmt')); return; }
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) { toast('Укажите дату'); return; }
     if (debt.items.length >= 1000) { toast('Слишком много записей о долгах'); return; }
     var acc = accOn() && accById($('dAcc').value) ? $('dAcc').value : '';
