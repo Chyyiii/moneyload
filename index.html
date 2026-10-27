@@ -197,7 +197,7 @@ html[data-hide] :is(.hero-bal, .hero-sub, .stat-v, .tile-val, .tile-sub, .jar-v,
 .bkrem { border-left-color: var(--brand); }
 .bkrem[hidden] { display: none; }
 .bkrem-b { display: flex; gap: 8px; }
-.bkrem-b button { flex: 1; height: 40px; border-radius: 12px; font-size: 14px; }
+.bkrem-b button { flex: 1; height: auto; min-height: 44px; padding: 0 6px; white-space: nowrap; margin: 0; display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1.15; border-radius: 12px; font-size: 14px; }
 .tile.wide { grid-column: 1 / -1; }
 .search { margin-bottom: 10px; }
 .goal { padding: 12px 0; border-bottom: 1px solid var(--line); }
@@ -660,7 +660,7 @@ html[data-style="glass"] .remind.bkrem { border-left-color: var(--brand); }
 .rrow b { font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .rrow .rd { grid-column: 1; font-size: 12px; color: var(--muted); font-weight: 600; }
 .rrow b { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
-html[data-hide] :is(.rrow b, #recSub) { filter: blur(9px); }
+html[data-hide] :is(.rrow b, #recSub, #debtSub, .dsum b, #dList .amt-n) { filter: blur(9px); }
 .arow { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
 .arow .an { font-weight: 700; overflow-wrap: anywhere; }
 .arow b { font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -818,6 +818,33 @@ html[data-hide] .limsum b { filter: blur(9px); }
 .setgrp > :last-child { margin-bottom: 0; }
 .setgrp[open] > summary::after { transform: rotate(-90deg); margin-top: -12px; }
 .setgrp .ssub { font-weight: 500; font-size: 13px; color: var(--muted); }
+.dsum { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.dsum > div { background: var(--tint); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; }
+.dsum span { font-size: 13px; font-weight: 600; color: var(--muted); }
+.dsum b { font-size: 20px; font-weight: 800; }
+.dsum b.in { color: var(--in); }
+.dsum b.out { color: var(--out); }
+.dhist { list-style: none; margin: 0; padding: 0 0 8px 52px; display: grid; gap: 6px; font-size: 14px; }
+.dhist li { display: flex; align-items: center; gap: 8px; }
+.dhist .dd { flex: 1; min-width: 0; color: var(--muted); }
+.dhist b { font-weight: 700; }
+.dhist b.in { color: var(--in); }
+.dhist b.out { color: var(--out); }
+.dhist button { background: none; border: 0; color: var(--muted); font-size: 18px; min-width: 36px; min-height: 36px; }
+#dList .amt-n.out { color: var(--out); }
+#dList .av.out { background: var(--out-tint); color: var(--out); }
+.srcb button { padding: 10px 4px; font-size: 14px; line-height: 1.15; min-height: 48px; display: flex; align-items: center; justify-content: center; text-align: center; }
+.rowsrc { padding: 0 0 10px 52px; display: grid; gap: 6px; }
+.rowsrc .lbl { margin: 0; }
+.rowact2 { display: flex; flex-wrap: wrap; gap: 8px; }
+.rowact2 button { flex: 1; min-height: 48px; }
+.recst { font-weight: 700; }
+.recst.ok { color: var(--in); }
+.chipsrow { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.chipsrow:empty { display: none; }
+.chipsrow button { border: 1px solid var(--line); background: var(--tint); border-radius: 999px; padding: 0 14px; min-height: 40px; font-weight: 700; font-size: 14px; }
+.loancard { padding: 14px 16px; display: grid; gap: 10px; }
+.loancard p { margin: 0; line-height: 1.5; font-size: 14px; }
 #tmWarn.bud-st { margin: 0; }
 </style>
 <script>
@@ -854,6 +881,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
     <p class="hero-bal" id="bal">0&nbsp;₽</p>
     <p class="hero-sub" id="balCarry" hidden></p>
     <p class="hero-sub" id="balExt" hidden></p>
+    <p class="hero-sub" id="balDebt" hidden></p>
     <p class="hero-sub" id="balFc" hidden></p>
     <div class="spark" id="spark" hidden></div>
     <div class="stats">
@@ -872,6 +900,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
 
   <div class="tiles" id="quick">
     <button type="button" class="tile wide" data-open="acc"><span class="tile-lbl">Счета</span><span class="tile-sub" id="accSub"></span><span class="rlist" id="accList"></span></button>
+    <button type="button" class="tile wide" data-open="debt"><span class="tile-lbl">Долги</span><span class="tile-sub" id="debtSub"></span></button>
     <button type="button" class="tile wide" data-open="rec"><span class="tile-lbl">Регулярные платежи</span><span class="tile-sub" id="recSub"></span><span class="rlist" id="recTileList"></span></button>
   </div>
 
@@ -1191,11 +1220,22 @@ html[data-hide] .limsum b { filter: blur(9px); }
       <details><summary>Регулярные платежи</summary>
         <p>Плитка «Регулярные платежи»: аренда, подписки, зарплата. Укажите сумму, категорию и день месяца, и запись сама появится в журнале в этот день каждый месяц. Предстоящие расходы заранее вычитаются из дневного лимита. На главном экране плитка показывает три ближайших платежа с датой и суммой, а также сколько уйдёт за ближайшие 30 дней.</p>
         <p>Если в журнале три и больше раз подряд есть одинаковая трата примерно раз в месяц (например, «Netflix 599»), сверху появится блок «Похоже на подписки». Нажмите «Добавить», и трата станет регулярной. Там же видно, сколько подписки стоят в год.</p>
+        <p>У расходного платежа есть выбор <b>«Откуда платить»</b>:</p>
         <ul>
-          <li><b>«Деньги на платёж отложены отдельно»</b>: деньги на платёж уже лежат отдельно. Сумма сразу вычитается из остатка, в день платежа попадает в журнал, повторно ничего не вычитается.</li>
-          <li><b>«Оплачу с будущего дохода»</b>: деньги ещё не пришли. До даты платежа он не уменьшает дневной лимит и не вызывает «Не хватает на платежи», в свой день попадает в журнал как обычный расход.</li>
+          <li><b>«С остатка»</b>: деньги есть на счёте. Сумма заранее уменьшает дневной лимит.</li>
+          <li><b>«Уже отложено»</b>: деньги лежат отдельно, например в конверте или на другой карте. Сумма сразу вычитается из остатка, в день платежа попадает в журнал, повторно ничего не вычитается.</li>
+          <li><b>«С будущего дохода»</b>: деньги ещё не пришли. До даты платежа он не уменьшает дневной лимит, в свой день попадает в журнал как обычный расход.</li>
         </ul>
-        <p>Если заведено несколько счетов, у платежа можно выбрать счёт: запись в день платежа появится именно на нём. Нажмите на платёж, чтобы изменить или удалить его. Уже созданные записи в журнале при этом остаются.</p>
+        <p><b>Оплатить заранее.</b> В окне платежа кнопка «Оплатить сейчас» записывает платёж сегодняшней датой. Если месяц уже оплачен, кнопка предложит «Оплатить за ноябрь» и так далее. В свой день такой платёж второй раз не создаётся.</p>
+        <p><b>Кредит или ипотека.</b> В «Дополнительно» впишите остаток долга и ставку. В окне платежа появится карточка: сколько осталось платить и сколько процентов вы отдадите за весь срок. После каждого платежа остаток уменьшается сам.</p>
+        <p><b>Досрочный платёж.</b> Кнопка в карточке кредита: впишите сумму, и до внесения будет видно, насколько сократится срок и сколько процентов сэкономите. Платёж остаётся прежним, срок становится короче. В журнале появится расход «Досрочно: …».</p>
+        <p>Расчёт приблизительный: банк считает проценты по дням, поэтому иногда сверяйте остаток с банком и поправляйте его в окне платежа. Если удалить запись платежа из журнала, остаток сам не вернётся.</p>
+        <p>Если заведено несколько счетов, у платежа можно выбрать счёт: запись в день платежа появится именно на нём. Уже созданные записи в журнале при этом остаются.</p>
+      </details>
+      <details><summary>Долги</summary>
+        <p>Плитка «Долги»: нажмите «Я дал в долг» или «Я взял в долг», укажите имя и сумму (дата и счёт в «Дополнительно»). Деньги ушли или пришли, поэтому остаток и выбранный счёт меняются, но это <b>не расход и не доход</b>: итоги месяца и категории остаются чистыми.</p>
+        <p>Нажмите на человека, чтобы увидеть историю. Кнопка «Вернул деньги» (или «Я вернул долг») по умолчанию подставляет остаток долга, сумму можно уменьшить: возврат частями тоже работает. Запись можно удалить крестиком.</p>
+        <p>Деньги, взятые в долг, <b>не увеличивают «Можно сегодня»</b>: до возврата они считаются чужими, под остатком появляется строка «из них … чужих денег». Деньги, которые вы дали, из лимита вычитаются, пока их не вернули.</p>
       </details>
       <details><summary>Перенос остатка и итог месяца</summary>
         <p>Неизрасходованные деньги прибавляются к остатку следующего месяца: под остатком видна строка «включая … с прошлых месяцев». Перерасход тоже переносится.</p>
@@ -1429,6 +1469,51 @@ html[data-hide] .limsum b { filter: blur(9px); }
   </div>
 </div>
 
+<div class="overlay" id="ovDebt" hidden>
+  <div class="backdrop" data-close></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="debtTitle" tabindex="-1">
+    <div class="sheet-head">
+      <h2 id="debtTitle">Долги</h2>
+      <button type="button" class="x" data-close aria-label="Закрыть">×</button>
+    </div>
+    <div class="stack">
+      <p class="hint">Записывайте, кому вы дали деньги в долг и у кого взяли. Это не расход и не доход, но остаток и счёт изменятся.</p>
+      <div class="dsum">
+        <div><span>Вам должны</span><b class="in" id="dOwed">0 ₽</b></div>
+        <div><span>Вы должны</span><b class="out" id="dOwe">0 ₽</b></div>
+      </div>
+      <div class="qrow" id="dBtns">
+        <button type="button" class="qbtn" id="dGive">Я дал в долг</button>
+        <button type="button" class="qbtn" id="dTake">Я взял в долг</button>
+      </div>
+      <p class="hint" id="dEmpty">Пока никого нет. Например: вы дали Ивану 5 000 ₽. Нажмите «Я дал в долг», впишите имя и сумму. Когда Иван вернёт деньги, нажмите на его имя и отметьте возврат.</p>
+      <h3 class="lbl" id="dListT" hidden>Люди</h3>
+      <div class="card" id="dCard" hidden><ul id="dList"></ul></div>
+      <button type="button" class="primary" data-close>Готово</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ovDebtF" hidden>
+  <div class="backdrop" data-close></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="dFormT" tabindex="-1">
+    <div class="sheet-head">
+      <h2 id="dFormT">Я дал в долг</h2>
+      <button type="button" class="x" data-close aria-label="Закрыть">×</button>
+    </div>
+    <form id="dForm" class="stack" novalidate>
+      <div class="field"><label for="dWho" id="dWhoL">Кому</label><input id="dWho" maxlength="30" autocomplete="off" placeholder="Имя"><div class="chipsrow" id="dChips"></div></div>
+      <div class="field"><label for="dAmt">Сумма, ₽</label><input id="dAmt" inputmode="decimal" autocomplete="off" placeholder="0"><p class="hint" id="dAmtH" hidden></p></div>
+      <details class="fold"><summary>Дополнительно</summary>
+        <div class="field"><label for="dDate">Дата</label><input id="dDate" type="date"></div>
+        <div class="field" id="dAccBox" hidden><label for="dAcc" id="dAccL">Со счёта</label><select id="dAcc"></select></div>
+        <div class="field"><label for="dNote">Комментарий</label><input id="dNote" maxlength="60" autocomplete="off" placeholder="Необязательно"></div>
+      </details>
+      <button type="submit" class="primary" id="dSubmit">Записать</button>
+    </form>
+  </div>
+</div>
+
 <div class="overlay" id="ovRec" hidden>
   <div class="backdrop" data-close></div>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="recTitle" tabindex="-1">
@@ -1436,12 +1521,12 @@ html[data-hide] .limsum b { filter: blur(9px); }
       <h2 id="recTitle">Регулярные платежи</h2>
       <button type="button" class="x" data-close aria-label="Закрыть">×</button>
     </div>
-    <p class="hint">Платёж сам появится в журнале в выбранный день месяца и заранее вычитается из дневного лимита.</p>
+    <p class="hint">Аренда, кредит, подписки. Платёж сам запишется в журнал в нужный день и заранее уменьшает «Можно сегодня».</p>
+    <button type="button" class="primary" id="recAddBtn">+ Добавить платёж</button>
     <details class="fold"><summary>Как это работает</summary>
       <p class="hint">Если заведено несколько счетов, можно выбрать, с какого спишется платёж.</p>
       <p class="hint">Если день этого месяца уже прошёл, платёж начнётся со следующего месяца. Не добавляйте сюда то, что уже записали вручную.</p>
-      <p class="hint">«Деньги на платёж отложены отдельно»: деньги уже лежат в стороне, сумма сразу вычитается из остатка. В день платежа он попадёт в журнал, повторно ничего не вычтется.</p>
-      <p class="hint">«Оплачу с будущего дохода»: деньги ещё не пришли, поэтому платёж не уменьшает лимит до своей даты.</p>
+      <p class="hint">Нажмите на платёж в списке: можно изменить его, оплатить раньше срока или удалить.</p>
     </details>
     <div id="recFound" class="found" hidden>
       <h3 class="lbl">Похоже на подписки</h3>
@@ -1450,28 +1535,65 @@ html[data-hide] .limsum b { filter: blur(9px); }
     </div>
     <h3 class="lbl" id="recListT" hidden>Ваши платежи</h3>
     <div class="card" id="recCard" hidden><ul id="recList"></ul></div>
-    <form id="recForm" class="stack recform" novalidate>
-      <h3 class="lbl" id="recFormTitle">Новый платёж</h3>
-      <div class="seg" role="radiogroup" aria-label="Тип платежа">
-        <label><input type="radio" name="rtype" value="out" checked><span>Расход</span></label>
-        <label><input type="radio" name="rtype" value="in"><span>Доход</span></label>
-      </div>
+  </div>
+</div>
+
+<div class="overlay" id="ovExtra" hidden>
+  <div class="backdrop" data-close></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="exT" tabindex="-1">
+    <div class="sheet-head">
+      <h2 id="exT">Досрочный платёж</h2>
+      <button type="button" class="x" data-close aria-label="Закрыть">×</button>
+    </div>
+    <form id="exForm" class="stack" novalidate>
+      <div class="field"><label for="exAmt">Сумма, ₽</label><input id="exAmt" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+      <p class="hint" id="exInfo"></p>
+      <button type="submit" class="primary">Внести</button>
+    </form>
+  </div>
+</div>
+
+<div class="overlay" id="ovRecF" hidden>
+  <div class="backdrop" data-close></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="recFormTitle" tabindex="-1">
+    <div class="sheet-head">
+      <h2 id="recFormTitle">Новый платёж</h2>
+      <button type="button" class="x" data-close aria-label="Закрыть">×</button>
+    </div>
+    <form id="recForm" class="stack" novalidate>
+      <div class="field"><label for="recNote">Название</label><input id="recNote" maxlength="60" autocomplete="off" placeholder="Например, аренда"></div>
       <div class="field"><label for="recAmount">Сумма, ₽</label><input id="recAmount" inputmode="decimal" autocomplete="off" placeholder="0"></div>
-      <div class="two">
-        <div class="field"><label for="recCat">Категория</label><select id="recCat"></select></div>
-        <div class="field"><label for="recDay">День месяца</label><input id="recDay" inputmode="numeric" maxlength="2" autocomplete="off" placeholder="От 1 до 31"></div>
-        <div class="field"><label for="recNote">Название</label><input id="recNote" maxlength="60" autocomplete="off" placeholder="Например, аренда"></div>
+      <div class="field"><label for="recDay">День месяца</label><input id="recDay" inputmode="numeric" maxlength="2" autocomplete="off" placeholder="От 1 до 31"><p class="hint">В этот день каждого месяца платёж запишется сам.</p></div>
+      <div class="field"><label for="recCat">Категория</label><select id="recCat"></select></div>
+      <details class="fold" id="recMore"><summary>Дополнительно</summary>
+        <div class="seg" role="radiogroup" aria-label="Тип платежа">
+          <label><input type="radio" name="rtype" value="out" checked><span>Расход</span></label>
+          <label><input type="radio" name="rtype" value="in"><span>Доход</span></label>
+        </div>
         <div class="field" id="recAccBox" hidden><label for="recAcc">С какого счёта</label><select id="recAcc"></select></div>
+        <div class="field" id="recSrcBox">
+          <span class="lbl" id="lblSrc">Откуда платить</span>
+          <div class="segb srcb" id="recSrc" role="group" aria-labelledby="lblSrc">
+            <button type="button" data-src="main" aria-pressed="true">С остатка</button>
+            <button type="button" data-src="apart" aria-pressed="false">Уже отложено</button>
+            <button type="button" data-src="future" aria-pressed="false">С будущего дохода</button>
+          </div>
+          <p class="hint" id="recSrcH"></p>
+        </div>
+        <div id="recLoanBox">
+          <div class="field"><label for="recLoanBal">Остаток долга, ₽ (если это кредит или ипотека)</label><input id="recLoanBal" inputmode="decimal" autocomplete="off" placeholder="Необязательно"></div>
+          <div class="field"><label for="recLoanRate">Ставка, % годовых</label><input id="recLoanRate" inputmode="decimal" autocomplete="off" placeholder="Например, 12,5"></div>
+          <p class="hint">Тогда приложение покажет срок и переплату и само уменьшит остаток после каждого платежа.</p>
+        </div>
+      </details>
+      <div class="card loancard" id="recLoan" hidden>
+        <p id="recLoanInfo"></p>
+        <button type="button" class="secondary" id="recExtra">Досрочный платёж</button>
       </div>
-      <div class="chkwrap">
-        <label class="chk"><input type="checkbox" id="recExt"><span>Деньги на платёж отложены отдельно</span></label>
-        <p class="hint">Деньги уже лежат отдельно. Сумма сразу вычитается из остатка.</p>
-        <label class="chk"><input type="checkbox" id="recFut"><span>Оплачу с будущего дохода</span></label>
-        <p class="hint">Деньги ещё не пришли: до своей даты платёж не уменьшает лимит.</p>
-      </div>
-      <div class="btnrow stickyb">
-        <button type="submit" class="primary" id="recSubmit">Добавить платёж</button>
-        <button type="button" class="secondary" id="recCancel" hidden>Отмена</button>
+      <button type="submit" class="primary" id="recSubmit">Добавить платёж</button>
+      <div class="rowact2" id="recEditBtns" hidden>
+        <button type="button" class="secondary" id="recPay">Оплатить сейчас</button>
+        <button type="button" class="rowdel" id="recDel">Удалить платёж</button>
       </div>
     </form>
   </div>
@@ -1738,6 +1860,54 @@ html[data-hide] .limsum b { filter: blur(9px); }
   var LS_REC = 'kassa-rec-v1';
   var rec = { items: [] };
   var recPending = 0, recChain = Promise.resolve(), recBusy = false;
+  var LS_DEBT = 'kassa-debt-v1';
+  var debt = { items: [] };
+  var debtVer = 0, debtPending = 0, debtChain = Promise.resolve();
+  function cleanDebt(o) {
+    var items = [];
+    if (o && Array.isArray(o.items)) o.items.forEach(function (x) {
+      if (items.length >= 1000 || !x || typeof x.id !== 'string' || !/^[A-Za-z0-9]{1,24}$/.test(x.id)) return;
+      if (x.type !== 'give' && x.type !== 'take') return;
+      var a = Number(x.amount);
+      if (!isFinite(a) || !(a > 0) || a > 1e9) return;
+      var who = typeof x.who === 'string' ? x.who.replace(/\s+/g, ' ').trim().slice(0, 30) : '';
+      if (!who || typeof x.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(x.date)) return;
+      items.push({ id: x.id, who: who, type: x.type, amount: r2(a), date: x.date, note: typeof x.note === 'string' ? x.note.slice(0, 60) : '',
+        acc: (typeof x.acc === 'string' && /^[A-Za-z0-9]{1,24}$/.test(x.acc)) ? x.acc : '', ts: Number(x.ts) > 0 ? Number(x.ts) : 0 });
+    });
+    return { items: items };
+  }
+  function lsLoadDebt() { try { return cleanDebt(JSON.parse(localStorage.getItem(LS_DEBT))); } catch (e) { return cleanDebt(null); } }
+  function saveDebt() {
+    var body = { items: debt.items };
+    if (store.mode === 'cloud') return store.col.doc('_debt').set(body);
+    try { localStorage.setItem(LS_DEBT, JSON.stringify(body)); } catch (e) {}
+    return Promise.resolve();
+  }
+  function persistDebt() {
+    debtVer++;
+    debtPending++;
+    debtChain = debtChain.then(saveDebt).catch(function () { toast('Не удалось сохранить долги. Попробуйте ещё раз.'); }).then(function () { debtPending--; });
+  }
+  // Люди и их балансы: плюс = должны вам, минус = вы должны
+  function debtPeople() {
+    var map = {}, list = [];
+    debt.items.forEach(function (e) {
+      var k = e.who.toLowerCase();
+      var p = map[k] || (map[k] = { key: k, name: e.who, bal: 0, items: [] });
+      p.bal += e.type === 'give' ? e.amount : -e.amount;
+      p.items.push(e);
+      p.name = e.who;
+    });
+    Object.keys(map).forEach(function (k) { var p = map[k]; p.bal = r2(p.bal); p.items.sort(function (a, b) { return a.date < b.date ? 1 : (a.date > b.date ? -1 : (b.ts - a.ts)); }); list.push(p); });
+    list.sort(function (a, b) { return (Math.abs(b.bal) > 0.005) - (Math.abs(a.bal) > 0.005) || Math.abs(b.bal) - Math.abs(a.bal) || (a.name < b.name ? -1 : 1); });
+    return list;
+  }
+  function debtTotals() {
+    var owed = 0, owe = 0;
+    debtPeople().forEach(function (p) { if (p.bal > 0.005) owed += p.bal; else if (p.bal < -0.005) owe += -p.bal; });
+    return { owed: r2(owed), owe: r2(owe) };
+  }
   var LS_TPL = 'kassa-tpl-v1';
   var tpl = { items: [] };
   var tplPending = 0, tplChain = Promise.resolve(), tplEditMode = false;
@@ -1983,6 +2153,8 @@ html[data-hide] .limsum b { filter: blur(9px); }
           note: typeof x.note === 'string' ? x.note.slice(0, 60) : '', acc: (typeof x.acc === 'string' && /^[A-Za-z0-9]{1,24}$/.test(x.acc)) ? x.acc : '', ext: x.ext === true, fut: x.fut === true, from: x.from,
           done: Array.isArray(x.done) ? x.done.filter(function (k) { return typeof k === 'string' && /^\d{4}-\d{2}$/.test(k); }).slice(-60) : []
         });
+        var lb = x.loan && Number(x.loan.bal), lr = x.loan && Number(x.loan.rate);
+        if (x.type === 'out' && isFinite(lb) && lb >= 0 && lb <= 1e10) items[items.length - 1].loan = { bal: r2(lb), rate: (isFinite(lr) && lr >= 0 && lr <= 100) ? lr : 0 };
       });
     }
     return { items: items };
@@ -2012,6 +2184,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
     fillSettingsInputs();
     rec = lsLoadRec();
     tpl = lsLoadTpl();
+    debt = lsLoadDebt(); debtVer++;
     loading = false;
     ensureCarryInit();
     render();
@@ -2108,6 +2281,10 @@ html[data-hide] .limsum b { filter: blur(9px); }
             var td = snap.docs.filter(function (d) { return d.id === '_tpl'; })[0];
             tpl = cleanTpl(td ? td.data() : null);
           }
+          if (!debtPending) {
+            var dd = snap.docs.filter(function (d) { return d.id === '_debt'; })[0];
+            debt = cleanDebt(dd ? dd.data() : null); debtVer++;
+          }
           loading = false;
           ensureCarryInit();
           render();
@@ -2188,13 +2365,20 @@ html[data-hide] .limsum b { filter: blur(9px); }
     document.addEventListener('touchend', end, { passive: true });
     document.addEventListener('touchcancel', end, { passive: true });
   })();
+  var BACK = {
+    ovRecF: function () { renderRecSheet(); openOv('ovRec'); },
+    ovDebtF: function () { renderDebt(); openOv('ovDebt'); },
+    ovExtra: function () { if (recEditId) startRecEdit(recEditId); else openOv('ovRec'); }
+  };
   function closeOv(keepFocus) {
     if (!openId) return;
+    var was = openId;
     var el = $(openId);
     el.classList.remove('show');
     el.hidden = true;
     document.body.style.overflow = '';
     openId = null;
+    if (!keepFocus && BACK[was]) { BACK[was](); return; }
     if (!keepFocus && lastFocus && lastFocus.focus) lastFocus.focus();
   }
   document.addEventListener('click', function (e) {
@@ -2548,6 +2732,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
       { v: '<div class="tm"><div class="row"><span>Отпуск</span><span style="color:var(--gold)">40%</span></div><div class="bar"><i style="width:40%"></i></div><small style="text-transform:none;letter-spacing:0">Откладывайте 10 000 ₽ в месяц · осталось 6 мес.</small></div>', t: 'Накопления: копилка и цели', p: 'Задайте сумму цели и за сколько месяцев её накопить, а приложение посчитает ежемесячный взнос. Деньги можно переводить между копилкой и целями.' },
       { v: '<div class="tm"><div class="row"><span>💳 Карта</span><span>49 000 ₽</span></div><div class="row"><span>💵 Наличка</span><span>5 300 ₽</span></div><small style="text-transform:none;letter-spacing:0;margin-top:6px">Всего на счетах: 54 300 ₽</small></div>', t: 'Несколько счетов', p: 'В плитке «Счета» заведите наличные и карты и укажите, сколько на каждом. При записи выберите счёт, и остаток пересчитается сам. Переводы между счетами видны в журнале бледной строкой и не считаются расходом.' },
       { v: '<div class="tm"><div class="row"><span>🏠 Аренда</span><span>25 000 ₽</span></div><div class="row"><span>💳 Кредит</span><span>7 520 ₽</span></div><div class="row"><span>📱 Связь</span><span>600 ₽</span></div></div>', t: 'Регулярные платежи', p: 'Аренда, кредит, подписки: укажите сумму и день месяца, и запись сама появится в журнале. Если деньги на платёж уже отложены отдельно или придут позже, отметьте это галочкой.' },
+      { v: '<div class="tm"><div class="row"><span>Иван</span><span style="color:var(--in)">+6 000 ₽</span></div><div class="row"><span>Пётр</span><span style="color:var(--out)">−5 000 ₽</span></div></div>', t: 'Долги', p: 'Дали или взяли деньги? Запишите в «Долгах»: остаток и счёт изменятся, но расходом это не станет. Вернули часть? Нажмите на человека и впишите сумму.' },
       { v: '<div class="tm plain"><div class="ring"></div></div>', t: 'Куда уходят деньги', p: 'Кнопка с диаграммой в шапке показывает, на что разошлись доходы. Нажмите на категорию, и в журнале останутся только её траты. Ещё есть поиск и сравнение месяцев.' },
       { v: '<div class="tm plain"><div class="ico">🏷️</div></div>', t: 'Метки', p: 'Добавьте в комментарий слово с решёткой, например «Билеты #отпуск». Нажмите на метку в журнале, и увидите все записи по ней и общую сумму. Так легко считать траты на отпуск, ремонт или подарки, даже если они в разных категориях.' },
       { v: '<div class="tm plain"><div class="ico">🎯</div></div>', t: 'Сколько тратить', p: 'В окне «Лимиты по категориям» есть рекомендуемый бюджет: сколько процентов дохода уходит на каждую категорию и сколько стоит тратить, чтобы откладывать 10, 20 или 30%. Одной кнопкой его можно превратить в лимиты.' },
@@ -2880,7 +3065,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
     var sum = 0, mon = agg().mon;
     Object.keys(mon).forEach(function (m) {
       if (m < settings.carryFrom || m >= key) return;
-      sum += mon[m].inc - mon[m].out - mon[m].save;
+      sum += mon[m].inc - mon[m].out - mon[m].save + (mon[m].debt || 0);
     });
     return r2(sum);
   }
@@ -2921,15 +3106,16 @@ html[data-hide] .limsum b { filter: blur(9px); }
     var t = new Date();
     var ck = t.getFullYear() + '-' + pad(t.getMonth() + 1);
     var today = dateStr(t);
-    var A = agg(), M = A.mon[ck] || { inc: 0, out: 0, save: 0 };
+    var A = agg(), M = A.mon[ck] || { inc: 0, out: 0, save: 0, debt: 0 };
     var inc = M.inc, exp = M.out, svm = M.save, spent = A.outDay[today] || 0, total = A.save;
     var carryV = carryIn(ck);
-    inc += carryV;
+    inc += carryV + (M.debt || 0);
     var goalsNeed = reserveNow(svm);
     var reserve = settings.limitGoals ? goalsNeed : 0;
     var upcoming = upcomingOut();
     var held = extOut();
-    var avail = inc - exp - svm - reserve - upcoming - held;
+    var iOwe = debtTotals().owe;
+    var avail = inc - exp - svm - reserve - upcoming - held - iOwe;
     var days = new Date(t.getFullYear(), t.getMonth() + 1, 0).getDate() - t.getDate() + 1;
     var limit = Math.max(0, (avail + spent) / days);
     var left = limit - spent;
@@ -2962,6 +3148,10 @@ html[data-hide] .limsum b { filter: blur(9px); }
     txs.forEach(function (t) {
       if (t.example || (t.createdAt || 0) < a.since || accOf(t) !== id) return;
       b += t.type === 'in' ? t.amount : -t.amount;
+    });
+    debt.items.forEach(function (e) {
+      if ((e.ts || 0) < a.since || (accById(e.acc) ? e.acc : '') !== id) return;
+      b += e.type === 'take' ? e.amount : -e.amount;
     });
     settings.xfers.forEach(function (x) {
       if (x.ts < a.since) return;
@@ -3213,7 +3403,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
     $('dayBig').textContent = big;
     $('dayBig').className = 'tile-val' + (isShort || s.over ? ' over' : '');
     R('Доходы за месяц' + (s.carryV > 0.005 ? ' (с переносом)' : ''), '+' + money(r2(s.inc)));
-    R('Расходы до сегодняшнего дня', '−' + money(r2(s.exp - s.spent)));
+    R('Расходы и платежи до сегодняшнего дня', '−' + money(r2(s.exp - s.spent)));
     if (s.svm > 0.005) R('Отложено в копилку', '−' + money(r2(s.svm)));
     if (s.held > 0.005) R('Отложено на платежи', '−' + money(r2(s.held)));
     if (s.upcoming > 0.005) R('Регулярные платежи впереди', '−' + money(r2(s.upcoming)));
@@ -3319,15 +3509,19 @@ html[data-hide] .limsum b { filter: blur(9px); }
   // Один проход по записям: суммы по месяцам, копилкам и дням. Пересчитывается только когда записи изменились.
   var aggC = null;
   function agg() {
-    if (aggC && aggC.ref === txs && aggC.len === txs.length) return aggC;
-    var a = { ref: txs, len: txs.length, save: 0, goal: {}, mon: {}, outDay: {} };
+    if (aggC && aggC.ref === txs && aggC.len === txs.length && aggC.dv === debtVer) return aggC;
+    var a = { ref: txs, len: txs.length, dv: debtVer, save: 0, goal: {}, mon: {}, outDay: {} };
     txs.forEach(function (t) {
-      var m = t.date.slice(0, 7), o = a.mon[m] || (a.mon[m] = { inc: 0, out: 0, save: 0 });
+      var m = t.date.slice(0, 7), o = a.mon[m] || (a.mon[m] = { inc: 0, out: 0, save: 0, debt: 0 });
       if (t.type === 'save') {
         a.save += t.amount; o.save += t.amount;
         if (t.goalId) a.goal[t.goalId] = (a.goal[t.goalId] || 0) + t.amount;
       } else if (t.type === 'in') o.inc += t.amount;
-      else { o.out += t.amount; a.outDay[t.date] = (a.outDay[t.date] || 0) + t.amount; }
+      else { o.out += t.amount; if (!t.auto) a.outDay[t.date] = (a.outDay[t.date] || 0) + t.amount; }
+    });
+    debt.items.forEach(function (e) {
+      var m = e.date.slice(0, 7), o = a.mon[m] || (a.mon[m] = { inc: 0, out: 0, save: 0, debt: 0 });
+      o.debt += e.type === 'take' ? e.amount : -e.amount;
     });
     aggC = a;
     return a;
@@ -3579,7 +3773,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
       if (t.acc) o.acc = t.acc;
       return o;
     }), cats: catsBody(), save: { accs: settings.accs, xfers: settings.xfers, on: settings.on, plan: settings.plan, goal: settings.goal, carry: settings.carry, limitGoals: settings.limitGoals, carryFrom: settings.carryFrom, closed: settings.closed, goals: settings.goals, months: settings.months, goalStart: settings.goalStart },
-      tpl: { items: tpl.items }, ui: { name: ui.name.trim(), palette: ui.palette, mode: ui.mode, style: STYLE, oled: OLED }, rec: { items: rec.items } };
+      tpl: { items: tpl.items }, debt: { items: debt.items }, ui: { name: ui.name.trim(), palette: ui.palette, mode: ui.mode, style: STYLE, oled: OLED }, rec: { items: rec.items } };
   }
   function downloadText(name, text) {
     var blob = new Blob([text], { type: 'application/json' });
@@ -3665,7 +3859,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
           if (typeof t.acc === 'string' && /^[A-Za-z0-9]{1,24}$/.test(t.acc)) o.acc = t.acc;
           list.push(o);
         });
-        bkPending = { txs: list, cats: b.cats, save: b.save, ui: b.ui, rec: b.rec, tpl: b.tpl };
+        bkPending = { txs: list, cats: b.cats, save: b.save, ui: b.ui, rec: b.rec, tpl: b.tpl, debt: b.debt };
         var cur = {}, inCopy = {}, nNew = 0, nChg = 0, nSame = 0, nExtra = 0;
         txs.forEach(function (t) { if (!t.example) cur[t.id] = t; });
         list.forEach(function (t) {
@@ -3738,6 +3932,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
       rec = cleanRec(b.rec);
       tpl = cleanTpl(b.tpl);
       persistTpl();
+      if (b.debt) { debt = cleanDebt(b.debt); persistDebt(); }
       applyUi(); renderUiSheet(); fillSettingsInputs();
       changeCats();
       persistSettings();
@@ -3893,13 +4088,17 @@ html[data-hide] .limsum b { filter: blur(9px); }
     var nowKey = new Date().getFullYear() + '-' + pad(new Date().getMonth() + 1);
     var held = key === nowKey ? extOut() : 0;
     var carry = carryIn(key);
-    var bal = r2(carry + inc - exp - sv - held);
+    var dM = (agg().mon[key] || {}).debt || 0;
+    var bal = r2(carry + inc - exp - sv - held + dM);
     var cs = $('balCarry');
     cs.hidden = !(Math.abs(carry) > 0.005);
     if (!cs.hidden) cs.textContent = (carry > 0 ? 'включая ' + money(carry) + ' с прошлых месяцев' : 'с учётом перерасхода прошлых месяцев ' + money(Math.abs(carry)));
     var hs = $('balExt');
     hs.hidden = !(held > 0);
     if (held > 0) hs.textContent = 'без учёта ' + money(r2(held)) + ', отложенных на платежи';
+    var dbEl = $('balDebt'), dbOwe = key === nowKey ? debtTotals().owe : 0;
+    dbEl.hidden = !(dbOwe > 0);
+    if (dbOwe > 0) dbEl.textContent = 'из них ' + money(dbOwe) + ' чужих денег (долг)';
     var fcEl = $('balFc');
     fcEl.hidden = true;
     if (!loading && key === nowKey) {
@@ -4171,11 +4370,17 @@ html[data-hide] .limsum b { filter: blur(9px); }
     return new Date(y, m, Math.min(day, last));
   }
   function fmtShort(d) { return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }); }
+  // Ближайшая будущая дата платежа: оплаченный заранее месяц и месяцы до старта пропускаются
   function nextDate(it) {
-    var t = new Date();
-    var d = clampDate(t.getFullYear(), t.getMonth(), it.day);
-    if (dateStr(d) > dateStr(t)) return d;
-    return clampDate(t.getFullYear(), t.getMonth() + 1, it.day);
+    var t = new Date(), tS = dateStr(t), last = null;
+    for (var k = 0; k < 14; k++) {
+      var m = t.getMonth() + k;
+      var d = clampDate(t.getFullYear() + Math.floor(m / 12), m % 12, it.day);
+      last = d;
+      if (monthKey(d) < it.from) continue;
+      if (dateStr(d) > tS && it.done.indexOf(monthKey(d)) < 0) return d;
+    }
+    return last;
   }
   // Сумма платежей, отложенных отдельно и ещё не наступивших в этом месяце
   function extOut() {
@@ -4221,6 +4426,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
           var atx = { id: id, type: j.it.type, cat: j.it.cat, amount: j.it.amount, note: j.it.note, date: j.date, createdAt: Date.now() + i, auto: true, recId: j.it.id };
           if (accOn() && j.it.acc && accById(j.it.acc)) atx.acc = j.it.acc;
           await addTx(atx);
+          loanApply(j.it, j.it.amount);
           added++;
         }
         j.it.done.push(j.key);
@@ -4405,6 +4611,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
         return '<span class="rrow"><span class="rn">' + esc(a.name) + '</span><b>' + (bl < 0 ? '−' : '') + money(Math.abs(bl)) + '</b></span>';
       }).join('') + (settings.accs.length > 4 ? '<span class="tile-sub">и ещё ' + (settings.accs.length - 4) + '</span>' : '');
     }
+    renderDebtTile();
     var rs = $('recSub'), rl = $('recTileList');
     if (!rec.items.length) {
       rs.textContent = 'Не настроены. Нажмите, чтобы добавить аренду, кредит, подписки';
@@ -4515,7 +4722,21 @@ html[data-hide] .limsum b { filter: blur(9px); }
     $('recAccBox').hidden = settings.accs.length < 2;
     if (settings.accs.length > 1) fillSel($('recAcc'), v || '');
   }
+  var recSrc = 'main';
+  var SRC_HINT = { main: 'Деньги есть на счёте. Сумма заранее уменьшает лимит на день.', apart: 'Деньги уже лежат отдельно (в конверте, на другой карте). Сумма сразу вычитается из остатка.', future: 'Деньги ещё не пришли. До даты платежа лимит на день не уменьшается.' };
+  function srcOf(it) { return it.ext ? 'apart' : (it.fut ? 'future' : 'main'); }
+  function setRecSrc(v) {
+    recSrc = v;
+    Array.prototype.forEach.call(document.querySelectorAll('#recSrc [data-src]'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-src') === v ? 'true' : 'false'); });
+    $('recSrcH').textContent = SRC_HINT[v];
+  }
+  document.getElementById('recSrc').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-src]');
+    if (b) setRecSrc(b.getAttribute('data-src'));
+  });
   function setRecType(tp) {
+    if ($('recLoanBox')) $('recLoanBox').hidden = tp === 'in';
+    $('recSrcBox').hidden = tp === 'in';
     recType = tp;
     var r = document.querySelector('input[name="rtype"][value="' + tp + '"]');
     if (r) r.checked = true;
@@ -4526,26 +4747,110 @@ html[data-hide] .limsum b { filter: blur(9px); }
     $('recAmount').value = '';
     $('recDay').value = '';
     $('recNote').value = '';
-    $('recExt').checked = false;
-    $('recFut').checked = false;
+    setRecSrc('main');
     fillRecAcc('');
     fillRecCats('');
     $('recFormTitle').textContent = 'Новый платёж';
     $('recSubmit').textContent = 'Добавить платёж';
-    $('recCancel').hidden = true;
+    $('recEditBtns').hidden = true;
+    $('recMore').open = false;
+    $('recLoanBal').value = '';
+    $('recLoanRate').value = '';
+    renderRecLoan(null);
   }
+  async function payNow(id) {
+    var it = rec.items.filter(function (x) { return x.id === id; })[0];
+    if (!it || recBusy) return;
+    var key = payKey(it);
+    if (it.done.indexOf(key) >= 0) return;
+    var tid = 'r_' + it.id + '_' + key;
+    recBusy = true;
+    try {
+      if (!txs.some(function (x) { return x.id === tid; })) {
+        var atx = { id: tid, type: it.type, cat: it.cat, amount: it.amount, note: it.note, date: dateStr(new Date()), createdAt: Date.now(), auto: true, recId: it.id };
+        if (accOn() && it.acc && accById(it.acc)) atx.acc = it.acc;
+        await addTx(atx);
+        loanApply(it, it.amount);
+      }
+      it.done.push(key);
+      persistRec();
+      toast(it.type === 'in' ? 'Записано: получено ' + money(it.amount) : 'Оплачено: ' + money(it.amount));
+    } catch (e) {
+      toast('Не удалось записать. Попробуйте ещё раз.');
+    }
+    recBusy = false;
+    renderRecSheet();
+    render();
+  }
+  // Кредит: простой помесячный расчёт (проценты = остаток × ставка / 12)
+  function loanCalc(bal, rate, pay) {
+    if (!(bal > 0.005)) return { ok: true, n: 0, int: 0 };
+    var r = rate / 1200, n = 0, tot = 0;
+    if (r > 0 && pay <= bal * r + 0.005) return { ok: false, mi: r2(bal * r) };
+    while (bal > 0.005 && n < 1200) { var i = bal * r; tot += i; bal = bal + i - pay; n++; }
+    return n >= 1200 ? { ok: false, mi: 0 } : { ok: true, n: n, int: r2(tot) };
+  }
+  function loanApply(it, amt) {
+    if (!it.loan || it.type !== 'out') return;
+    var l = it.loan;
+    l.bal = Math.max(0, r2(l.bal + l.bal * l.rate / 1200 - amt));
+  }
+  function loanLeft(n) {
+    var y = Math.floor(n / 12), m = n % 12, p = [];
+    if (y) p.push(y + ' ' + (y % 10 === 1 && y % 100 !== 11 ? 'год' : (y % 10 >= 2 && y % 10 <= 4 && (y % 100 < 12 || y % 100 > 14) ? 'года' : 'лет')));
+    if (m || !y) p.push(m + ' мес.');
+    return p.join(' ');
+  }
+  function renderRecLoan(it) {
+    var box = $('recLoan');
+    if (!it || !it.loan) { box.hidden = true; return; }
+    var l = it.loan, h;
+    if (l.bal <= 0.005) h = 'Кредит погашен.';
+    else {
+      var c = loanCalc(l.bal, l.rate, it.amount);
+      h = 'Остаток долга: <b>' + money(l.bal) + '</b>.<br>';
+      if (!c.ok) h += 'Платёж меньше процентов за месяц' + (c.mi ? ' (около ' + money(c.mi) + ')' : '') + ', поэтому долг не уменьшается. Увеличьте платёж или внесите досрочно.';
+      else {
+        var nd = nextDate(it), end = new Date(nd.getFullYear(), nd.getMonth() + c.n - 1, 1);
+        h += 'Осталось примерно <b>' + loanLeft(c.n) + '</b> (до ' + esc(end.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }).replace(/^\d+\s/, '').replace(' г.', ' года')) + ').' + (l.rate > 0 ? '<br>Проценты за весь срок: <b>' + money(Math.round(c.int)) + '</b>.' : '');
+      }
+    }
+    $('recLoanInfo').innerHTML = h;
+    $('recExtra').hidden = l.bal <= 0.005;
+    box.hidden = false;
+  }
+  function exPreview() {
+    var it = rec.items.filter(function (x) { return x.id === recEditId; })[0];
+    if (!it || !it.loan) return;
+    var l = it.loan, x = parseAmt($('exAmt').value), h;
+    if (!(x > 0)) h = 'Платёж останется прежним, а срок кредита сократится.';
+    else if (x > l.bal + 0.005) h = 'Сумма больше остатка долга (' + money(l.bal) + ').';
+    else {
+      var a = loanCalc(l.bal, l.rate, it.amount), b = loanCalc(l.bal - x, l.rate, it.amount);
+      h = 'Остаток после платежа: <b>' + money(r2(l.bal - x)) + '</b>.';
+      if (a.ok && b.ok && a.n > b.n) h += '<br>Срок сократится на <b>' + loanLeft(a.n - b.n) + '</b>, на процентах сэкономите <b>' + money(Math.round(a.int - b.int)) + '</b>.';
+      else if (b.ok && b.n === 0) h += '<br>Кредит будет погашен полностью.';
+    }
+    $('exInfo').innerHTML = h;
+  }
+  // Какой месяц оплатит «Оплатить сейчас»: первый ещё не оплаченный, начиная с текущего (или со старта платежа)
+  function payKey(it) {
+    var t = new Date(), k = 0, key;
+    do { key = monthKey(new Date(t.getFullYear(), t.getMonth() + k, 1)); k++; } while ((key < it.from || it.done.indexOf(key) >= 0) && k < 60);
+    return key;
+  }
+  function recMonthKey() { var t = new Date(); return t.getFullYear() + '-' + pad(t.getMonth() + 1); }
   function recRow(it) {
-    var ic = iconFor(it.type, it.cat), sel = recSel === it.id;
+    var ic = iconFor(it.type, it.cat), mk = recMonthKey();
     var title = it.note || it.cat;
-    var sub = (it.note ? it.cat + ' · ' : '') + 'каждое ' + it.day + '-е число · следующее ' + fmtShort(nextDate(it)) + (settings.accs.length > 1 && accById(it.acc || '') ? ' · ' + accName(it.acc || '') : '');
-    return '<li class="row' + (it.ext ? ' ext' : '') + '"><button type="button" class="rowmain" data-rsel="' + esc(it.id) + '" aria-expanded="' + (sel ? 'true' : 'false') + '">' +
+    var paid = it.done.indexOf(mk) >= 0 && it.from <= mk;
+    var td = new Date(), nd = nextDate(it), diff = Math.round((new Date(nd.getFullYear(), nd.getMonth(), nd.getDate()) - new Date(td.getFullYear(), td.getMonth(), td.getDate())) / 86400000);
+    var when = diff <= 0 ? 'сегодня' : (diff === 1 ? 'завтра' : 'через ' + diff + ' дн.');
+    var status = paid ? '<span class="recst ok">' + (it.type === 'in' ? 'Получено' : 'Оплачено') + ' в этом месяце</span> · дальше ' + esc(fmtShort(nd)) : 'Следующий: ' + esc(fmtShort(nd)) + ', ' + when;
+    return '<li class="row' + (it.ext ? ' ext' : '') + '"><button type="button" class="rowmain" data-redit="' + esc(it.id) + '">' +
       '<span class="av ' + it.type + (ic ? ' ico' : '') + '" aria-hidden="true">' + esc(ic || it.cat.charAt(0).toUpperCase()) + '</span>' +
-      '<span class="what"><span class="cat">' + esc(title) + (it.ext ? '<em class="ex">отложено отдельно</em>' : '') + (it.fut && !it.ext ? '<em class="ex">с будущего дохода</em>' : '') + '</span><span class="note">' + esc(sub) + '</span></span>' +
-      '<span class="amt-n ' + it.type + '">' + (it.type === 'in' ? '+' : '−') + money(it.amount) + '</span></button>' +
-      (sel ? '<label class="extchk"><input type="checkbox" data-rext="' + esc(it.id) + '"' + (it.ext ? ' checked' : '') + '><span>Деньги на платёж отложены отдельно</span></label>' +
-      '<label class="extchk"><input type="checkbox" data-rfut="' + esc(it.id) + '"' + (it.fut ? ' checked' : '') + '><span>Оплачу с будущего дохода</span></label>' : '') +
-      (sel ? '<div class="rowact"><button type="button" class="rowedit" data-redit="' + esc(it.id) + '">Изменить</button>' +
-        '<button type="button" class="rowdel" data-rdel="' + esc(it.id) + '">Удалить</button></div>' : '') + '</li>';
+      '<span class="what"><span class="cat">' + esc(title) + (it.ext ? '<em class="ex">отложено отдельно</em>' : '') + (it.fut && !it.ext ? '<em class="ex">с будущего дохода</em>' : '') + '</span><span class="note">Каждое ' + it.day + '-е число · ' + status + (it.loan ? ' · остаток ' + money(it.loan.bal) : '') + (settings.accs.length > 1 && accById(it.acc || '') ? ' · ' + esc(accName(it.acc || '')) : '') + '</span></span>' +
+      '<span class="amt-n ' + it.type + '">' + (it.type === 'in' ? '+' : '−') + money(it.amount) + '</span></button></li>';
   }
 
   // Подписки: повторяющиеся траты, найденные по записям
@@ -4620,75 +4925,80 @@ html[data-hide] .limsum b { filter: blur(9px); }
     $('recAmount').value = String(it.amount).replace('.', ',');
     $('recDay').value = String(it.day);
     $('recNote').value = it.note;
-    $('recExt').checked = !!it.ext;
-    $('recFut').checked = !!it.fut;
+    setRecSrc(srcOf(it));
     fillRecAcc(it.acc || '');
     fillRecCats(it.cat);
-    $('recFormTitle').textContent = 'Изменить платёж';
+    $('recFormTitle').textContent = it.note || it.cat;
     $('recSubmit').textContent = 'Сохранить';
-    $('recCancel').hidden = false;
-    $('recForm').scrollIntoView({ block: 'nearest' });
-    $('recAmount').focus();
+    $('recEditBtns').hidden = false;
+    $('recLoanBal').value = it.loan ? String(it.loan.bal).replace('.', ',') : '';
+    $('recLoanRate').value = it.loan ? String(it.loan.rate).replace('.', ',') : '';
+    renderRecLoan(it);
+    var pk = payKey(it), cur = pk === recMonthKey();
+    $('recPay').disabled = false;
+    $('recPay').textContent = cur ? (it.type === 'in' ? 'Получено сейчас' : 'Оплатить сейчас') : (it.type === 'in' ? 'Получено за ' : 'Оплатить за ') + monthName(pk);
+    $('recMore').open = it.type === 'in' || srcOf(it) !== 'main' || !!it.acc || !!it.loan;
+    openOv('ovRecF');
   }
   Array.prototype.forEach.call(document.querySelectorAll('input[name="rtype"]'), function (r) {
-    r.addEventListener('change', function () { recType = r.value; fillRecCats(''); });
+    r.addEventListener('change', function () { recType = r.value; $('recSrcBox').hidden = r.value === 'in'; fillRecCats(''); });
   });
-  $('recCancel').addEventListener('click', function () { resetRecForm(); });
+  $('recAddBtn').addEventListener('click', function () { resetRecForm(); openOv('ovRecF'); });
   $('recList').addEventListener('click', function (e) {
-    var del = e.target.closest('[data-rdel]');
-    if (del) {
-      var did = del.getAttribute('data-rdel');
-      var rgone = rec.items.filter(function (x) { return x.id === did; })[0], ridx = rec.items.indexOf(rgone);
-      rec.items = rec.items.filter(function (x) { return x.id !== did; });
-      recSel = null;
-      if (recEditId === did) resetRecForm();
-      persistRec();
-      renderRecSheet();
-      render();
-      toast('Платёж удалён. Созданные записи остались в журнале.', function () {
-        if (!rgone || rec.items.some(function (x) { return x.id === rgone.id; })) return;
-        rec.items.splice(Math.min(ridx, rec.items.length), 0, rgone);
-        persistRec(); renderRecSheet(); render();
-        toast('Платёж восстановлен');
-      });
-      return;
-    }
     var ed = e.target.closest('[data-redit]');
-    if (ed) { startRecEdit(ed.getAttribute('data-redit')); return; }
-    var sl = e.target.closest('[data-rsel]');
-    if (sl) {
-      var sid = sl.getAttribute('data-rsel');
-      recSel = recSel === sid ? null : sid;
-      renderRecSheet();
+    if (ed) startRecEdit(ed.getAttribute('data-redit'));
+  });
+  $('recPay').addEventListener('click', function () {
+    var id = recEditId;
+    if (!id) return;
+    payNow(id).then(function () { closeOv(); });
+  });
+  $('recDel').addEventListener('click', function () {
+    var did = recEditId;
+    if (!did) return;
+    var rgone = rec.items.filter(function (x) { return x.id === did; })[0], ridx = rec.items.indexOf(rgone);
+    if (!rgone) return;
+    rec.items = rec.items.filter(function (x) { return x.id !== did; });
+    persistRec();
+    render();
+    closeOv();
+    toast('Платёж удалён. Созданные записи остались в журнале.', function () {
+      if (rec.items.some(function (x) { return x.id === rgone.id; })) return;
+      rec.items.splice(Math.min(ridx, rec.items.length), 0, rgone);
+      persistRec(); renderRecSheet(); render();
+      toast('Платёж восстановлен');
+    });
+  });
+  function setLoan(it) {
+    var lb = parseAmt($('recLoanBal').value), lr = parseFloat(String($('recLoanRate').value).replace(',', '.'));
+    if (it.type === 'out' && lb > 0 && lb <= 1e10) it.loan = { bal: r2(lb), rate: (isFinite(lr) && lr >= 0 && lr <= 100) ? lr : 0 };
+    else delete it.loan;
+  }
+  $('recExtra').addEventListener('click', function () {
+    $('exAmt').value = '';
+    exPreview();
+    openOv('ovExtra');
+  });
+  $('exAmt').addEventListener('input', exPreview);
+  $('exForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var it = rec.items.filter(function (x) { return x.id === recEditId; })[0];
+    if (!it || !it.loan) { closeOv(); return; }
+    var x = parseAmt($('exAmt').value);
+    if (!(x > 0)) { toast('Введите сумму больше нуля'); $('exAmt').focus(); return; }
+    if (x > it.loan.bal + 0.005) { toast('Сумма больше остатка долга'); return; }
+    try {
+      var atx = { id: newId(), type: 'out', cat: it.cat, amount: x, note: 'Досрочно: ' + (it.note || it.cat), date: dateStr(new Date()), createdAt: Date.now(), auto: true };
+      if (accOn() && it.acc && accById(it.acc)) atx.acc = it.acc;
+      await addTx(atx);
+      it.loan.bal = Math.max(0, r2(it.loan.bal - x));
+      persistRec();
+      toast('Внесено ' + money(x) + '. Остаток долга ' + money(it.loan.bal));
+    } catch (er) {
+      toast('Не удалось записать. Попробуйте ещё раз.');
     }
-  });
-  $('recList').addEventListener('change', function (e) {
-    var c = e.target.closest('[data-rext]');
-    if (!c) return;
-    var id = c.getAttribute('data-rext');
-    var it = rec.items.filter(function (x) { return x.id === id; })[0];
-    if (!it) return;
-    it.ext = c.checked;
-    persistRec();
-    renderRecSheet();
     render();
-    var again = $('recList').querySelector('[data-rext="' + id + '"]');
-    if (again) again.focus();
-    toast(it.ext ? 'Сумма вычтена из остатка как отложенная' : 'Платёж снова учитывается заранее');
-  });
-  $('recList').addEventListener('change', function (e) {
-    var c = e.target.closest('[data-rfut]');
-    if (!c) return;
-    var id = c.getAttribute('data-rfut');
-    var it = rec.items.filter(function (x) { return x.id === id; })[0];
-    if (!it) return;
-    it.fut = c.checked;
-    persistRec();
-    renderRecSheet();
-    render();
-    var again = $('recList').querySelector('[data-rfut="' + id + '"]');
-    if (again) again.focus();
-    toast(it.fut ? 'Платёж не уменьшает лимит до своей даты' : 'Платёж снова учитывается заранее');
+    closeOv();
   });
   $('recForm').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -4699,7 +5009,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
     var cat = $('recCat').value;
     if (!cat) { toast('Выберите категорию'); return; }
     var note = $('recNote').value.trim().slice(0, 60);
-    var ext = $('recExt').checked, fut = $('recFut').checked;
+    var ext = recType === 'out' && recSrc === 'apart', fut = recType === 'out' && recSrc === 'future';
     var racc = (settings.accs.length > 1 && accById($('recAcc').value)) ? $('recAcc').value : '';
     var it;
     if (recEditId) {
@@ -4707,6 +5017,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
       if (!it) { resetRecForm(); return; }
       var wasExt = it.ext;
       it.type = recType; it.cat = cat; it.amount = amt; it.day = day; it.note = note; it.ext = ext; it.fut = fut; it.acc = racc;
+      setLoan(it);
       toast('Сохранено');
     } else {
       if (rec.items.length >= 50) { toast('Слишком много регулярных платежей'); return; }
@@ -4714,14 +5025,134 @@ html[data-hide] .limsum b { filter: blur(9px); }
       var start = dateStr(clampDate(t.getFullYear(), t.getMonth(), day)) > dateStr(t) ? t : new Date(t.getFullYear(), t.getMonth() + 1, 1);
       it = { id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), type: recType, cat: cat, amount: amt, day: day, note: note, acc: racc, ext: ext, fut: fut,
         from: start.getFullYear() + '-' + pad(start.getMonth() + 1), done: [] };
+      setLoan(it);
       rec.items.push(it);
       toast(ext ? 'Платёж добавлен. Сумма вычтена из остатка как отложенная' : 'Платёж добавлен. Первое добавление: ' + fmtShort(nextDate(it)));
     }
     persistRec();
-    resetRecForm();
-    renderRecSheet();
     render();
+    closeOv();
   });
+
+
+  /* Долги */
+  var dSel = null, dMode = '', dCtx = '';
+  function signedMoney(v) { return (v < 0 ? '−' : '') + money(Math.abs(v)); }
+  function debtWhen(p) {
+    if (p.bal > 0.005) return 'должен вам';
+    if (p.bal < -0.005) return 'вы должны';
+    return 'рассчитались';
+  }
+  function renderDebt() {
+    var T = debtTotals(), ppl = debtPeople();
+    $('dOwed').textContent = money(T.owed);
+    $('dOwe').textContent = money(T.owe);
+    $('dListT').hidden = !ppl.length;
+    $('dCard').hidden = !ppl.length;
+    $('dEmpty').hidden = ppl.length > 0;
+    $('dList').innerHTML = ppl.map(function (p) {
+      var sel = dSel === p.key, zero = Math.abs(p.bal) <= 0.005;
+      var cls = p.bal > 0.005 ? 'in' : (p.bal < -0.005 ? 'out' : '');
+      var h = '<li class="row"><button type="button" class="rowmain" data-dsel="' + esc(p.key) + '" aria-expanded="' + (sel ? 'true' : 'false') + '">' +
+        '<span class="av ' + cls + '" aria-hidden="true">' + esc(p.name.charAt(0).toUpperCase()) + '</span>' +
+        '<span class="what"><span class="cat">' + esc(p.name) + '</span><span class="note">' + debtWhen(p) + '</span></span>' +
+        '<span class="amt-n ' + cls + '">' + (zero ? '0 ₽' : (p.bal > 0 ? '+' : '−') + money(Math.abs(p.bal))) + '</span></button>';
+      if (sel) {
+        var sent = p.bal > 0.005 ? esc(p.name) + ' должен вам ' + money(p.bal) + '.' : (p.bal < -0.005 ? 'Вы должны ' + esc(p.name) + ' ' + money(-p.bal) + '.' : esc(p.name) + ' вам ничего не должен.');
+        h += '<p class="note" style="padding:0 0 8px 52px">' + sent + '</p><div class="rowact">';
+        if (p.bal > 0.005) h += '<button type="button" class="rowedit" data-dact="back" data-dk="' + esc(p.key) + '">Вернул деньги</button><button type="button" class="rowedit" data-dact="give" data-dk="' + esc(p.key) + '">Дал ещё</button>';
+        else if (p.bal < -0.005) h += '<button type="button" class="rowedit" data-dact="pay" data-dk="' + esc(p.key) + '">Я вернул долг</button><button type="button" class="rowedit" data-dact="take" data-dk="' + esc(p.key) + '">Взял ещё</button>';
+        else h += '<button type="button" class="rowedit" data-dact="give" data-dk="' + esc(p.key) + '">Я дал в долг</button><button type="button" class="rowedit" data-dact="take" data-dk="' + esc(p.key) + '">Я взял в долг</button>';
+        h += '</div><ul class="dhist">' + p.items.slice(0, 12).map(function (e) {
+          var d = new Date(+e.date.slice(0, 4), +e.date.slice(5, 7) - 1, +e.date.slice(8, 10));
+          return '<li><span class="dd">' + esc(fmtShort(d)) + (e.note ? ' · ' + esc(e.note) : '') + (accOn() && settings.accs.length > 1 && accById(e.acc) ? ' · ' + esc(accName(e.acc)) : '') + '</span>' +
+            '<b class="' + (e.type === 'give' ? 'out' : 'in') + '">' + (e.type === 'give' ? '−' : '+') + money(e.amount) + '</b>' +
+            '<button type="button" data-ddel="' + esc(e.id) + '" aria-label="Удалить запись">×</button></li>';
+        }).join('') + '</ul>' + (p.items.length > 12 ? '<p class="hint" style="padding:0 0 10px 52px">Показаны последние 12 записей.</p>' : '');
+      }
+      return h + '</li>';
+    }).join('');
+  }
+  function dOpen(type, who, amount, title, rest) {
+    dMode = type;
+    $('dFormT').textContent = title;
+    $('dWhoL').textContent = type === 'give' ? 'Кому' : 'У кого';
+    $('dWho').value = who || '';
+    $('dAmt').value = amount > 0 ? String(amount).replace('.', ',') : '';
+    $('dAmtH').hidden = !(rest > 0);
+    if (rest > 0) $('dAmtH').textContent = 'Остаток долга ' + money(rest) + '. Можно вписать меньше: вернули часть.';
+    $('dDate').value = dateStr(new Date());
+    $('dNote').value = '';
+    $('dAccBox').hidden = !accOn();
+    $('dAccL').textContent = type === 'give' ? 'Со счёта' : 'На счёт';
+    if (accOn()) fillSel($('dAcc'), lsGet('kassa-acc-last') || '');
+    var names = debtPeople().map(function (p) { return p.name; }).slice(0, 8);
+    $('dChips').innerHTML = who ? '' : names.map(function (n) { return '<button type="button" data-dn="' + esc(n) + '">' + esc(n) + '</button>'; }).join('');
+    openOv('ovDebtF');
+  }
+  $('dChips').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-dn]');
+    if (b) { $('dWho').value = b.getAttribute('data-dn'); $('dAmt').focus(); }
+  });
+  $('dGive').addEventListener('click', function () { dOpen('give', '', 0, 'Я дал в долг', 0); });
+  $('dTake').addEventListener('click', function () { dOpen('take', '', 0, 'Я взял в долг', 0); });
+  $('dList').addEventListener('click', function (e) {
+    var del = e.target.closest('[data-ddel]');
+    if (del) {
+      var id = del.getAttribute('data-ddel');
+      var idx = -1; debt.items.forEach(function (x, i) { if (x.id === id) idx = i; });
+      if (idx < 0) return;
+      var gone = debt.items[idx];
+      debt.items.splice(idx, 1);
+      persistDebt(); renderDebt(); render();
+      toast('Запись удалена', function () {
+        debt.items.splice(Math.min(idx, debt.items.length), 0, gone);
+        persistDebt(); renderDebt(); render();
+        toast('Запись восстановлена');
+      });
+      return;
+    }
+    var act = e.target.closest('[data-dact]');
+    if (act) {
+      var k = act.getAttribute('data-dk'), p = debtPeople().filter(function (x) { return x.key === k; })[0];
+      if (!p) return;
+      var a = act.getAttribute('data-dact'), rest = Math.abs(p.bal);
+      if (a === 'back') dOpen('take', p.name, rest, p.name + ' вернул деньги', rest);
+      else if (a === 'pay') dOpen('give', p.name, rest, 'Я вернул долг: ' + p.name, rest);
+      else if (a === 'give') dOpen('give', p.name, 0, 'Дал ещё: ' + p.name, 0);
+      else dOpen('take', p.name, 0, 'Взял ещё у: ' + p.name, 0);
+      return;
+    }
+    var sl = e.target.closest('[data-dsel]');
+    if (sl) { var kk = sl.getAttribute('data-dsel'); dSel = dSel === kk ? null : kk; renderDebt(); }
+  });
+  $('dForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var who = $('dWho').value.replace(/\s+/g, ' ').trim().slice(0, 30);
+    var amt = parseAmt($('dAmt').value);
+    var date = $('dDate').value;
+    if (!who) { toast('Укажите, кто это'); $('dWho').focus(); return; }
+    if (!(amt > 0) || amt > 1e9) { toast('Введите сумму больше нуля'); $('dAmt').focus(); return; }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) { toast('Укажите дату'); return; }
+    if (debt.items.length >= 1000) { toast('Слишком много записей о долгах'); return; }
+    var acc = accOn() && accById($('dAcc').value) ? $('dAcc').value : '';
+    debt.items.push({ id: 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), who: who, type: dMode, amount: r2(amt), date: date,
+      note: $('dNote').value.trim().slice(0, 60), acc: acc, ts: Date.now() });
+    var key = who.toLowerCase();
+    persistDebt();
+    dSel = key;
+    render();
+    closeOv();
+    toast(dMode === 'give' ? 'Записано: вы дали ' + money(r2(amt)) : 'Записано: вы взяли ' + money(r2(amt)));
+  });
+  function renderDebtTile() {
+    var T = debtTotals(), el = $('debtSub');
+    if (!debt.items.length) { el.textContent = 'Кто кому должен: дал или взял в долг'; return; }
+    var parts = [];
+    if (T.owed > 0) parts.push('вам должны ' + money(T.owed));
+    if (T.owe > 0) parts.push('вы должны ' + money(T.owe));
+    el.textContent = parts.length ? parts.join(' · ') : 'Все рассчитались';
+  }
 
   var quickClick;
   $('quick2').addEventListener('click', function (e) { quickClick(e); });
@@ -4730,6 +5161,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
     if (!b) return;
     if (b.getAttribute('data-open') === 'acc') { accEditId = null; renderAcc(); openOv('ovAcc'); return; }
     if (b.getAttribute('data-open') === 'cmp') { renderCmp(); openOv('ovCmp'); return; }
+    if (b.getAttribute('data-open') === 'debt') { dSel = null; renderDebt(); openOv('ovDebt'); return; }
     if (b.getAttribute('data-open') === 'lim') {
       renderLimSheet();
       openOv('ovLim');
@@ -4883,7 +5315,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
     var t0 = tmDay0(), nowKey = monthKey(t0);
     var mt = txs.filter(function (t) { return t.date.slice(0, 7) === nowKey; }), inc = 0, exp = 0, sv = 0;
     mt.forEach(function (t) { if (t.type === 'in') inc += t.amount; else if (t.type === 'out') exp += t.amount; else sv += t.amount; });
-    var B0 = r2(carryIn(nowKey) + inc - exp - sv - extOut());
+    var B0 = r2(carryIn(nowKey) + inc - exp - sv - extOut() + ((agg().mon[nowKey] || {}).debt || 0) - debtTotals().owe);
     var J0 = r2(agg().save);
     var real = txs.filter(function (t) { return !t.example; });
     var first = real.reduce(function (m, t) { return !m || t.date < m ? t.date : m; }, '');
@@ -4912,7 +5344,7 @@ html[data-hide] .limsum b { filter: blur(9px); }
         var dt = clampDate(y + Math.floor(m / 12), ((m % 12) + 12) % 12, it.day);
         var key = monthKey(dt), idx = Math.round((dt - t0) / 86400000);
         if (key < it.from || idx <= 0 || idx > TM_H) continue;
-        if (k === 0 && (it.done.indexOf(key) >= 0 || (it.ext && it.type === 'out'))) continue;
+        if (it.done.indexOf(key) >= 0 || (k === 0 && it.ext && it.type === 'out')) continue;
         if (it.type === 'in') ev[idx].inc += it.amount; else ev[idx].out += it.amount;
         ev[idx].list.push((it.type === 'in' ? '+' : '−') + money(it.amount) + ' ' + (it.note || it.cat));
       }
